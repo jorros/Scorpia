@@ -1,0 +1,108 @@
+using TMPro;
+using UnityEngine;
+using Scorpia.Assets.Scripts.Map;
+using Unity.Netcode;
+using System.Linq;
+using Scorpia.Assets.Scripts.Actors;
+using Scorpia.Assets.Scripts.World;
+
+namespace Scorpia.Assets.Scripts
+{
+    public class DevInfo : MonoBehaviour
+    {
+        public bool enable;
+
+        private TextMeshProUGUI text;
+        private MapRenderer map;
+        private MapTile selected;
+
+        void Awake()
+        {
+            text = GetComponent<TextMeshProUGUI>();
+        }
+
+        void Update()
+        {
+            if (map == null)
+            {
+                var mapRenderer = GameObject.FindGameObjectWithTag("Map");
+                map = mapRenderer?.GetComponent<MapRenderer>();
+
+                return;
+            }
+            if (enable)
+            {
+                text.SetText($"{Application.version}\n{GetTileInfo()}\n{GetSelectedTileInfo()}\n{GetNetworkDetails()}\n{GetPlayerNames()}");
+            }
+        }
+
+        private string GetTileInfo()
+        {
+            var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            var currentTile = map.GetTile(mousePos);
+
+            if (currentTile == null)
+            {
+                return "No tile";
+            }
+
+            var direction = string.Empty;
+            if(selected != null)
+            {
+                direction = $"D:{map.map.GetDirection(selected, currentTile)}";
+            }
+
+            return $"{PrintTileInfo(currentTile)} {direction}";
+        }
+
+        private string PrintTileInfo(MapTile tile)
+        {
+            var riverInfo = string.Empty;
+
+            if (tile.River != null)
+            {
+                riverInfo = $"River: {tile.River.From} / {tile.River.To}";
+            }
+
+            return $"{tile.Position} {tile.Biome} {tile.Feature} {riverInfo}";
+        }
+
+        private string GetSelectedTileInfo()
+        {
+            if (Input.GetMouseButton(0))
+            {
+                var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                selected = map.GetTile(mousePos);
+            }
+
+            if (selected == null)
+            {
+                return "Nothing selected";
+            }
+
+            return $"Selected {PrintTileInfo(selected)}";
+        }
+
+        private string GetNetworkDetails()
+        {
+            var spawnCount = NetworkManager.Singleton.SpawnManager.SpawnedObjectsList.Count;
+            var status = NetworkManager.Singleton.IsClient ? "Client" : "Server";
+            var time = new ScorpiaDate(Game.CurrentTick);
+
+            return $"NetObj:{spawnCount} Status:{status} Date:{time.ToString("D")}";
+        }
+
+        private string GetPlayerNames()
+        {
+            if(NetworkManager.Singleton.IsClient)
+            {
+                return string.Empty;
+            }
+
+            var clients = NetworkManager.Singleton.ConnectedClients;
+            var players = clients.Values.Select(x => x.PlayerObject?.GetComponent<Player>().PlayerName.Value);
+
+            return string.Join(",", players);
+        }
+    }
+}
