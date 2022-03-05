@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Scorpia.Assets.Scripts
 {
-    public class EventSystem : NetworkBehaviour
+    public class NotificationSystem : NetworkBehaviour
     {
         // Start is called before the first frame update
         void Start()
@@ -21,7 +21,7 @@ namespace Scorpia.Assets.Scripts
         }
 
         [ClientRpc]
-        public void SendClientRpc(Event @event, ClientRpcParams clientRpcParams = default)
+        public void SendClientRpc(Notification @event, ClientRpcParams clientRpcParams = default)
         {
             print($"{@event.Title}: {@event.Text}");
         }

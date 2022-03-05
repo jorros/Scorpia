@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Scorpia.Assets.Scripts
 {
-    public class Event : INetworkSerializable
+    public class Notification : INetworkSerializable
     {
         public string Title;
 
@@ -13,7 +13,7 @@ namespace Scorpia.Assets.Scripts
 
         public Vector2Int Position = new Vector2Int(-1, -1);
 
-        public Event(string title, string text, string icon)
+        public Notification(string title, string text, string icon)
         {
             Title = title;
             Text = text;
@@ -28,9 +28,9 @@ namespace Scorpia.Assets.Scripts
             serializer.SerializeValue(ref Icon);
         }
 
-        public static Event Format(Event @event, Vector2Int? target, params string[] args)
+        public static Notification Format(Notification @event, Vector2Int? target, params string[] args)
         {
-            var ret = new Event(@event.Title, string.Format(@event.Text, args), @event.Icon)
+            var ret = new Notification(@event.Title, string.Format(@event.Text, args), @event.Icon)
             {
                 Position = target ?? new Vector2Int(-1, -1)
             };
@@ -38,7 +38,7 @@ namespace Scorpia.Assets.Scripts
             return ret;
         }
 
-        public static Event Format(Event @event, params string[] args)
+        public static Notification Format(Notification @event, params string[] args)
         {
             return Format(@event, null, args);
         }

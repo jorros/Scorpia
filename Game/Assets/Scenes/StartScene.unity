@@ -1440,7 +1440,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nameInputObj: {fileID: 1684818137}
-  worldManagerPrefab: {fileID: 272371273876135381, guid: e25c9d0e887594ef1bdf1724f5bbb29a, type: 3}
 --- !u!114 &2074219256
 MonoBehaviour:
   m_ObjectHideFlags: 0

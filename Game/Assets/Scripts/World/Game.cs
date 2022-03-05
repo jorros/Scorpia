@@ -11,7 +11,7 @@ namespace Scorpia.Assets.Scripts.World
         public static GameObject WorldManagerObject { get; set; }
         public static MapRenderer MapRenderer => MapObject?.GetComponent<MapRenderer>();
         public static Map.Map Map => MapRenderer?.map;
-        public static EventSystem EventSystem => WorldManagerObject?.GetComponent<EventSystem>();
+        public static NotificationSystem NotificationSystem => WorldManagerObject?.GetComponent<NotificationSystem>();
 
         public static int CurrentTick
         {

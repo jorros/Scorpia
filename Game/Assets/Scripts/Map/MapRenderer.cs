@@ -40,24 +40,31 @@ namespace Scorpia.Assets.Scripts.Map
         private Counter river2Counter;
         private Counter river3Counter;
 
+        [SerializeField]
+        private Tile[] minimapTiles;
+
         private NetworkVariable<int> width = new NetworkVariable<int>();
         private NetworkVariable<int> height = new NetworkVariable<int>();
         private NetworkVariable<int> seed = new NetworkVariable<int>();
 
         private Tilemap groundLayer;
+        private Tilemap minimapLayer;
         private Tilemap riverLayer;
         private CameraMovement cam;
 
         [HideInInspector]
         public Map map;
 
+        public Vector3 mapSize;
+
         void Awake()
         {
             Game.MapObject = gameObject;
-            
+
             var tilemaps = GetComponentsInChildren<Tilemap>();
             groundLayer = tilemaps[0];
-            riverLayer = tilemaps[1];
+            minimapLayer = tilemaps[1];
+            riverLayer = tilemaps[2];
 
             var camObj = GameObject.FindGameObjectWithTag("MainCamera");
             cam = camObj.GetComponent<CameraMovement>();
@@ -101,19 +108,33 @@ namespace Scorpia.Assets.Scripts.Map
                 for (int x = 0; x < width.Value; x++)
                 {
                     var tile = map.GetTile(x, y);
-                    groundLayer.SetTile(new Vector3Int(x, y, 0), MapTile(tile));
+                    var pos = new Vector3Int(x, y, 0);
+                    groundLayer.SetTile(pos, MapTile(tile));
+
+                    var minimapTile = MapMinimapTile(tile);
+
+                    if (minimapTile != null)
+                    {
+                        minimapLayer.SetTile(pos, minimapTile);
+                    }
 
                     if (tile.River != null)
                     {
-                        riverLayer.SetTile(new Vector3Int(x, y, 0), MapRiver(tile));
+                        riverLayer.SetTile(pos, MapRiver(tile));
                     }
                 }
             }
 
-            cam.mapWidth = groundLayer.size.x * groundLayer.cellSize.x;
-            cam.mapHeight = groundLayer.size.y * groundLayer.cellSize.y;
+            mapSize = groundLayer.CellToWorld(new Vector3Int(groundLayer.size.x - 1, groundLayer.size.y - 1)) + (groundLayer.cellSize / 2);
 
-            print($"width: {groundLayer.size.y}; cell width: {groundLayer.cellSize.y}; cam width: {cam.mapHeight}");
+            var mapWidth = mapSize.x;
+            var mapHeight = mapSize.y;
+
+            var minimap = GameObject.FindObjectOfType<MinimapRenderer>();
+            minimap.GetComponent<MinimapRenderer>().Refresh();
+
+            cam.mapWidth = mapWidth;
+            cam.mapHeight = mapHeight;
         }
 
         private class Counter
@@ -284,6 +305,34 @@ namespace Scorpia.Assets.Scripts.Map
                 default:
                     return grassTile[grassCounter.Next()];
             }
+        }
+
+        private Tile MapMinimapTile(MapTile tile)
+        {
+            switch (tile.Biome)
+            {
+                case Biome.Water:
+                    return minimapTiles[0];
+
+                case Biome.Grass:
+                    if (tile.River != null)
+                    {
+                        return minimapTiles[3];
+                    }
+
+                    if (tile.Feature == TileFeature.Forest)
+                    {
+                        return minimapTiles[2];
+                    }
+                    break;
+
+                    // return minimapTiles[1];
+
+                case Biome.Mountain:
+                    return minimapTiles[4];
+            }
+
+            return null;
         }
     }
 }

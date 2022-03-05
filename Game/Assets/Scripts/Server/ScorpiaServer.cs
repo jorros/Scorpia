@@ -41,9 +41,9 @@ namespace Scorpia.Assets.Scripts.Server
             playerObjects[uid].Add(obj);
         }
 
-        public void SendEvent(Event @event, IReadOnlyList<ulong> clients = null)
+        public void SendNotification(Notification @event, IReadOnlyList<ulong> clients = null)
         {
-            Game.EventSystem.SendClientRpc(@event, new ClientRpcParams
+            Game.NotificationSystem.SendClientRpc(@event, new ClientRpcParams
             {
                 Send = new ClientRpcSendParams
                 {
