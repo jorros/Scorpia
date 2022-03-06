@@ -58,7 +58,7 @@ namespace Scorpia.Assets.Scripts.World
             {
                 var uid = ScorpiaServer.Singleton.FindUid(clientId);
 
-                ScorpiaServer.Singleton.SendNotification(Notification.Format(Events.PLAYER_DISCONNECTED, $"{clientId}"));
+                ScorpiaServer.Singleton.SendNotification(Notification.Format(Notifications.PLAYER_DISCONNECTED, $"{clientId}"));
 
                 print($"{uid} ({clientId}) disconnected");
             }

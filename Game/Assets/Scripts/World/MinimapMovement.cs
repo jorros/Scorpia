@@ -40,7 +40,7 @@ namespace Scorpia.Assets.Scripts.World
                     uiPos.x / uiSize.x * terrainSize.x,
                     uiPos.y / uiSize.y * terrainSize.y
                 );
-                camMovement.SetPosition(realPos);
+                EventManager.Trigger(EventManager.PanCamera, realPos);
             }
         }
 

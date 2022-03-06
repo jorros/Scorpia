@@ -20,6 +20,8 @@ namespace Scorpia.Assets.Scripts.World
 
         private Vector3? dragOrigin;
 
+        private bool isDragging;
+
         [SerializeField]
         private GameObject worldManagerPrefab;
 
@@ -35,11 +37,39 @@ namespace Scorpia.Assets.Scripts.World
             }
 
             raycaster = GameObject.Find("HUD").GetComponent<GraphicRaycaster>();
+
+            EventManager.Register(EventManager.PanCamera, SetPosition);
+            EventManager.Register(EventManager.ZoomInCamera, ZoomIn);
+            EventManager.Register(EventManager.ZoomOutCamera, ZoomOut);
+        }
+
+        void OnDestroy()
+        {
+            EventManager.Remove(EventManager.PanCamera, SetPosition);
+            EventManager.Remove(EventManager.ZoomInCamera, ZoomIn);
+            EventManager.Remove(EventManager.ZoomOutCamera, ZoomOut);
         }
 
         void Update()
         {
             PanCamera();
+            SelectTile();
+        }
+
+        private void SelectTile()
+        {
+            if (Input.GetMouseButtonUp(0) && !isDragging)
+            {
+                var mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+                Game.SelectedTile = Game.MapRenderer.GetTile(mousePos);
+                EventManager.Trigger(EventManager.SelectTile, Game.SelectedTile);
+            }
+
+            if(Input.GetMouseButtonUp(1) && Game.SelectedTile != null)
+            {
+                Game.SelectedTile = null;
+                EventManager.Trigger(EventManager.DeselectTile);
+            }
         }
 
         private void PanCamera()
@@ -65,28 +95,40 @@ namespace Scorpia.Assets.Scripts.World
             if (Input.GetMouseButton(0) && dragOrigin != null)
             {
                 var delta = dragOrigin.Value - cam.ScreenToWorldPoint(Input.mousePosition);
-                SetPosition(cam.transform.position + delta);
+
+                if (delta != Vector3.zero)
+                {
+                    isDragging = true;
+                }
+
+                cam.transform.position = ClampCamera(cam.transform.position + delta);
+            }
+
+            if (Input.GetMouseButtonUp(0) && isDragging)
+            {
+                isDragging = false;
             }
         }
 
-        public void ZoomIn()
+        public void ZoomIn(IReadOnlyList<object> args = null)
         {
             var newSize = cam.orthographicSize - zoomStep;
             cam.orthographicSize = Mathf.Clamp(newSize, minCamSize, maxCamSize);
 
-            SetPosition(cam.transform.position);
+            cam.transform.position = ClampCamera(cam.transform.position);
         }
 
-        public void ZoomOut()
+        public void ZoomOut(IReadOnlyList<object> args = null)
         {
             var newSize = cam.orthographicSize + zoomStep;
             cam.orthographicSize = Mathf.Clamp(newSize, minCamSize, maxCamSize);
 
-            SetPosition(cam.transform.position);
+            cam.transform.position = ClampCamera(cam.transform.position);
         }
 
-        public void SetPosition(Vector3 pos)
+        private void SetPosition(IReadOnlyList<object> args)
         {
+            var pos = (Vector3)args[0];
             cam.transform.position = ClampCamera(pos);
         }
 

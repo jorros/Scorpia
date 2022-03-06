@@ -8,8 +8,6 @@ namespace Scorpia.Assets.Scripts
 
         private const int START_YEAR = 3000;
 
-        private readonly string[] monthNames = { "Tishri", "Marẖeshvan", "Kislev", "Tevet", "Shvat", "Adar", "Nisan", "Iyyar", "Sivan", "Tammuz", "Av", "Elul" };
-
         public ScorpiaDate(int ticks = 0)
         {
             this.ticks = ticks;
@@ -39,11 +37,16 @@ namespace Scorpia.Assets.Scripts
             }
         }
 
+        public override string ToString()
+        {
+            return ToString(null);
+        }
+
         public string ToString(string format)
         {
             if (format == "D")
             {
-                return $"{Day} {monthNames[Month - 1]} {Year}";
+                return $"{Day} {Month} {Year}";
             }
             else if (format == "m")
             {
@@ -51,10 +54,10 @@ namespace Scorpia.Assets.Scripts
             }
             else if (format == "M")
             {
-                return $"{Day} {monthNames[Month - 1]}";
+                return $"{Day} {Month}";
             }
             
-            return $"{Day}-{Month}-{Year}";
+            return $"{Day.ToString("D2")}-{Month.ToString("D2")}-{Year}";
         }
     }
 }

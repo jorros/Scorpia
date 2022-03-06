@@ -1,3 +1,4 @@
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,9 +10,12 @@ namespace Scorpia.Assets.Scripts.World
 
         private float step = 0f;
 
+        private TextMeshProUGUI dateText;
+
         void Awake()
         {
             Game.TickerObject = gameObject;
+            dateText = GameObject.Find("DateText").GetComponent<TextMeshProUGUI>();
         }
 
         public override void OnNetworkSpawn()
@@ -43,6 +47,8 @@ namespace Scorpia.Assets.Scripts.World
 
         void Tick()
         {
+            dateText.SetText(new ScorpiaDate(currentTick.Value).ToString());
+            
             if (IsServer)
             {
             }

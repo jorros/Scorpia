@@ -32,7 +32,7 @@ namespace Scorpia.Assets.Scripts
             }
             if (enable)
             {
-                text.SetText($"{Application.version}\n{GetTileInfo()}\n{GetSelectedTileInfo()}\n{GetNetworkDetails()}\n{GetPlayerNames()}");
+                text.SetText($"{GetTileInfo()}\n{GetNetworkDetails()}\n{Application.version}");
             }
         }
 
@@ -87,9 +87,8 @@ namespace Scorpia.Assets.Scripts
         {
             var spawnCount = NetworkManager.Singleton.SpawnManager.SpawnedObjectsList.Count;
             var status = NetworkManager.Singleton.IsClient ? "Client" : "Server";
-            var time = new ScorpiaDate(Game.CurrentTick);
 
-            return $"NetObj:{spawnCount} Status:{status} Date:{time.ToString("D")}";
+            return $"Status:{status} Pool:{spawnCount}";
         }
 
         private string GetPlayerNames()
