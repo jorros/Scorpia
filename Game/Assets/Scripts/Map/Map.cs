@@ -33,6 +33,7 @@ namespace Scorpia.Assets.Scripts.Map
             {
                 new BiomeGenerator(),
                 new RiverGenerator(),
+                new FertilityGenerator(),
                 new ResourceGenerator()
             };
         }

@@ -34,6 +34,10 @@ namespace Scorpia.Assets.Scripts.Map.Render
             public Tile[] ForestClear;
 
             public Tile[] MountainForest;
+
+            public Tile[] Barren;
+
+            public Tile[] BarrenClear;
         }
 
         public BiomeRenderer(Tilemap layer, BiomeRendererTiles tiles)
@@ -51,9 +55,14 @@ namespace Scorpia.Assets.Scripts.Map.Render
             {
                 { Biome: Biome.Water, Feature: TileFeature.Wave } => tiles.Wave[counter.Next(0)],
                 { Biome: Biome.Water } => tiles.Water,
-                { Biome: Biome.Grass, Feature: TileFeature.Hill } => tiles.Hill[counter.Next(0)],
-                { Biome: Biome.Grass, Feature: TileFeature.Forest } => tiles.Forest[counter.Next(0)],
-                { Biome: Biome.Grass } => tiles.Grass[counter.Next(0)],
+                { Biome: Biome.Grass, Feature: TileFeature.Hill, Fertility: Fertility.Low } => tiles.Barren[counter.Next(0)],
+                { Biome: Biome.Grass, Feature: TileFeature.Hill, Fertility: Fertility.Normal } => tiles.Hill[counter.Next(0)],
+                { Biome: Biome.Grass, Feature: TileFeature.Hill } => tiles.Hill[counter.Next(10)],
+                { Biome: Biome.Grass, Feature: TileFeature.Forest, Fertility: Fertility.Low } => tiles.Forest[counter.Next(0)],
+                { Biome: Biome.Grass, Feature: TileFeature.Forest } => tiles.Forest[counter.Next(10)],
+                { Biome: Biome.Grass, Fertility: Fertility.Low } => tiles.Barren[counter.Next(0)],
+                { Biome: Biome.Grass, Fertility: Fertility.Normal } => tiles.Grass[counter.Next(0)],
+                { Biome: Biome.Grass } => tiles.Grass[counter.Next(10)],
                 { Biome: Biome.Mountain, Feature: TileFeature.Forest } => tiles.MountainForest[counter.Next(0)],
                 { Biome: Biome.Mountain } => tiles.Mountain[counter.Next(0)],
                 _ => tiles.Grass[counter.Next(0)]

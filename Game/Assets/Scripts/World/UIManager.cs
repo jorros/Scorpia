@@ -55,6 +55,7 @@ namespace Scorpia.Assets.Scripts.World
 
             AddBiomeIcon(mapTile);
             AddResourceIcon(mapTile);
+            AddFertilityIcon(mapTile);
         }
 
         private void AddInfoIcon(int icon)
@@ -94,6 +95,21 @@ namespace Scorpia.Assets.Scripts.World
                 Resource.Gold => 6,
                 Resource.Zellos => 9,
                 Resource.Nitra => 7,
+                _ => -1
+            };
+
+            if (i > -1)
+            {
+                AddInfoIcon(i);
+            }
+        }
+
+        private void AddFertilityIcon(MapTile tile)
+        {
+            var i = tile.Fertility switch
+            {
+                Fertility.Low => 4,
+                Fertility.High => 5,
                 _ => -1
             };
 
