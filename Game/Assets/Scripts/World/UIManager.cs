@@ -20,6 +20,8 @@ namespace Scorpia.Assets.Scripts.World
         [SerializeField]
         private GameObject infoIconPrefab;
 
+        private int infoCounter = 0;
+
         void Awake()
         {
             EventManager.Register(EventManager.SelectTile, SelectTile);
@@ -35,61 +37,74 @@ namespace Scorpia.Assets.Scripts.World
         private void SelectTile(IReadOnlyList<object> args)
         {
             var mapTile = args[0] as MapTile;
+            infoCounter = 0;
 
             if (infoInstance == null)
             {
-                infoInstance = GameObject.Instantiate(infoUI, transform);
+                infoInstance = Instantiate(infoUI, transform);
             }
 
-            var textObjs = infoInstance.GetComponentsInChildren<TextMeshProUGUI>();
-            textObjs.First(x => x.name == "TileName").SetText("Free");
+            var children = infoInstance.GetComponentsInChildren<TextMeshProUGUI>();
+            children.First(x => x.name == "TileName").SetText("Free");
 
-            SetInfoIcon(0, GetIconIndex(mapTile));
+            foreach (var icon in children.Where(x => x.name.StartsWith("InfoIcon")))
+            {
+                Destroy(icon.gameObject);
+            }
+
+            AddBiomeIcon(mapTile);
+            AddResourceIcon(mapTile);
         }
 
-        private void SetInfoIcon(int pos, int icon)
+        private void AddInfoIcon(int icon)
         {
-            var objName = $"InfoIcon{pos}";
-            var children = infoInstance.GetComponentsInChildren<Transform>();
-            var obj = children.FirstOrDefault(x => x.name == objName)?.gameObject;
-
-            if (obj == null)
-            {
-                obj = GameObject.Instantiate(infoIconPrefab, infoInstance.transform);
-                obj.name = objName;
-                obj.GetComponent<RectTransform>().localPosition = new Vector3(-604 + 179 * pos, 93.5f);
-            }
+            var obj = Instantiate(infoIconPrefab, infoInstance.transform);
+            obj.name = $"InfoIcon{infoCounter}";
+            obj.GetComponent<RectTransform>().localPosition = new Vector3(-604 + 179 * infoCounter, 93.5f);
 
             var img = obj.GetComponent<Image>();
             img.sprite = infoIcons[icon];
+
+            infoCounter++;
         }
 
-        private int GetIconIndex(MapTile tile)
+        private void AddBiomeIcon(MapTile tile)
         {
-            if (tile.Biome == Biome.Water)
+            var i = tile switch
             {
-                return 0;
-            }
-            if (tile.Biome == Biome.Grass)
-            {
-                if (tile.Feature == TileFeature.Forest)
-                {
-                    return 2;
-                }
+                { Biome: Biome.Water } => 0,
+                { Biome: Biome.Grass, Feature: TileFeature.Forest } => 2,
+                { Biome: Biome.Grass } => 1,
+                { Biome: Biome.Mountain } => 3,
+                _ => -1
+            };
 
-                return 1;
-            }
-            if (tile.Biome == Biome.Mountain)
+            if (i > -1)
             {
-                return 3;
+                AddInfoIcon(i);
             }
+        }
 
-            return 1;
+        private void AddResourceIcon(MapTile tile)
+        {
+            var i = tile.Resource switch
+            {
+                Resource.Sofrum => 8,
+                Resource.Gold => 6,
+                Resource.Zellos => 9,
+                Resource.Nitra => 7,
+                _ => -1
+            };
+
+            if (i > -1)
+            {
+                AddInfoIcon(i);
+            }
         }
 
         private void Deselect(IReadOnlyList<object> args)
         {
-            infoInstance.SetActive(false);
+            Destroy(infoInstance);
             infoInstance = null;
         }
     }

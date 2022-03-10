@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Scorpia.Assets.Scripts.Map.Generation;
 using Scorpia.Assets.Scripts.Utils;
 using UnityEngine;
 
@@ -10,22 +11,15 @@ namespace Scorpia.Assets.Scripts.Map
     {
         private MapTile[] tiles;
         private int seed, width, height;
+        private System.Random rnd;
+
+        private IReadOnlyList<IGenerator> generators;
 
         public int Seed => seed;
-
-        public float SCALE = 20;
-        public int OCTAVES = 5;
-        public float PERSISTENCE = 0.35f;
-        public float LACUNARITY = 5f;
-
-        private const int forestSpawnRate = 30;
-        private const int hillSpawnRate = 10;
-        private const int waveSpawnRate = 10;
-        private const int riverMinDistance = 20;
-        private const int riverMaxCount = 6;
-        private const int maxRiverBuildAttempts = 5;
-
-        private System.Random rnd;
+        public System.Random Rnd => rnd;
+        public int Width => width;
+        public int Height => height;
+        public IReadOnlyList<MapTile> Tiles => tiles;
 
         public Map(int width, int height, int seed)
         {
@@ -34,6 +28,13 @@ namespace Scorpia.Assets.Scripts.Map
             this.width = width;
             this.height = height;
             this.rnd = new System.Random(seed);
+
+            generators = new IGenerator[]
+            {
+                new BiomeGenerator(),
+                new RiverGenerator(),
+                new ResourceGenerator()
+            };
         }
 
         public MapTile GetTile(int x, int y)
@@ -49,6 +50,11 @@ namespace Scorpia.Assets.Scripts.Map
         public MapTile GetTile(int q, int r, int s)
         {
             return GetTile(q + (r - (r & 1)) / 2, r);
+        }
+
+        public void SetTile(int x, int y, MapTile tile)
+        {
+            tiles[y * width + x] = tile;
         }
 
         public bool HasNeighbour(MapTile start, Func<MapTile, bool> predicate, int range = 1)
@@ -164,88 +170,10 @@ namespace Scorpia.Assets.Scripts.Map
 
         public void Generate()
         {
-            var noiseMap = new NoiseMap(width, height);
-
-            noiseMap.Generate(seed, SCALE, OCTAVES, PERSISTENCE, LACUNARITY, new Vector2(0, 0));
-
-            for (int x = 0; x < width; x++)
+            foreach(var generator in generators)
             {
-                for (int y = 0; y < height; y++)
-                {
-                    var noise = noiseMap.GetPosition(x, y);
-
-                    var tile = new MapTile
-                    {
-                        Biome = MapBiome(noise),
-                        Position = new Vector2Int(x, y)
-                    };
-
-                    tile.Feature = MapFeature(tile.Biome);
-
-                    tiles[y * width + x] = tile;
-                }
+                generator.Generate(this);
             }
-
-            var rivers = new List<River>();
-            FindRiverSpawns(rivers);
-
-            foreach (var river in rivers)
-            {
-                river.Build();
-            }
-        }
-
-        private void FindRiverSpawns(List<River> rivers)
-        {
-            for (int i = 0; i < rnd.Next(0, riverMaxCount); i++)
-            {
-                for (int attempt = 0; attempt < maxRiverBuildAttempts; attempt++)
-                {
-                    var tile = GetRandomTile(tile => tile.Biome == Biome.Water || tile.Biome == Biome.Mountain);
-
-                    var hasNoRiverStartingNearby = !HasNeighbour(tile, tile => tile.River != null, riverMinDistance);
-                    var hasGrasslandNext = HasNeighbour(tile, tile => tile.Biome == Biome.Grass);
-
-                    if (hasNoRiverStartingNearby && hasGrasslandNext)
-                    {
-                        rivers.Add(new River(tile, this, rnd));
-                        continue;
-                    }
-                }
-            }
-        }
-
-        private TileFeature MapFeature(Biome biome)
-        {
-            if (biome != Biome.Water && rnd.Next(0, 100) <= forestSpawnRate)
-            {
-                return TileFeature.Forest;
-            }
-            else if (biome == Biome.Grass && rnd.Next(0, 100) <= hillSpawnRate)
-            {
-                return TileFeature.Hill;
-            }
-
-            if (biome == Biome.Water && rnd.Next(0, 100) <= waveSpawnRate)
-            {
-                return TileFeature.Wave;
-            }
-
-            return TileFeature.None;
-        }
-
-        private Biome MapBiome(float noise)
-        {
-            if (noise < 0.2)
-            {
-                return Biome.Water;
-            }
-            if (noise < 0.8)
-            {
-                return Biome.Grass;
-            }
-
-            return Biome.Mountain;
-        }
+        }       
     }
 }

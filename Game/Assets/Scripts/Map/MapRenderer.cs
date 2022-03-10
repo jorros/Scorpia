@@ -3,6 +3,8 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Scorpia.Assets.Scripts.World;
+using System.Collections.Generic;
+using Scorpia.Assets.Scripts.Map.Render;
 
 namespace Scorpia.Assets.Scripts.Map
 {
@@ -10,35 +12,27 @@ namespace Scorpia.Assets.Scripts.Map
     {
         [SerializeField]
         public Tile[] grassTile;
-        private Counter grassCounter;
 
         [SerializeField]
         public Tile waterTile;
 
         [SerializeField]
         public Tile[] waveTile;
-        private Counter waveCounter;
 
         [SerializeField]
         public Tile[] hillTile;
-        private Counter hillCounter;
 
         [SerializeField]
         public Tile[] mountainTile;
-        private Counter mountainCounter;
 
         [SerializeField]
         public Tile[] forestTile;
-        private Counter forestCounter;
 
         [SerializeField]
         public Tile[] mountainForestTile;
-        private Counter mountainForestCounter;
 
         [SerializeField]
         public Tile[] riverTile;
-        private Counter river2Counter;
-        private Counter river3Counter;
 
         [SerializeField]
         private Tile[] minimapTiles;
@@ -55,6 +49,7 @@ namespace Scorpia.Assets.Scripts.Map
         [HideInInspector]
         public Map map;
 
+        [HideInInspector]
         public Vector3 mapSize;
 
         void Awake()
@@ -94,14 +89,12 @@ namespace Scorpia.Assets.Scripts.Map
         {
             map.Generate();
 
-            grassCounter = new Counter(grassTile.Length);
-            waveCounter = new Counter(waveTile.Length);
-            hillCounter = new Counter(hillTile.Length);
-            mountainCounter = new Counter(mountainTile.Length);
-            forestCounter = new Counter(forestTile.Length);
-            mountainForestCounter = new Counter(mountainForestTile.Length);
-            river2Counter = new Counter(2);
-            river3Counter = new Counter(3);
+            var renderers = new ITileRenderer[]
+            {
+                new BiomeRenderer(groundLayer, grassTile, waterTile, waveTile, hillTile, mountainTile, forestTile, mountainForestTile),
+                new RiverTileRenderer(riverLayer, riverTile),
+                new MinimapTileRenderer(minimapLayer, minimapTiles)
+            };
 
             for (int y = 0; y < height.Value; y++)
             {
@@ -109,18 +102,10 @@ namespace Scorpia.Assets.Scripts.Map
                 {
                     var tile = map.GetTile(x, y);
                     var pos = new Vector3Int(x, y, 0);
-                    groundLayer.SetTile(pos, MapTile(tile));
 
-                    var minimapTile = MapMinimapTile(tile);
-
-                    if (minimapTile != null)
+                    foreach(var renderer in renderers)
                     {
-                        minimapLayer.SetTile(pos, minimapTile);
-                    }
-
-                    if (tile.River != null)
-                    {
-                        riverLayer.SetTile(pos, MapRiver(tile));
+                        renderer.Layer.SetTile(pos, renderer.GetTile(tile));
                     }
                 }
             }
@@ -135,204 +120,6 @@ namespace Scorpia.Assets.Scripts.Map
 
             cam.mapWidth = mapWidth;
             cam.mapHeight = mapHeight;
-        }
-
-        private class Counter
-        {
-            private readonly int max;
-            private int current = 0;
-
-            public Counter(int max)
-            {
-                this.max = max;
-            }
-
-            public int Next()
-            {
-                if (current < max)
-                {
-                    return current++;
-                }
-
-                current = 0;
-                return current;
-            }
-        }
-
-        private Tile MapRiver(MapTile tile)
-        {
-            var river = tile.River;
-            if (river.IsDirection(Direction.East, null))
-            {
-                // 0, 1
-                return riverTile[0 + river2Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthEast, null))
-            {
-                // 2, 3, 4
-                return riverTile[2 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthWest, null))
-            {
-                // 5, 6, 7
-                return riverTile[5 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.SouthEast, null))
-            {
-                // 8, 9, 10
-                return riverTile[8 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.SouthWest, null))
-            {
-                // 11, 12, 13
-                return riverTile[11 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.West, null))
-            {
-                // 14, 15
-                return riverTile[14 + river2Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.East, Direction.SouthEast))
-            {
-                // 16, 17
-                return riverTile[16 + river2Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.East, Direction.SouthWest))
-            {
-                // 18, 19
-                return riverTile[18 + river2Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.East, Direction.West))
-            {
-                // 20, 21, 22
-                return riverTile[20 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthEast, Direction.East))
-            {
-                // 23, 24, 25
-                return riverTile[23 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthEast, Direction.SouthEast))
-            {
-                // 26, 27, 28
-                return riverTile[26 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthEast, Direction.SouthWest))
-            {
-                // 29, 30, 31
-                return riverTile[29 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthEast, Direction.West))
-            {
-                // 32, 33, 34
-                return riverTile[32 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthWest, Direction.East))
-            {
-                // 35, 36, 37
-                return riverTile[35 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthWest, Direction.NorthEast))
-            {
-                // 38, 39
-                return riverTile[38 + river2Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthWest, Direction.SouthEast))
-            {
-                // 40, 41, 42
-                return riverTile[40 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthWest, Direction.SouthWest))
-            {
-                // 43, 44, 45
-                return riverTile[43 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.NorthWest, Direction.West))
-            {
-                // 46, 47, 48
-                return riverTile[46 + river3Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.SouthEast, Direction.SouthWest))
-            {
-                // 49, 50
-                return riverTile[49 + river2Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.SouthEast, Direction.West))
-            {
-                // 51, 52
-                return riverTile[51 + river2Counter.Next()];
-            }
-            else if (river.IsDirection(Direction.SouthWest, Direction.West))
-            {
-                // 53, 54
-                return riverTile[53 + river2Counter.Next()];
-            }
-
-            return riverTile[0];
-        }
-
-        private Tile MapTile(MapTile tile)
-        {
-            switch (tile.Biome)
-            {
-                case Biome.Water:
-                    if (tile.Feature == TileFeature.Wave)
-                    {
-                        return waveTile[waveCounter.Next()];
-                    }
-
-                    return waterTile;
-
-                case Biome.Grass:
-                    if (tile.Feature == TileFeature.Hill)
-                    {
-                        return hillTile[hillCounter.Next()];
-                    }
-                    if (tile.Feature == TileFeature.Forest)
-                    {
-                        return forestTile[forestCounter.Next()];
-                    }
-
-                    return grassTile[grassCounter.Next()];
-
-                case Biome.Mountain:
-                    if (tile.Feature == TileFeature.Forest)
-                    {
-                        return mountainForestTile[mountainForestCounter.Next()];
-                    }
-                    return mountainTile[mountainCounter.Next()];
-
-                default:
-                    return grassTile[grassCounter.Next()];
-            }
-        }
-
-        private Tile MapMinimapTile(MapTile tile)
-        {
-            switch (tile.Biome)
-            {
-                case Biome.Water:
-                    return minimapTiles[0];
-
-                case Biome.Grass:
-                    if (tile.River != null)
-                    {
-                        return minimapTiles[3];
-                    }
-
-                    if (tile.Feature == TileFeature.Forest)
-                    {
-                        return minimapTiles[2];
-                    }
-                    break;
-
-                    // return minimapTiles[1];
-
-                case Biome.Mountain:
-                    return minimapTiles[4];
-            }
-
-            return null;
         }
     }
 }

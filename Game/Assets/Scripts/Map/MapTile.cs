@@ -9,7 +9,11 @@ namespace Scorpia.Assets.Scripts.Map
 
         public TileFeature Feature { get; set; } = TileFeature.None;
 
-        public RiverTile River { get; set; }
+        public River River { get; set; }
+
+        public Fertility Fertility { get; set; }
+
+        public Resource Resource { get; set; }
 
         public Vector2Int Position { get; set; }
 

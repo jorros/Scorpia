@@ -34,10 +34,10 @@ namespace Scorpia.Assets.Scripts.ConsoleCommands
             var persistence = float.Parse(tokens[2]);
             var lacunarity = float.Parse(tokens[3]);
 
-            behaviour.map.SCALE = scale;
-            behaviour.map.OCTAVES = octaves;
-            behaviour.map.PERSISTENCE = persistence;
-            behaviour.map.LACUNARITY = lacunarity;
+            //behaviour.map.SCALE = scale;
+            //behaviour.map.OCTAVES = octaves;
+            //behaviour.map.PERSISTENCE = persistence;
+            //behaviour.map.LACUNARITY = lacunarity;
 
             behaviour.Refresh();
 
