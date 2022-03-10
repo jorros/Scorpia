@@ -1,4 +1,4 @@
-﻿namespace Scorpia.Assets.Scripts.Map.Render
+﻿namespace Scorpia.Assets.Scripts.Utils
 {
 	public class RandomIndex
 	{
@@ -14,7 +14,7 @@
         {
             if (current < max)
             {
-                return current++;
+                return from + current++;
             }
 
             current = 0;
