@@ -14,7 +14,8 @@ namespace Scorpia.Assets.Scripts
         public static string ZoomInCamera => "ZoomInCamera";
         public static string SelectTile => "SelectTile";
         public static string DeselectTile => "DeselectTile";
-
+        public static string ReceiveNotification => "ReceiveNotification";
+        public static string RemoveNotification => "RemoveNotification";
 
         private static EventManager instance
         {

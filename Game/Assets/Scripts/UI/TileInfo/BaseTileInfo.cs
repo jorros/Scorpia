@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Scorpia.Assets.Scripts.Map;
 using TMPro;
 using UnityEngine;

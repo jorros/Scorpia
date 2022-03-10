@@ -2756,7 +2756,10 @@ MonoBehaviour:
   - {fileID: -1398446902, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
   - {fileID: 434109490, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
   - {fileID: -2036970951, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  notificationIcons:
+  - {fileID: -144694462, guid: 71ae1ebd73c674e5aac72a9c73f970f9, type: 3}
   infoIconPrefab: {fileID: 8896980302620663982, guid: f708edf9f07694bd88c3e43b3c688c90, type: 3}
+  notificationPrefab: {fileID: 1992443054943534186, guid: 488f1e1fc7b5544f4933e750fa56598c, type: 3}
 --- !u!1 &2097790681
 GameObject:
   m_ObjectHideFlags: 0

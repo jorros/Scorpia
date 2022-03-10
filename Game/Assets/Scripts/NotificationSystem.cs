@@ -21,9 +21,9 @@ namespace Scorpia.Assets.Scripts
         }
 
         [ClientRpc]
-        public void SendClientRpc(Notification @event, ClientRpcParams clientRpcParams = default)
+        public void SendClientRpc(Notification notification, ClientRpcParams clientRpcParams = default)
         {
-            print($"{@event.Title}: {@event.Text}");
+            EventManager.Trigger(EventManager.ReceiveNotification, notification);
         }
     }
 }

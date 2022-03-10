@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,12 +10,15 @@ namespace Scorpia.Assets.Scripts
 
         public string Text;
 
-        public string Icon;
+        public int Icon;
+
+        public string Id;
 
         public Vector2Int Position = new Vector2Int(-1, -1);
 
-        public Notification(string title, string text, string icon)
+        public Notification(string title, string text, int icon)
         {
+            Id = Guid.NewGuid().ToString();
             Title = title;
             Text = text;
             Icon = icon;
