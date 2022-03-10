@@ -1,0 +1,19 @@
+#
+# Sprite sheet data for Unity.
+#
+# To import these sprites into your Unity project, download "TexturePackerImporter":
+# https://www.codeandweb.com/texturepacker/unity
+#
+# $TexturePacker:SmartUpdate:09bb2a40bee24e7a81e3ccff047b2056:b7d5693670ad46b80fe1247a12a2fda7:547ba9a4660a833113c44c283adb2d09$
+#
+:format=40300
+:texture=overlays_flair.png
+:size=1024x256
+:pivotpoints=enabled
+:borders=disabled
+:alphahandling=ClearTransparentPixels
+
+flair_gold;0;46;210;210; 0.5;0.5; 0;0;0;0
+flair_nitra;210;46;210;210; 0.5;0.5; 0;0;0;0
+flair_sofrum;420;46;210;210; 0.5;0.5; 0;0;0;0
+flair_zellos;630;46;210;210; 0.5;0.5; 0;0;0;0

@@ -37,6 +37,9 @@ namespace Scorpia.Assets.Scripts.Map
         [SerializeField]
         private Tile[] minimapTiles;
 
+        [SerializeField]
+        private Tile[] flairTiles;
+
         private NetworkVariable<int> width = new NetworkVariable<int>();
         private NetworkVariable<int> height = new NetworkVariable<int>();
         private NetworkVariable<int> seed = new NetworkVariable<int>();
@@ -44,6 +47,7 @@ namespace Scorpia.Assets.Scripts.Map
         private Tilemap groundLayer;
         private Tilemap minimapLayer;
         private Tilemap riverLayer;
+        private Tilemap flairLayer;
         private CameraMovement cam;
 
         [HideInInspector]
@@ -60,6 +64,7 @@ namespace Scorpia.Assets.Scripts.Map
             groundLayer = tilemaps[0];
             minimapLayer = tilemaps[1];
             riverLayer = tilemaps[2];
+            flairLayer = tilemaps[3];
 
             var camObj = GameObject.FindGameObjectWithTag("MainCamera");
             cam = camObj.GetComponent<CameraMovement>();
@@ -93,7 +98,8 @@ namespace Scorpia.Assets.Scripts.Map
             {
                 new BiomeRenderer(groundLayer, grassTile, waterTile, waveTile, hillTile, mountainTile, forestTile, mountainForestTile),
                 new RiverTileRenderer(riverLayer, riverTile),
-                new MinimapTileRenderer(minimapLayer, minimapTiles)
+                new MinimapTileRenderer(minimapLayer, minimapTiles),
+                new FlairTileRenderer(flairLayer, flairTiles)
             };
 
             for (int y = 0; y < height.Value; y++)

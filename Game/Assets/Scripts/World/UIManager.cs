@@ -44,10 +44,11 @@ namespace Scorpia.Assets.Scripts.World
                 infoInstance = Instantiate(infoUI, transform);
             }
 
-            var children = infoInstance.GetComponentsInChildren<TextMeshProUGUI>();
-            children.First(x => x.name == "TileName").SetText("Free");
+            var textComponents = infoInstance.GetComponentsInChildren<TextMeshProUGUI>();
+            textComponents.First(x => x.name == "TileName").SetText("Free");
 
-            foreach (var icon in children.Where(x => x.name.StartsWith("InfoIcon")))
+            var imageComponents = infoInstance.GetComponentsInChildren<Image>();
+            foreach (var icon in imageComponents.Where(x => x.name.StartsWith("InfoIcon")))
             {
                 Destroy(icon.gameObject);
             }
