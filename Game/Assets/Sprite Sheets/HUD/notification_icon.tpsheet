@@ -1,0 +1,16 @@
+#
+# Sprite sheet data for Unity.
+#
+# To import these sprites into your Unity project, download "TexturePackerImporter":
+# https://www.codeandweb.com/texturepacker/unity
+#
+# $TexturePacker:SmartUpdate:30974f850765f5b732f95bb0e982aa82:2f9546bd63fc8edb923620d3c3c161c4:da0f7e043bd03be20d8fe09751de6c8c$
+#
+:format=40300
+:texture=notification_icon.png
+:size=64x128
+:pivotpoints=enabled
+:borders=disabled
+:alphahandling=ClearTransparentPixels
+
+notification_player_disconnected;1;63;45;64; 0.5;0.5078125; 0;0;0;0; 4;45;0;0;0;0;64;45;64; 2;1;2;3;0;1;3

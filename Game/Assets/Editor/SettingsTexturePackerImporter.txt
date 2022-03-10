@@ -1,11 +1,20 @@
 version: 2
 tpsheetFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites.tpsheet
+- Assets/Sprite Sheets/HUD/info_icon.tpsheet
+- Assets/Sprite Sheets/HUD/notification_icon.tpsheet
 - Assets/Sprite Sheets/overlays_flair.tpsheet
+- Assets/Sprite Sheets/tiles_minimap.tpsheet
 textureFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites.png
+- Assets/Sprite Sheets/HUD/info_icon.png
+- Assets/Sprite Sheets/HUD/notification_icon.png
 - Assets/Sprite Sheets/overlays_flair.png
+- Assets/Sprite Sheets/tiles_minimap.png
 normalmapFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites_n.png
+- 
+- 
+- 
 - 
 enableDebugOutput: 0

@@ -2131,7 +2131,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 1
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 97d6da2b45b9448aaa638893867575b5, type: 2}
   m_TargetDisplay: 0
@@ -2167,7 +2167,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1709467267}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aaf96c48018f34409abfa7cae2ca9cfe, type: 3}
+  m_Script: {fileID: 11500000, guid: b3aee0bc010e14b2ba16833f9c2be8f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cameraBoxMaterial: {fileID: 2100000, guid: 192a6b5bf96bc45f2a1b7eabdd9f6a0a, type: 2}
@@ -2738,24 +2738,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 2056911793}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8bb6f387cf9d4f48a2995a30033944d, type: 3}
+  m_Script: {fileID: 11500000, guid: 3277ead0d58be467eb3676235d41409a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   infoUI: {fileID: 6027799713287416568, guid: 9ae0ef88f61504772b4672a88ed9b999, type: 3}
   infoIcons:
-  - {fileID: 21300000, guid: 66718c3da323f40f59b0ea3c27a3225d, type: 3}
-  - {fileID: 21300000, guid: 7152acae44553441f89af9e9ea6e9a4d, type: 3}
-  - {fileID: 21300000, guid: cc0d2de288fb14adbaf86baafd04f754, type: 3}
-  - {fileID: 21300000, guid: f0bfb7c2ab92c4a08b67f77c83bbe017, type: 3}
-  - {fileID: 21300000, guid: e8ced782ed32c494fb7d5b3bb566feb4, type: 3}
-  - {fileID: 21300000, guid: dec56012356fc4996a956b3a0f010db4, type: 3}
-  - {fileID: 21300000, guid: 8181e46c00f0b48fb8fb61e15eef6ef4, type: 3}
-  - {fileID: 21300000, guid: 4e6a9ac7143b040379d937b7ca9c28b9, type: 3}
-  - {fileID: 21300000, guid: 5bcc9c47fe5314cf5965894c45b4ec6e, type: 3}
-  - {fileID: 21300000, guid: e2c045f3aa51544e681a0f51a4ab25bd, type: 3}
-  - {fileID: 21300000, guid: cd897d26769af4e558437a3e08681c9d, type: 3}
-  - {fileID: 21300000, guid: c70dc577efc9b4b208769185267e6ba3, type: 3}
-  - {fileID: 21300000, guid: c769be3aab6744cb9bb7faec6d18f118, type: 3}
+  - {fileID: 1040569122, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: 502517100, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: 125438436, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: 1450528037, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: -1915400742, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: 1180362116, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: -561413284, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: -2073048040, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: -1134766086, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: 678438132, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: -1398446902, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: 434109490, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
+  - {fileID: -2036970951, guid: b7e635a39ef82447e86cbb721cc5803a, type: 3}
   infoIconPrefab: {fileID: 8896980302620663982, guid: f708edf9f07694bd88c3e43b3c688c90, type: 3}
 --- !u!1 &2097790681
 GameObject:

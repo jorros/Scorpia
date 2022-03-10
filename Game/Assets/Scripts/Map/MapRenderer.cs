@@ -4,6 +4,7 @@ using UnityEngine.Tilemaps;
 using Scorpia.Assets.Scripts.World;
 using Scorpia.Assets.Scripts.Map.Render;
 using static Scorpia.Assets.Scripts.Map.Render.BiomeRenderer;
+using Scorpia.Assets.Scripts.UI;
 
 namespace Scorpia.Assets.Scripts.Map
 {

@@ -1,7 +1,7 @@
-using System;
+using Scorpia.Assets.Scripts.World;
 using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.World
+namespace Scorpia.Assets.Scripts.UI
 {
     public class MinimapRenderer : MonoBehaviour
     {
