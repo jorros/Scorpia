@@ -8,38 +8,40 @@ namespace Scorpia.Assets.Scripts.Map.Render
     public class BiomeRenderer : ITileRenderer
     {
         private readonly Tilemap layer;
-        private readonly IReadOnlyList<Tile> grass;
-        private readonly Tile water;
-        private readonly IReadOnlyList<Tile> wave;
-        private readonly IReadOnlyList<Tile> hill;
-        private readonly IReadOnlyList<Tile> mountain;
-        private readonly IReadOnlyList<Tile> forest;
-        private readonly IReadOnlyList<Tile> mountainForest;
+        private readonly BiomeRendererTiles tiles;
 
-        private readonly RandomIndex grassCounter;
-        private readonly RandomIndex waveCounter;
-        private readonly RandomIndex hillCounter;
-        private readonly RandomIndex mountainCounter;
-        private readonly RandomIndex forestCounter;
-        private readonly RandomIndex mountainForestCounter;
+        private readonly RandomIndex counter;
 
-        public BiomeRenderer(Tilemap layer, IReadOnlyList<Tile> grass, Tile water, IReadOnlyList<Tile> wave, IReadOnlyList<Tile> hill, IReadOnlyList<Tile> mountain, IReadOnlyList<Tile> forest, IReadOnlyList<Tile> mountainForest)
+        [Serializable]
+        public class BiomeRendererTiles
+        {
+            public Tile[] Grass;
+
+            public Tile[] GrassClear;
+
+            public Tile Water;
+
+            public Tile[] Wave;
+
+            public Tile[] Hill;
+
+            public Tile[] HillClear;
+
+            public Tile[] Mountain;
+
+            public Tile[] Forest;
+
+            public Tile[] ForestClear;
+
+            public Tile[] MountainForest;
+        }
+
+        public BiomeRenderer(Tilemap layer, BiomeRendererTiles tiles)
         {
             this.layer = layer;
-            this.grass = grass;
-            this.water = water;
-            this.wave = wave;
-            this.hill = hill;
-            this.mountain = mountain;
-            this.forest = forest;
-            this.mountainForest = mountainForest;
+            this.tiles = tiles;
 
-            grassCounter = new RandomIndex(grass.Count);
-            waveCounter = new RandomIndex(wave.Count);
-            hillCounter = new RandomIndex(hill.Count);
-            mountainCounter = new RandomIndex(mountain.Count);
-            forestCounter = new RandomIndex(forest.Count);
-            mountainForestCounter = new RandomIndex(mountainForest.Count);
+            counter = new RandomIndex(10);
         }
 
         public Tilemap Layer => layer;
@@ -47,14 +49,14 @@ namespace Scorpia.Assets.Scripts.Map.Render
         public Tile GetTile(MapTile tile) =>
             tile switch
             {
-                { Biome: Biome.Water, Feature: TileFeature.Wave } => wave[waveCounter.Next(0)],
-                { Biome: Biome.Water } => water,
-                { Biome: Biome.Grass, Feature: TileFeature.Hill } => hill[hillCounter.Next(0)],
-                { Biome: Biome.Grass, Feature: TileFeature.Forest } => forest[forestCounter.Next(0)],
-                { Biome: Biome.Grass } => grass[grassCounter.Next(0)],
-                { Biome: Biome.Mountain, Feature: TileFeature.Forest } => mountainForest[mountainForestCounter.Next(0)],
-                { Biome: Biome.Mountain } => mountain[mountainCounter.Next(0)],
-                _ => grass[grassCounter.Next(0)]
+                { Biome: Biome.Water, Feature: TileFeature.Wave } => tiles.Wave[counter.Next(0)],
+                { Biome: Biome.Water } => tiles.Water,
+                { Biome: Biome.Grass, Feature: TileFeature.Hill } => tiles.Hill[counter.Next(0)],
+                { Biome: Biome.Grass, Feature: TileFeature.Forest } => tiles.Forest[counter.Next(0)],
+                { Biome: Biome.Grass } => tiles.Grass[counter.Next(0)],
+                { Biome: Biome.Mountain, Feature: TileFeature.Forest } => tiles.MountainForest[counter.Next(0)],
+                { Biome: Biome.Mountain } => tiles.Mountain[counter.Next(0)],
+                _ => tiles.Grass[counter.Next(0)]
             };
     }
 }

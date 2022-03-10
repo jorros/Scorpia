@@ -1,36 +1,14 @@
-using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Scorpia.Assets.Scripts.World;
-using System.Collections.Generic;
 using Scorpia.Assets.Scripts.Map.Render;
+using static Scorpia.Assets.Scripts.Map.Render.BiomeRenderer;
 
 namespace Scorpia.Assets.Scripts.Map
 {
     public class MapRenderer : NetworkBehaviour
     {
-        [SerializeField]
-        public Tile[] grassTile;
-
-        [SerializeField]
-        public Tile waterTile;
-
-        [SerializeField]
-        public Tile[] waveTile;
-
-        [SerializeField]
-        public Tile[] hillTile;
-
-        [SerializeField]
-        public Tile[] mountainTile;
-
-        [SerializeField]
-        public Tile[] forestTile;
-
-        [SerializeField]
-        public Tile[] mountainForestTile;
-
         [SerializeField]
         public Tile[] riverTile;
 
@@ -39,6 +17,9 @@ namespace Scorpia.Assets.Scripts.Map
 
         [SerializeField]
         private Tile[] flairTiles;
+
+        [SerializeField]
+        private BiomeRendererTiles biomeTiles;
 
         private NetworkVariable<int> width = new NetworkVariable<int>();
         private NetworkVariable<int> height = new NetworkVariable<int>();
@@ -96,7 +77,7 @@ namespace Scorpia.Assets.Scripts.Map
 
             var renderers = new ITileRenderer[]
             {
-                new BiomeRenderer(groundLayer, grassTile, waterTile, waveTile, hillTile, mountainTile, forestTile, mountainForestTile),
+                new BiomeRenderer(groundLayer, biomeTiles),
                 new RiverTileRenderer(riverLayer, riverTile),
                 new MinimapTileRenderer(minimapLayer, minimapTiles),
                 new FlairTileRenderer(flairLayer, flairTiles)
