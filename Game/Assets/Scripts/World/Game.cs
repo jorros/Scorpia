@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Scorpia.Assets.Scripts.Map;
 using UnityEngine;
 
@@ -20,6 +19,22 @@ namespace Scorpia.Assets.Scripts.World
             get
             {
                 return TickerObject?.GetComponent<Ticker>()?.currentTick?.Value ?? default(int);
+            }
+        }
+
+        private static string version;
+
+        public static string Version
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(version))
+                {
+                    var request = Resources.Load<VersionScriptableObject>("Build");
+                    version = request.BuildNumber;
+                }
+
+                return version;
             }
         }
     }

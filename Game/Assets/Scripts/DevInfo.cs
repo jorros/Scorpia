@@ -32,7 +32,7 @@ namespace Scorpia.Assets.Scripts
             }
             if (enable)
             {
-                text.SetText($"{GetTileInfo()}\n{GetNetworkDetails()}\n{Application.version}");
+                text.SetText($"{GetTileInfo()}\n{GetNetworkDetails()}\n{Game.Version}");
             }
         }
 
