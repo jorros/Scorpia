@@ -12,8 +12,6 @@ namespace Scorpia.Assets.Scripts.World
         public static Map.Map Map => MapRenderer?.map;
         public static NotificationSystem NotificationSystem => WorldManagerObject?.GetComponent<NotificationSystem>();
 
-        public static MapTile SelectedTile { get; set; }
-
         public static int CurrentTick
         {
             get

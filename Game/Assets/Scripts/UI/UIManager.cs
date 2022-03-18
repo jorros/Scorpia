@@ -17,7 +17,7 @@ namespace Scorpia.Assets.Scripts.UI
         private Sprite[] notificationIcons;
 
         [SerializeField]
-        private GameObject infoIconPrefab;
+        private Sprite[] fieldAvatarIcons;
 
         [SerializeField]
         private GameObject notificationPrefab;
@@ -52,7 +52,7 @@ namespace Scorpia.Assets.Scripts.UI
                 tileInfo.Close();
             }
 
-            tileInfo = new EmptyTileInfo(infoUI, gameObject, infoIconPrefab, infoIcons);
+            tileInfo = new EmptyTileInfo(infoUI, gameObject, infoIcons, fieldAvatarIcons);
             tileInfo.Open(mapTile);
         }
 

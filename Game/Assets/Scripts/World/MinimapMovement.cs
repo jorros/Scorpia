@@ -1,27 +1,26 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Scorpia.Assets.Scripts.World
 {
-    public class MinimapMovement : MonoBehaviour,  IPointerDownHandler, IPointerUpHandler
+    public class MinimapMovement : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
-        private Vector2 uiSize;
-
-        private Vector3 minimapPos;
-
         private Vector2 lastPointerPosition;
         private bool dragging = false;
 
-        private CameraMovement camMovement;
+        private RectTransform rect;
+        private Canvas canvas;
 
-        private void Start()
+        [SerializeField]
+        private Vector2 referenceScreenSize;
+
+        void Start()
         {
-            var rect = GetComponent<RectTransform>();
-            uiSize = rect.sizeDelta;
-            minimapPos = Camera.main.WorldToScreenPoint(rect.position);
-            lastPointerPosition = Input.mousePosition;
+            rect = GetComponent<RectTransform>();
+            canvas = FindObjectOfType<Canvas>();
 
-            camMovement = Camera.main.GetComponent<CameraMovement>();
+            lastPointerPosition = Input.mousePosition;
         }
 
         void Update()
@@ -33,10 +32,16 @@ namespace Scorpia.Assets.Scripts.World
 
             if (delta.magnitude > Mathf.Epsilon)
             {
+                var scaleFactor = canvas.renderingDisplaySize.x / referenceScreenSize.x;
+                var uiSize = rect.sizeDelta * scaleFactor;
+
+                var minimapPos = Camera.main.WorldToScreenPoint(rect.position);
+
                 var terrainSize = Game.MapRenderer.mapSize;
 
-                Vector3 uiPos = Input.mousePosition - minimapPos;
-                Vector3 realPos = new Vector3(
+                var uiPos = Input.mousePosition - minimapPos;
+
+                var realPos = new Vector3(
                     uiPos.x / uiSize.x * terrainSize.x,
                     uiPos.y / uiSize.y * terrainSize.y
                 );

@@ -11,17 +11,17 @@ namespace Scorpia.Assets.Scripts.UI.TileInfo
         protected GameObject instance;
         private GameObject prefab;
         private GameObject parent;
-        private GameObject iconPrefab;
         private Sprite[] icons;
+        private Sprite[] avatars;
 
         private int infoCounter = 0;
 
-        public BaseTileInfo(GameObject prefab, GameObject parent, GameObject iconPrefab, Sprite[] icons)
+        public BaseTileInfo(GameObject prefab, GameObject parent, Sprite[] icons, Sprite[] avatars)
         {
             this.prefab = prefab;
             this.parent = parent;
-            this.iconPrefab = iconPrefab;
             this.icons = icons;
+            this.avatars = avatars;
         }
 
         protected abstract string GetName(MapTile mapTile);
@@ -40,25 +40,25 @@ namespace Scorpia.Assets.Scripts.UI.TileInfo
             var textComponents = instance.GetComponentsInChildren<TextMeshProUGUI>();
             textComponents.First(x => x.name == "TileName").SetText(GetName(mapTile));
 
-            var imageComponents = instance.GetComponentsInChildren<Image>();
-            foreach (var icon in imageComponents.Where(x => x.name.StartsWith("InfoIcon")))
-            {
-                GameObject.Destroy(icon.gameObject);
-            }
-
             Render(mapTile);
         }
 
         protected void AddInfoIcon(int icon)
         {
-            var obj = GameObject.Instantiate(iconPrefab, instance.transform);
-            obj.name = $"InfoIcon{infoCounter}";
-            obj.GetComponent<RectTransform>().localPosition = new Vector3(-604 + 179 * infoCounter, 93.5f);
+            var imgs = instance.GetComponentsInChildren<Image>();
+            var img = imgs.First(x => x.name == $"InfoIcon{infoCounter}");
 
-            var img = obj.GetComponent<Image>();
             img.sprite = icons[icon];
 
             infoCounter++;
+        }
+
+        protected void SetAvatarIcon(int avatar)
+        {
+            var imgs = instance.GetComponentsInChildren<Image>();
+            var img = imgs.First(x => x.name == "TileAvatar");
+
+            img.sprite = avatars[avatar];
         }
 
         public void Close()

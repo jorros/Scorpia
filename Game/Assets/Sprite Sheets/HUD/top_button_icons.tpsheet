@@ -1,0 +1,21 @@
+#
+# Sprite sheet data for Unity.
+#
+# To import these sprites into your Unity project, download "TexturePackerImporter":
+# https://www.codeandweb.com/texturepacker/unity
+#
+# $TexturePacker:SmartUpdate:c85d0584b650f8388444cb242a2c5848:dc54057a7768477facb9394308e9b1fb:3be36a38c609cf836ba68cee49411e37$
+#
+:format=40300
+:texture=top_button_icons.png
+:size=256x256
+:pivotpoints=enabled
+:borders=disabled
+:alphahandling=ClearTransparentPixels
+
+top_button_cities;71;127;72;66; 0.5;0.5; 0;0;0;0; 6;72;24;72;0;0;0;0;25;30;66;49;66; 4;0;4;5;2;0;1;2;3;0;0;3;4
+top_button_diplomacy;0;196;60;60; 0.5;0.5; 0;0;0;0; 4;60;0;0;0;0;60;60;60; 2;1;2;3;0;1;3
+top_button_finance;60;199;60;57; 0.5;0.5; 0;0;0;0; 4;60;0;0;0;0;57;60;57; 2;1;2;3;0;1;3
+top_button_military;180;193;63;63; 0.5;0.5; 0;0;0;0; 6;63;37;26;0;0;0;0;26;37;63;63;63; 4;0;4;5;0;3;4;1;2;3;0;1;3
+top_button_notifications;0;125;71;68; 0.5;0.5; 0;0;0;0; 4;71;0;0;0;0;68;71;68; 2;1;2;3;0;1;3
+top_button_research;120;196;60;60; 0.5;0.5; 0;0;0;0; 4;60;0;0;0;0;60;60;60; 2;1;2;3;0;1;3

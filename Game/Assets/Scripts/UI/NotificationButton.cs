@@ -31,10 +31,11 @@ namespace Scorpia.Assets.Scripts.UI
 
         void Update()
         {
-            if(shouldX <= rectTransform.localPosition.x)
+            if(shouldX <= rectTransform.anchoredPosition.x)
             {
-                var newPos = Vector2.MoveTowards(rectTransform.localPosition, new Vector2(shouldX, rectTransform.localPosition.y), Time.deltaTime * MOVE_SPEED);
-                rectTransform.localPosition = new Vector3(newPos.x, rectTransform.localPosition.y, rectTransform.localPosition.z);
+                var moveTo = new Vector2(shouldX, rectTransform.anchoredPosition.y);
+
+                rectTransform.anchoredPosition = Vector2.MoveTowards(rectTransform.anchoredPosition, moveTo, Time.deltaTime * MOVE_SPEED);
             }
         }
     }

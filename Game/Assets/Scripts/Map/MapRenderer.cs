@@ -4,7 +4,6 @@ using UnityEngine.Tilemaps;
 using Scorpia.Assets.Scripts.World;
 using Scorpia.Assets.Scripts.Map.Render;
 using static Scorpia.Assets.Scripts.Map.Render.BiomeRenderer;
-using Scorpia.Assets.Scripts.UI;
 
 namespace Scorpia.Assets.Scripts.Map
 {
@@ -30,7 +29,6 @@ namespace Scorpia.Assets.Scripts.Map
         private Tilemap minimapLayer;
         private Tilemap riverLayer;
         private Tilemap flairLayer;
-        private CameraMovement cam;
 
         [HideInInspector]
         public Map map;
@@ -47,9 +45,6 @@ namespace Scorpia.Assets.Scripts.Map
             minimapLayer = tilemaps[1];
             riverLayer = tilemaps[2];
             flairLayer = tilemaps[3];
-
-            var camObj = GameObject.FindGameObjectWithTag("MainCamera");
-            cam = camObj.GetComponent<CameraMovement>();
         }
 
         void Start()
@@ -100,14 +95,7 @@ namespace Scorpia.Assets.Scripts.Map
 
             mapSize = groundLayer.CellToWorld(new Vector3Int(groundLayer.size.x - 1, groundLayer.size.y - 1)) + (groundLayer.cellSize / 2);
 
-            var mapWidth = mapSize.x;
-            var mapHeight = mapSize.y;
-
-            var minimap = GameObject.FindObjectOfType<MinimapRenderer>();
-            minimap.GetComponent<MinimapRenderer>().Refresh();
-
-            cam.mapWidth = mapWidth;
-            cam.mapHeight = mapHeight;
+            EventManager.Trigger(EventManager.MapRendered);
         }
     }
 }

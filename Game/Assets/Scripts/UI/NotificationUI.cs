@@ -12,6 +12,9 @@ namespace Scorpia.Assets.Scripts.UI
         private List<GameObject> notifications;
         private IReadOnlyList<Sprite> icons;
 
+        private const float START_POS_X = 100;
+        private const float POS_Y = -330;
+
         public NotificationUI(GameObject prefab, GameObject parent, IReadOnlyList<Sprite> icons)
         {
             this.prefab = prefab;
@@ -24,7 +27,7 @@ namespace Scorpia.Assets.Scripts.UI
         {
             var instance = GameObject.Instantiate(prefab);
             var positionX = CalculateX(notifications.Count);
-            instance.GetComponent<RectTransform>().position = new Vector3(positionX, 852, 0);
+            instance.GetComponent<RectTransform>().position = new Vector3(positionX, POS_Y, 0);
 
             instance.transform.SetParent(parent.transform, false);
 
@@ -44,7 +47,7 @@ namespace Scorpia.Assets.Scripts.UI
         public void Remove(Notification notification)
         {
             var instance = notifications.First(x => x.GetComponent<NotificationButton>().notification.Id == notification.Id);
-            GameObject.Destroy(instance);
+            Object.Destroy(instance);
             notifications.Remove(instance);
 
             Refresh();
@@ -58,10 +61,7 @@ namespace Scorpia.Assets.Scripts.UI
             }
         }
 
-        private float CalculateX(int position)
-        {
-            return -1820 + position * 160;
-        }
+        private float CalculateX(int position) => START_POS_X + position * 160;
     }
 }
 

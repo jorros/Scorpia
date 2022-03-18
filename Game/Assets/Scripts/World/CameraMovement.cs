@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Scorpia.Assets.Scripts.Map;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,9 +16,6 @@ namespace Scorpia.Assets.Scripts.World
         [SerializeField]
         private float zoomStep, minCamSize, maxCamSize;
 
-        [SerializeField]
-        public float mapWidth, mapHeight;
-
         private Vector3? dragOrigin;
 
         private bool isDragging;
@@ -28,6 +26,10 @@ namespace Scorpia.Assets.Scripts.World
         private EventSystem eventSystem;
         private GraphicRaycaster raycaster;
 
+        private MapTile tile;
+        private PointerEventData pointData;
+        private List<RaycastResult> raycastResults;
+
         void Start()
         {
             if (NetworkManager.Singleton.IsServer)
@@ -37,6 +39,8 @@ namespace Scorpia.Assets.Scripts.World
             }
 
             raycaster = GameObject.Find("HUD").GetComponent<GraphicRaycaster>();
+            pointData = new PointerEventData(EventSystem.current);
+            raycastResults = new List<RaycastResult>();
 
             EventManager.Register(EventManager.PanCamera, SetPosition);
             EventManager.Register(EventManager.ZoomInCamera, ZoomIn);
@@ -52,8 +56,14 @@ namespace Scorpia.Assets.Scripts.World
 
         void Update()
         {
-            PanCamera();
+            if(ClickedOnUI())
+            {
+                return;
+            }
+
+            StartDragging();
             SelectTile();
+            StopDragging();
         }
 
         private void SelectTile()
@@ -61,35 +71,39 @@ namespace Scorpia.Assets.Scripts.World
             if (Input.GetMouseButtonUp(0) && !isDragging)
             {
                 var mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-                Game.SelectedTile = Game.MapRenderer.GetTile(mousePos);
-                EventManager.Trigger(EventManager.SelectTile, Game.SelectedTile);
+                tile = Game.MapRenderer.GetTile(mousePos);
+                EventManager.Trigger(EventManager.SelectTile, tile);
             }
 
-            if(Input.GetMouseButtonUp(1) && Game.SelectedTile != null)
+            if(Input.GetMouseButtonUp(1) && tile != null)
             {
-                Game.SelectedTile = null;
+                tile = null;
                 EventManager.Trigger(EventManager.DeselectTile);
             }
         }
 
-        private void PanCamera()
+        private bool ClickedOnUI()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonUp(0) || Input.GetMouseButton(0))
             {
-                var pointData = new PointerEventData(EventSystem.current);
                 pointData.position = Input.mousePosition;
-                var results = new List<RaycastResult>();
-                raycaster.Raycast(pointData, results);
+                raycaster.Raycast(pointData, raycastResults);
 
-                if (results.Any())
+                if (raycastResults.Any())
                 {
-                    dragOrigin = null;
+                    raycastResults.Clear();
+                    return true;
                 }
-                else
-                {
-                    dragOrigin = cam.ScreenToWorldPoint(Input.mousePosition);
-                }
+            }
 
+            return false;
+        }
+
+        private void StartDragging()
+        {
+            if(Input.GetMouseButtonDown(0))
+            {
+                dragOrigin = cam.ScreenToWorldPoint(Input.mousePosition);
             }
 
             if (Input.GetMouseButton(0) && dragOrigin != null)
@@ -103,7 +117,10 @@ namespace Scorpia.Assets.Scripts.World
 
                 cam.transform.position = ClampCamera(cam.transform.position + delta);
             }
+        }
 
+        private void StopDragging()
+        {
             if (Input.GetMouseButtonUp(0) && isDragging)
             {
                 isDragging = false;
@@ -138,9 +155,9 @@ namespace Scorpia.Assets.Scripts.World
             var camWidth = cam.orthographicSize * cam.aspect;
 
             var minX = camWidth - 1;
-            var maxX = mapWidth - camWidth + 1;
+            var maxX = Game.MapRenderer.mapSize.x - camWidth + 1;
             var minY = camHeight - 1;
-            var maxY = mapHeight - camHeight - 1;
+            var maxY = Game.MapRenderer.mapSize.y - camHeight - 1;
 
             var newX = Mathf.Clamp(targetPosition.x, minX, maxX);
             var newY = Mathf.Clamp(targetPosition.y, minY, maxY);

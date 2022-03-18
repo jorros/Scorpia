@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Scorpia.Assets.Scripts.World;
 using UnityEngine;
 
@@ -17,6 +18,16 @@ namespace Scorpia.Assets.Scripts.UI
         void Awake()
         {
             cam = GetComponent<Camera>();
+        }
+
+        void Start()
+        {
+            EventManager.Register(EventManager.MapRendered, Refresh);
+        }
+
+        void OnDestroy()
+        {
+            EventManager.Remove(EventManager.MapRendered, Refresh);
         }
 
         private Vector3 GetCameraFrustumPoint(Vector3 position)
@@ -73,7 +84,7 @@ namespace Scorpia.Assets.Scripts.UI
             GL.PopMatrix();
         }
 
-        public void Refresh()
+        public void Refresh(IReadOnlyList<object> args = null)
         {
             var width = Game.MapRenderer.mapSize.x;
             var height = Game.MapRenderer.mapSize.y;
