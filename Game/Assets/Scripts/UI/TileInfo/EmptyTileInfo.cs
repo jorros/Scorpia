@@ -13,6 +13,8 @@ namespace Scorpia.Assets.Scripts.UI.TileInfo
 
         public void Render(MapTile mapTile)
         {
+            system.SetName("Empty");
+
             SetAvatar(mapTile);
             AddResourceIcon(mapTile);
             AddFertilityIcon(mapTile);

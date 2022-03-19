@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 10029824935897327}
   - component: {fileID: 8855288694986101787}
   - component: {fileID: 7239721913514404847}
+  - component: {fileID: 6739423050880972622}
   m_Layer: 5
   m_Name: Notification
   m_TagString: Untagged
@@ -137,6 +138,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shouldX: 0
   MOVE_SPEED: 400
+--- !u!114 &6739423050880972622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992443054943534186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df19dff52e1f243acbc082480beb30b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  header: 
+  subHeader: 
+  offset: 40
+  position: 0
+  content: 
 --- !u!1 &5957584685291012737
 GameObject:
   m_ObjectHideFlags: 0
