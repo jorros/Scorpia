@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Scorpia.Assets.Scripts.World;
+using Scorpia.Assets.Scripts.Map;
 using UnityEngine;
 
 namespace Scorpia.Assets.Scripts.UI
@@ -86,8 +86,8 @@ namespace Scorpia.Assets.Scripts.UI
 
         public void Refresh(IReadOnlyList<object> args = null)
         {
-            var width = Game.MapRenderer.mapSize.x;
-            var height = Game.MapRenderer.mapSize.y;
+            var width = MapRenderer.current.mapSize.x;
+            var height = MapRenderer.current.mapSize.y;
 
             float screenRatio = (float)minimapTexture.width / minimapTexture.height;
             float targetRatio = width / height;

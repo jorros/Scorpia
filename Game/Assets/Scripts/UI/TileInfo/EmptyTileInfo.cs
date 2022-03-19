@@ -1,20 +1,17 @@
 ﻿using Scorpia.Assets.Scripts.Map;
-using UnityEngine;
 
 namespace Scorpia.Assets.Scripts.UI.TileInfo
 {
-	public class EmptyTileInfo : BaseTileInfo
+	public class EmptyTileInfo : ITileInfo
 	{
-        public EmptyTileInfo(GameObject prefab, GameObject parent, Sprite[] icons, Sprite[] avatars) : base(prefab, parent, icons, avatars)
+        private InfoUISystem system;
+
+        public EmptyTileInfo(InfoUISystem system)
         {
+            this.system = system;
         }
 
-        protected override string GetName(MapTile mapTile)
-        {
-            return "Empty";
-        }
-
-        protected override void Render(MapTile mapTile)
+        public void Render(MapTile mapTile)
         {
             SetAvatar(mapTile);
             AddResourceIcon(mapTile);
@@ -34,7 +31,7 @@ namespace Scorpia.Assets.Scripts.UI.TileInfo
 
             if (i > -1)
             {
-                SetAvatarIcon(i);
+                system.SetAvatarIcon(i);
             }
         }
 
@@ -42,16 +39,16 @@ namespace Scorpia.Assets.Scripts.UI.TileInfo
         {
             var i = tile.Resource switch
             {
-                Resource.Sofrum => 5,
-                Resource.Gold => 3,
-                Resource.Zellos => 6,
-                Resource.Nitra => 4,
-                _ => -1
+                Resource.Sofrum => (5, "Sofrum", "Can produce sofrum here"),
+                Resource.Gold => (3, "Gold", "Can mine gold here"),
+                Resource.Zellos => (6, "Zellos", "Can extract zellos here"),
+                Resource.Nitra => (4, "Nitra", "Can mine nitra here"),
+                _ => (-1, "Error", "")
             };
 
-            if (i > -1)
+            if (i.Item1 > -1)
             {
-                AddInfoIcon(i);
+                system.AddInfoIcon(i.Item1, new TooltipDescription(i.Item2, string.Empty, i.Item3));
             }
         }
 
@@ -59,14 +56,14 @@ namespace Scorpia.Assets.Scripts.UI.TileInfo
         {
             var i = tile.Fertility switch
             {
-                Fertility.Low => 0,
-                Fertility.High => 2,
-                _ => -1
+                Fertility.Low => (0, "Barren", "Barely able to produce food here"),
+                Fertility.High => (2, "Fertile ground", "Can produce more food here"),
+                _ => (-1, "Error", "")
             };
 
-            if (i > -1)
+            if (i.Item1 > -1)
             {
-                AddInfoIcon(i);
+                system.AddInfoIcon(i.Item1, new TooltipDescription(i.Item2, string.Empty, i.Item3));
             }
         }
     }

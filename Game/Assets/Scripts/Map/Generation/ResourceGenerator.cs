@@ -4,10 +4,10 @@ namespace Scorpia.Assets.Scripts.Map.Generation
 {
     public class ResourceGenerator : IGenerator
     {
-        private const int GOLD_SPAWN_CHANCE = 10;
-        private const int SOFRUM_SPAWN_CHANCE = 10;
-        private const int NITRA_SPAWN_CHANCE = 15;
-        private const int ZELLOS_SPAWN_CHANCE = 10;
+        private const int GOLD_SPAWN_CHANCE = 6;
+        private const int SOFRUM_SPAWN_CHANCE = 4;
+        private const int NITRA_SPAWN_CHANCE = 1;
+        private const int ZELLOS_SPAWN_CHANCE = 4;
 
         public void Generate(Map map)
         {

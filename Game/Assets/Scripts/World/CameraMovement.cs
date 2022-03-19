@@ -71,7 +71,7 @@ namespace Scorpia.Assets.Scripts.World
             if (Input.GetMouseButtonUp(0) && !isDragging)
             {
                 var mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-                tile = Game.MapRenderer.GetTile(mousePos);
+                tile = MapRenderer.current.GetTile(mousePos);
                 EventManager.Trigger(EventManager.SelectTile, tile);
             }
 
@@ -155,9 +155,9 @@ namespace Scorpia.Assets.Scripts.World
             var camWidth = cam.orthographicSize * cam.aspect;
 
             var minX = camWidth - 1;
-            var maxX = Game.MapRenderer.mapSize.x - camWidth + 1;
+            var maxX = MapRenderer.current.mapSize.x - camWidth + 1;
             var minY = camHeight - 1;
-            var maxY = Game.MapRenderer.mapSize.y - camHeight - 1;
+            var maxY = MapRenderer.current.mapSize.y - camHeight - 1;
 
             var newX = Mathf.Clamp(targetPosition.x, minX, maxX);
             var newY = Mathf.Clamp(targetPosition.y, minY, maxY);

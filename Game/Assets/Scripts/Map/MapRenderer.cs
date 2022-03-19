@@ -36,9 +36,11 @@ namespace Scorpia.Assets.Scripts.Map
         [HideInInspector]
         public Vector3 mapSize;
 
+        public static MapRenderer current;
+
         void Awake()
         {
-            Game.MapObject = gameObject;
+            current = this;
 
             var tilemaps = GetComponentsInChildren<Tilemap>();
             groundLayer = tilemaps[0];

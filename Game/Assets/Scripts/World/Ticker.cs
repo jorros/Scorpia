@@ -6,6 +6,8 @@ namespace Scorpia.Assets.Scripts.World
 {
     public class Ticker : NetworkBehaviour
     {
+        public static Ticker current;
+
         public NetworkVariable<int> currentTick = new NetworkVariable<int>(0);
 
         private float step = 0f;
@@ -14,7 +16,7 @@ namespace Scorpia.Assets.Scripts.World
 
         void Awake()
         {
-            Game.TickerObject = gameObject;
+            current = this;
             dateText = GameObject.Find("DateText").GetComponent<TextMeshProUGUI>();
         }
 

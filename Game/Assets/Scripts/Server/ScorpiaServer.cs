@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Scorpia.Assets.Scripts.Server;
-using Scorpia.Assets.Scripts.World;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -43,7 +41,7 @@ namespace Scorpia.Assets.Scripts.Server
 
         public void SendNotification(Notification @event, IReadOnlyList<ulong> clients = null)
         {
-            Game.NotificationSystem.SendClientRpc(@event, new ClientRpcParams
+            NotificationSystem.current.SendClientRpc(@event, new ClientRpcParams
             {
                 Send = new ClientRpcSendParams
                 {

@@ -3,22 +3,28 @@ tpsheetFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites.tpsheet
 - Assets/Sprite Sheets/HUD/info_avatars.tpsheet
 - Assets/Sprite Sheets/HUD/info_icons.tpsheet
+- Assets/Sprite Sheets/HUD/info_stat_icons.tpsheet
 - Assets/Sprite Sheets/HUD/minimap_button_icon.tpsheet
 - Assets/Sprite Sheets/HUD/notifications.tpsheet
 - Assets/Sprite Sheets/HUD/top_button_icons.tpsheet
 - Assets/Sprite Sheets/HUD/top_icons.tpsheet
 - Assets/Sprite Sheets/HUD/top_player.tpsheet
+- Assets/Sprite Sheets/overlays_flair.tpsheet
 textureFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites.png
 - Assets/Sprite Sheets/HUD/info_avatars.png
 - Assets/Sprite Sheets/HUD/info_icons.png
+- Assets/Sprite Sheets/HUD/info_stat_icons.png
 - Assets/Sprite Sheets/HUD/minimap_button_icon.png
 - Assets/Sprite Sheets/HUD/notifications.png
 - Assets/Sprite Sheets/HUD/top_button_icons.png
 - Assets/Sprite Sheets/HUD/top_icons.png
 - Assets/Sprite Sheets/HUD/top_player.png
+- Assets/Sprite Sheets/overlays_flair.png
 normalmapFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites_n.png
+- 
+- 
 - 
 - 
 - 

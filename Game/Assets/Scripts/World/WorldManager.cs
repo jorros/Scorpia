@@ -19,12 +19,7 @@ namespace Scorpia.Assets.Scripts.World
         [SerializeField]
         private GameObject playerPrefab;
 
-        void Awake()
-        {
-            Game.WorldManagerObject = gameObject;
-        }
-
-        void Start()
+        private void Start()
         {
             if (IsServer)
             {
@@ -45,14 +40,14 @@ namespace Scorpia.Assets.Scripts.World
             }
         }
 
-        void OnConnect(ulong clientId)
+        private void OnConnect(ulong clientId)
         {
             if (IsServer)
             {
             }
         }
 
-        void OnDisconnect(ulong clientId)
+        private void OnDisconnect(ulong clientId)
         {
             if (IsServer)
             {

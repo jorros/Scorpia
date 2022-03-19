@@ -1,6 +1,6 @@
+using Scorpia.Assets.Scripts.Map;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace Scorpia.Assets.Scripts.World
 {
@@ -37,7 +37,7 @@ namespace Scorpia.Assets.Scripts.World
 
                 var minimapPos = Camera.main.WorldToScreenPoint(rect.position);
 
-                var terrainSize = Game.MapRenderer.mapSize;
+                var terrainSize = MapRenderer.current.mapSize;
 
                 var uiPos = Input.mousePosition - minimapPos;
 

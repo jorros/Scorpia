@@ -1,0 +1,20 @@
+#
+# Sprite sheet data for Unity.
+#
+# To import these sprites into your Unity project, download "TexturePackerImporter":
+# https://www.codeandweb.com/texturepacker/unity
+#
+# $TexturePacker:SmartUpdate:0578e1a35288f326c381f6e1acaac935:a15397243372967dee1e141c2d634b66:5213464b62026858f5e7bbc63ddbea5c$
+#
+:format=40300
+:texture=info_stat_icons.png
+:size=128x128
+:pivotpoints=enabled
+:borders=disabled
+:alphahandling=ClearTransparentPixels
+
+info_stat_icons_balance;1;91;36;36; 0.5;0.5; 0;0;0;0
+info_stat_icons_food;1;53;36;36; 0.5;0.5; 0;0;0;0
+info_stat_icons_garrison;1;15;36;36; 0.5;0.5; 0;0;0;0
+info_stat_icons_population;39;91;36;36; 0.5;0.5; 0;0;0;0
+info_stat_icons_production;77;91;36;36; 0.5;0.5; 0;0;0;0

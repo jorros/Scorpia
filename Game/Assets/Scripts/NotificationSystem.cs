@@ -1,23 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Unity.Netcode;
-using UnityEngine;
 
 namespace Scorpia.Assets.Scripts
 {
     public class NotificationSystem : NetworkBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
+        public static NotificationSystem current;
+
+        private void Awake()
         {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
+            current = this;
         }
 
         [ClientRpc]
