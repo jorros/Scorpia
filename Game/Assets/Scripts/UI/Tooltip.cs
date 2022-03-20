@@ -53,8 +53,6 @@ namespace Scorpia.Assets.Scripts.UI
 
             position.y = GetY(position);
 
-            print(position.y);
-
             rectTransform.pivot = new Vector2(pivotX, pivotY);
 
             var worldPos = canvas.worldCamera.ScreenToWorldPoint(position);
@@ -81,6 +79,8 @@ namespace Scorpia.Assets.Scripts.UI
                 {
                     TooltipPosition.Info => ViewportToScreen(425.0f / Screen.height),
                     TooltipPosition.Top => ViewportToScreen(1 - 140.0f / Screen.height),
+                    TooltipPosition.Action => ViewportToScreen(140f / Screen.height),
+                    TooltipPosition.ExtraAction => ViewportToScreen(240f / Screen.height),
                     _ => 0
                 };
             }

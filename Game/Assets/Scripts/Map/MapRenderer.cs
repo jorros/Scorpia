@@ -1,7 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Scorpia.Assets.Scripts.World;
 using Scorpia.Assets.Scripts.Map.Render;
 using static Scorpia.Assets.Scripts.Map.Render.BiomeRenderer;
 
@@ -38,7 +37,7 @@ namespace Scorpia.Assets.Scripts.Map
 
         public static MapRenderer current;
 
-        void Awake()
+        private void Awake()
         {
             current = this;
 
@@ -49,7 +48,7 @@ namespace Scorpia.Assets.Scripts.Map
             flairLayer = tilemaps[3];
         }
 
-        void Start()
+        private void Start()
         {
             if (IsServer)
             {

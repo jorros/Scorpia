@@ -1,6 +1,8 @@
 version: 2
 tpsheetFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites.tpsheet
+- Assets/Sprite Sheets/HUD/action_m.tpsheet
+- Assets/Sprite Sheets/HUD/action_s.tpsheet
 - Assets/Sprite Sheets/HUD/info_avatars.tpsheet
 - Assets/Sprite Sheets/HUD/info_icons.tpsheet
 - Assets/Sprite Sheets/HUD/info_stat_icons.tpsheet
@@ -12,6 +14,8 @@ tpsheetFileNames:
 - Assets/Sprite Sheets/overlays_flair.tpsheet
 textureFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites.png
+- Assets/Sprite Sheets/HUD/action_m.png
+- Assets/Sprite Sheets/HUD/action_s.png
 - Assets/Sprite Sheets/HUD/info_avatars.png
 - Assets/Sprite Sheets/HUD/info_icons.png
 - Assets/Sprite Sheets/HUD/info_stat_icons.png
@@ -23,6 +27,8 @@ textureFileNames:
 - Assets/Sprite Sheets/overlays_flair.png
 normalmapFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites_n.png
+- 
+- 
 - 
 - 
 - 

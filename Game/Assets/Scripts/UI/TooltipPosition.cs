@@ -5,6 +5,7 @@
 		None,
 		Info,
 		Action,
+		ExtraAction,
 		Top
 	}
 }
