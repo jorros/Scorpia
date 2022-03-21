@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Scorpia.Assets.Scripts.Map.Render;
 using static Scorpia.Assets.Scripts.Map.Render.BiomeRenderer;
+using System.Collections.Generic;
 
 namespace Scorpia.Assets.Scripts.Map
 {
@@ -18,6 +19,9 @@ namespace Scorpia.Assets.Scripts.Map
         private Tile[] flairTiles;
 
         [SerializeField]
+        private TileBase selectedTile;
+
+        [SerializeField]
         private BiomeRendererTiles biomeTiles;
 
         private NetworkVariable<int> width = new NetworkVariable<int>();
@@ -28,6 +32,7 @@ namespace Scorpia.Assets.Scripts.Map
         private Tilemap minimapLayer;
         private Tilemap riverLayer;
         private Tilemap flairLayer;
+        private Tilemap selectedLayer;
 
         [HideInInspector]
         public Map map;
@@ -46,6 +51,16 @@ namespace Scorpia.Assets.Scripts.Map
             minimapLayer = tilemaps[1];
             riverLayer = tilemaps[2];
             flairLayer = tilemaps[3];
+            selectedLayer = tilemaps[4];
+
+            EventManager.Register(EventManager.SelectTile, SelectTile);
+            EventManager.Register(EventManager.DeselectTile, DeselectTile);
+        }
+
+        public override void OnDestroy()
+        {
+            EventManager.Remove(EventManager.SelectTile, SelectTile);
+            EventManager.Remove(EventManager.DeselectTile, DeselectTile);
         }
 
         private void Start()
@@ -97,6 +112,19 @@ namespace Scorpia.Assets.Scripts.Map
             mapSize = groundLayer.CellToWorld(new Vector3Int(groundLayer.size.x - 1, groundLayer.size.y - 1)) + (groundLayer.cellSize / 2);
 
             EventManager.Trigger(EventManager.MapRendered);
+        }
+
+        private void SelectTile(IReadOnlyList<object> args)
+        {
+            var selected = args[0] as MapTile;
+
+            selectedLayer.ClearAllTiles();
+            selectedLayer.SetTile(new Vector3Int(selected.Position.x, selected.Position.y, 0), selectedTile);
+        }
+
+        private void DeselectTile(IReadOnlyList<object> args)
+        {
+            selectedLayer.ClearAllTiles();
         }
     }
 }

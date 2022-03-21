@@ -23,6 +23,11 @@ namespace Scorpia.Assets.Scripts
 
         void Update()
         {
+            if(NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+
             if (map == null)
             {
                 var mapRenderer = GameObject.FindGameObjectWithTag("Map");
