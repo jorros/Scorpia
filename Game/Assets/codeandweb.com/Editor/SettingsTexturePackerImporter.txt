@@ -14,6 +14,7 @@ tpsheetFileNames:
 - Assets/Sprite Sheets/overlays_flair.tpsheet
 - Assets/Sprite Sheets/selected_tile.tpsheet
 - Assets/Sprite Sheets/UI/buttons.tpsheet
+- Assets/Sprite Sheets/UI/flag_button.tpsheet
 - Assets/Sprite Sheets/UI/player_icons.tpsheet
 textureFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites.png
@@ -30,9 +31,11 @@ textureFileNames:
 - Assets/Sprite Sheets/overlays_flair.png
 - Assets/Sprite Sheets/selected_tile.png
 - Assets/Sprite Sheets/UI/buttons.png
+- Assets/Sprite Sheets/UI/flag_button.png
 - Assets/Sprite Sheets/UI/player_icons.png
 normalmapFileNames:
 - Assets/codeandweb.com/Example/SpriteSheet/sprites_n.png
+- 
 - 
 - 
 - 

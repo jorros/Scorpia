@@ -17,13 +17,14 @@ namespace Scorpia.Assets.Scripts.World
         void Awake()
         {
             current = this;
-            dateText = GameObject.Find("DateText").GetComponent<TextMeshProUGUI>();
         }
 
         public override void OnNetworkSpawn()
         {
             if (IsClient)
             {
+                dateText = GameObject.Find("DateText")?.GetComponent<TextMeshProUGUI>();
+
                 currentTick.OnValueChanged += (oldVal, newVal) =>
                 {
                     Tick();
@@ -49,14 +50,17 @@ namespace Scorpia.Assets.Scripts.World
 
         void Tick()
         {
-            dateText.SetText(new ScorpiaDate(currentTick.Value).ToString());
-            
             if (IsServer)
             {
             }
             else
             {
+                if (dateText == null)
+                {
+                    dateText = GameObject.Find("DateText")?.GetComponent<TextMeshProUGUI>();
+                }
 
+                dateText?.SetText(new ScorpiaDate(currentTick.Value).ToString());
             }
         }
     }

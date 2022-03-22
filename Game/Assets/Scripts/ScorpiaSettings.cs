@@ -18,6 +18,19 @@ namespace Scorpia.Assets.Scripts
             }
         }
 
+        public static PlayerColour PlayerColour
+        {
+            get
+            {
+                return (PlayerColour)PlayerPrefs.GetInt("PlayerColour", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("PlayerColour", (int)value);
+                PlayerPrefs.Save();
+            }
+        }
+
         public static string Uid
         {
             get

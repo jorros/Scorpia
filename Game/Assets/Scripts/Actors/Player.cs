@@ -7,7 +7,7 @@ namespace Scorpia.Assets.Scripts.Actors
 {
     public class Player : NetworkBehaviour
     {
-        public NetworkVariable<int> Doubloons { get; set; }
+        public NetworkVariable<int> Doubloons { get; set; } = new NetworkVariable<int>();
 
         public NetworkVariable<FixedString64Bytes> PlayerName { get; set; } = new NetworkVariable<FixedString64Bytes>();
 

@@ -1,32 +1,49 @@
 using System.Text;
 using Scorpia.Assets.Scripts.Server;
+using Scorpia.Assets.Scripts.Utils;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-namespace Scorpia.Assets.Scripts
+namespace Scorpia.Assets.Scripts.MainMenu
 {
     public class MainMenuSystem : MonoBehaviour
     {
         [SerializeField]
-        private GameObject nameInputObj;
         private TMP_InputField nameInput;
 
         [SerializeField]
         private TextMeshProUGUI statusText;
 
+        [SerializeField]
+        private GameObject lobby;
+
+        public GameObject lobbyMenu;
+
+        public GameObject playerListMenu;
+
         private string otherStatus;
 
-        void Start()
+        public static MainMenuSystem Current;
+
+        public ToggleGroup colourToggle;
+
+        public GameObject playerPreviewPrefab;
+
+        public Sprite[] playerColourSprites;
+
+        private void Awake()
         {
-            nameInput = nameInputObj.GetComponent<TMP_InputField>();
+            Current = this;
+        }
+
+        private void Start()
+        {
             nameInput.text = ScorpiaSettings.PlayerName;
 
-            print(gameObject.name);
-
-            if (Application.isBatchMode)
+            if (Application.isBatchMode || ParrelSyncHelper.IsClone())
             {
                 StartServer();
             }
@@ -41,7 +58,7 @@ namespace Scorpia.Assets.Scripts
             var approve = false;
             var uid = Encoding.ASCII.GetString(connectionData);
 
-            if (ScorpiaServer.Singleton.State == Server.GameState.Lobby)
+            if (ScorpiaServer.Singleton.State == GameState.Lobby)
             {
                 approve = true;
             }
@@ -67,7 +84,8 @@ namespace Scorpia.Assets.Scripts
             {
                 otherStatus = null;
                 OnDisconnect(0);
-                //NetworkManager.Singleton.
+
+                NetworkManager.Singleton.StartClient();
             }
         }
 
@@ -86,6 +104,11 @@ namespace Scorpia.Assets.Scripts
             NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
             NetworkManager.Singleton.StartServer();
 
+            var instance = Instantiate(lobby);
+            instance.GetComponent<NetworkObject>().Spawn();
+
+            Debug.Log("Starting server");
+
             // Switch scene when everyone is ready
             //SceneManager.LoadScene("GameScene", LoadSceneMode.Single);
         }
@@ -94,7 +117,7 @@ namespace Scorpia.Assets.Scripts
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnConnect;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnect;
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(ScorpiaSettings.Uid);
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes(ScorpiaSettings.Uid);
 
             NetworkManager.Singleton.StartClient();
 

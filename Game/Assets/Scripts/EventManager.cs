@@ -68,7 +68,7 @@ namespace Scorpia.Assets.Scripts
             Action<IReadOnlyList<object>> thisEvent = null;
             if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
             {
-                thisEvent.Invoke(message);
+                thisEvent?.Invoke(message);
             }
         }
     }

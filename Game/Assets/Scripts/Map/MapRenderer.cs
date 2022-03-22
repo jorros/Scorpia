@@ -63,7 +63,7 @@ namespace Scorpia.Assets.Scripts.Map
             EventManager.Remove(EventManager.DeselectTile, DeselectTile);
         }
 
-        private void Start()
+        public override void OnNetworkSpawn()
         {
             if (IsServer)
             {
@@ -85,6 +85,8 @@ namespace Scorpia.Assets.Scripts.Map
 
         public void Refresh()
         {
+            print($"S:{seed.Value};H:{height.Value};W:{width.Value}");
+
             map.Generate();
 
             var renderers = new ITileRenderer[]

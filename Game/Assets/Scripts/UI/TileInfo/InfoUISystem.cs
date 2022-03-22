@@ -48,7 +48,7 @@ namespace Scorpia.Assets.Scripts.UI.TileInfo
 
         private IReadOnlyList<ITileInfo> tileInfos;
 
-        private void Awake()
+        private void Start()
         {
             EventManager.Register(EventManager.SelectTile, SelectTile);
             EventManager.Register(EventManager.DeselectTile, Deselect);

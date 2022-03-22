@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Scorpia.Assets.Scripts.Map;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Scorpia.Assets.Scripts.UI
@@ -15,17 +16,18 @@ namespace Scorpia.Assets.Scripts.UI
         [SerializeField]
         private Texture minimapTexture;
 
-        void Awake()
+        private void Awake()
         {
             cam = GetComponent<Camera>();
-        }
-
-        void Start()
-        {
             EventManager.Register(EventManager.MapRendered, Refresh);
         }
 
-        void OnDestroy()
+        private void Start()
+        {
+            Refresh();
+        }
+
+        private void OnDestroy()
         {
             EventManager.Remove(EventManager.MapRendered, Refresh);
         }
@@ -35,7 +37,7 @@ namespace Scorpia.Assets.Scripts.UI
             return Camera.main.ScreenToWorldPoint(position);
         }
 
-        void OnPostRender()
+        private void OnPostRender()
         {
             var minViewportPoint = cam.WorldToViewportPoint(GetCameraFrustumPoint(new Vector3(0f, 0f)));
             var maxViewportPoint = cam.WorldToViewportPoint(GetCameraFrustumPoint(new Vector3(Screen.width, Screen.height)));
@@ -54,18 +56,15 @@ namespace Scorpia.Assets.Scripts.UI
                 GL.Begin(GL.QUADS);
                 GL.Color(Color.white);
                 {
-
                     GL.Vertex(new Vector3(minX, minY + lineWidth, 0));
                     GL.Vertex(new Vector3(minX, minY - lineWidth, 0));
                     GL.Vertex(new Vector3(maxX, minY - lineWidth, 0));
                     GL.Vertex(new Vector3(maxX, minY + lineWidth, 0));
 
-
                     GL.Vertex(new Vector3(minX + lineWidth, minY, 0));
                     GL.Vertex(new Vector3(minX - lineWidth, minY, 0));
                     GL.Vertex(new Vector3(minX - lineWidth, maxY, 0));
                     GL.Vertex(new Vector3(minX + lineWidth, maxY, 0));
-
 
 
                     GL.Vertex(new Vector3(minX, maxY + lineWidth, 0));
@@ -77,7 +76,6 @@ namespace Scorpia.Assets.Scripts.UI
                     GL.Vertex(new Vector3(maxX - lineWidth, minY, 0));
                     GL.Vertex(new Vector3(maxX - lineWidth, maxY, 0));
                     GL.Vertex(new Vector3(maxX + lineWidth, maxY, 0));
-
                 }
                 GL.End();
             }
@@ -86,24 +84,26 @@ namespace Scorpia.Assets.Scripts.UI
 
         public void Refresh(IReadOnlyList<object> args = null)
         {
-            var width = MapRenderer.current.mapSize.x;
-            var height = MapRenderer.current.mapSize.y;
-
-            float screenRatio = (float)minimapTexture.width / minimapTexture.height;
-            float targetRatio = width / height;
-
-            if (screenRatio >= targetRatio)
+            if (NetworkManager.Singleton.IsClient)
             {
-                cam.orthographicSize = height / 2;
-            }
-            else
-            {
-                float differenceInSize = targetRatio / screenRatio;
-                cam.orthographicSize = height / 2 * differenceInSize;
-            }
+                var width = MapRenderer.current.mapSize.x;
+                var height = MapRenderer.current.mapSize.y;
 
-            transform.position = new Vector3(width / 2, height / 2, -10);
-            print("minimap: " + transform.position);
+                float screenRatio = (float)minimapTexture.width / minimapTexture.height;
+                float targetRatio = width / height;
+
+                if (screenRatio >= targetRatio)
+                {
+                    cam.orthographicSize = height / 2;
+                }
+                else
+                {
+                    float differenceInSize = targetRatio / screenRatio;
+                    cam.orthographicSize = height / 2 * differenceInSize;
+                }
+
+                transform.position = new Vector3(width / 2, height / 2, -10);
+            }
         }
     }
 }
