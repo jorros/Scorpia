@@ -15,6 +15,7 @@ namespace Scorpia.Assets.Scripts.MainMenu
             public bool IsReady;
             public bool FinishedLoading;
             public ulong ID;
+            public string UID;
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
@@ -65,6 +66,8 @@ namespace Scorpia.Assets.Scripts.MainMenu
             this[id].IsReady = ready;
         }
 
+        public PlayerDetail FindByUID(string uid) => players.FirstOrDefault(x => x.UID == uid);
+
         public bool HasDistinctColours()
         {
             var colours = new List<PlayerColour>();
@@ -82,20 +85,6 @@ namespace Scorpia.Assets.Scripts.MainMenu
         }
 
         public PlayerDetail Get(ulong id) => this[id];
-
-        public PlayerColour GetFreeColour()
-        {
-            var length = Enum.GetNames(typeof(PlayerColour)).Length;
-            for(var i = 0; i < length; i++)
-            {
-                if(!players.Any(x => (int)x.Colour == i))
-                {
-                    return (PlayerColour)i;
-                }
-            }
-
-            return PlayerColour.Blue;
-        }
 
         public bool Exists(ulong id) => players.Any(x => x.ID == id);
 

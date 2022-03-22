@@ -17,6 +17,7 @@ namespace Scorpia.Assets.Scripts
         public static string ReceiveNotification => "ReceiveNotification";
         public static string RemoveNotification => "RemoveNotification";
         public static string MapRendered => "MapRendered";
+        public static string PlayerInfo => "PlayerInfo";
 
         private static EventManager instance
         {

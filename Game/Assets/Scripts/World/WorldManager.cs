@@ -23,7 +23,6 @@ namespace Scorpia.Assets.Scripts.World
         {
             if (IsServer)
             {
-                NetworkManager.Singleton.OnClientConnectedCallback += OnConnect;
                 NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnect;
 
                 var map = Instantiate(mapPrefab, Vector3.zero, Quaternion.identity);
@@ -35,15 +34,7 @@ namespace Scorpia.Assets.Scripts.World
 
             if (IsClient)
             {
-                print("log in");
-                LoginServerRpc(ScorpiaSettings.PlayerName, ScorpiaSettings.Uid);
-            }
-        }
-
-        private void OnConnect(ulong clientId)
-        {
-            if (IsServer)
-            {
+                LoginServerRpc(ScorpiaSettings.Uid);
             }
         }
 
@@ -51,48 +42,49 @@ namespace Scorpia.Assets.Scripts.World
         {
             if (IsServer)
             {
-                var uid = ScorpiaServer.Singleton.FindUid(clientId);
+                var player = ScorpiaServer.Singleton.Players.Get(clientId);
 
-                ScorpiaServer.Singleton.SendNotification(Notification.Format(Notifications.PLAYER_DISCONNECTED, $"{clientId}"));
+                ScorpiaServer.Singleton.SendNotification(Notification.Format(Notifications.PLAYER_DISCONNECTED, $"{player.Name}"));
 
-                print($"{uid} ({clientId}) disconnected");
+                print($"[{clientId}]{player.Name} disconnected");
             }
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void LoginServerRpc(string name, string uid, ServerRpcParams serverRpcParams = default)
+        public void LoginServerRpc(string uid, ServerRpcParams serverRpcParams = default)
         {
             var senderId = serverRpcParams.Receive.SenderClientId;
+            var player = ScorpiaServer.Singleton.Players.FindByUID(uid);
 
-            if (ScorpiaServer.Singleton.PlayerMap.ContainsKey(uid))
+            if (player.ID != senderId)
             {
-                print($"reconnecting {uid} ({senderId})");
+                print($"reconnecting [{player.ID}=>{senderId}]{player.Name}");
 
-                var objs = ScorpiaServer.Singleton.GetPlayerObjects(uid);
+                var objs = NetworkManager.SpawnManager.SpawnedObjects;
 
                 foreach (var obj in objs)
                 {
-                    var nObj = obj.GetComponent<NetworkObject>();
-                    nObj.ChangeOwnership(senderId);
+                    if (obj.Key == player.ID)
+                    {
+                        obj.Value.ChangeOwnership(senderId);
+                    }
                 }
 
-                ScorpiaServer.Singleton.PlayerMap[uid] = senderId;
+                player.ID = senderId;
+
+                return;
             }
-            else
-            {
-                print($"connecting {uid} ({senderId})");
 
-                var instance = Instantiate(playerPrefab);
-                instance.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
-                ScorpiaServer.Singleton.AddPlayerObject(uid, instance);
+            print($"connecting {uid} ({senderId})");
 
-                var player = instance.GetComponent<Player>();
+            var instance = Instantiate(playerPrefab);
+            instance.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
 
-                player.PlayerName.Value = name;
-                player.Uid.Value = uid;
+            var playerInstance = instance.GetComponent<Player>();
 
-                ScorpiaServer.Singleton.PlayerMap.Add(uid, serverRpcParams.Receive.SenderClientId);
-            }
+            playerInstance.Name.Value = player.Name;
+            playerInstance.UID.Value = player.UID;
+            playerInstance.Colour.Value = (int)player.Colour;
         }
     }
 }

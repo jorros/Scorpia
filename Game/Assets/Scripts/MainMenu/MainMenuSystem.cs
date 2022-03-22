@@ -62,7 +62,7 @@ namespace Scorpia.Assets.Scripts.MainMenu
             {
                 approve = true;
             }
-            else if (ScorpiaServer.Singleton.PlayerMap.ContainsKey(uid))
+            else if (ScorpiaServer.Singleton.Players.FindByUID(uid) != null)
             {
                 approve = true;
             }
@@ -73,7 +73,6 @@ namespace Scorpia.Assets.Scripts.MainMenu
                 writer.WriteValueSafe(message);
                 NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("ErrorMessage", clientId, writer, NetworkDelivery.Reliable);
             }
-
 
             callback(false, null, approve, null, null);
         }
@@ -108,9 +107,6 @@ namespace Scorpia.Assets.Scripts.MainMenu
             instance.GetComponent<NetworkObject>().Spawn();
 
             Debug.Log("Starting server");
-
-            // Switch scene when everyone is ready
-            //SceneManager.LoadScene("GameScene", LoadSceneMode.Single);
         }
 
         private void StartClient()

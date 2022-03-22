@@ -72,22 +72,6 @@ namespace Scorpia.Assets.Scripts
             return $"{tile.Position} {tile.Biome} {tile.Feature} {riverInfo}";
         }
 
-        private string GetSelectedTileInfo()
-        {
-            if (Input.GetMouseButton(0))
-            {
-                var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                selected = map.GetTile(mousePos);
-            }
-
-            if (selected == null)
-            {
-                return "Nothing selected";
-            }
-
-            return $"Selected {PrintTileInfo(selected)}";
-        }
-
         private string GetNetworkDetails()
         {
             var spawnCount = NetworkManager.Singleton.SpawnManager.SpawnedObjectsList.Count;
@@ -104,7 +88,7 @@ namespace Scorpia.Assets.Scripts
             }
 
             var clients = NetworkManager.Singleton.ConnectedClients;
-            var players = clients.Values.Select(x => x.PlayerObject?.GetComponent<Player>().PlayerName.Value);
+            var players = clients.Values.Select(x => x.PlayerObject?.GetComponent<Player>().Name.Value);
 
             return string.Join(",", players);
         }

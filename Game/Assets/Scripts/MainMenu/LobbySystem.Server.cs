@@ -1,4 +1,5 @@
 using System.Linq;
+using Scorpia.Assets.Scripts.Server;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -42,7 +43,7 @@ namespace Scorpia.Assets.Scripts.MainMenu
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void JoinServerRpc(string name, PlayerColour colour, ServerRpcParams serverRpcParams = default)
+        private void JoinServerRpc(string name, PlayerColour colour, string uid, ServerRpcParams serverRpcParams = default)
         {
             var senderId = serverRpcParams.Receive.SenderClientId;
             print($"[{senderId}]{name} joined match");
@@ -50,7 +51,8 @@ namespace Scorpia.Assets.Scripts.MainMenu
             var playerInfo = new PlayerInfo.PlayerDetail
             {
                 Name = name,
-                Colour = colour
+                Colour = colour,
+                UID = uid
             };
             players.Add(senderId, playerInfo);
         }
@@ -100,14 +102,27 @@ namespace Scorpia.Assets.Scripts.MainMenu
 
         private void OnDisconnectServer(ulong senderId)
         {
-            PlayerLeft(senderId);
+            if (ScorpiaServer.Singleton.State == GameState.Lobby)
+            {
+                PlayerLeft(senderId);
+            }
         }
 
         private void TriggerLoadingServer()
         {
             if (players.AreReady)
             {
+                ScorpiaServer.Singleton.State = GameState.Ingame;
+                foreach (var id in NetworkManager.ConnectedClientsIds.ToArray())
+                {
+                    if (!players.Exists(id))
+                    {
+                        NetworkManager.Singleton.DisconnectClient(id);
+                    }
+                }
                 var loading = NetworkManager.Singleton.SceneManager.LoadScene("GameScene", LoadSceneMode.Single);
+
+                ScorpiaServer.Singleton.Players = players;
             }
         }
     }

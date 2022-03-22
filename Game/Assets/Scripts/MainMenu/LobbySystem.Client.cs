@@ -102,7 +102,7 @@ namespace Scorpia.Assets.Scripts.MainMenu
                 }
             }
 
-            JoinServerRpc(ScorpiaSettings.PlayerName, ScorpiaSettings.PlayerColour);
+            JoinServerRpc(ScorpiaSettings.PlayerName, ScorpiaSettings.PlayerColour, ScorpiaSettings.Uid);
             isInLobby = true;
 
             RefreshButtons();
