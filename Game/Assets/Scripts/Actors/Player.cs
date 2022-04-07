@@ -1,7 +1,7 @@
 using Unity.Collections;
 using Unity.Netcode;
 
-namespace Scorpia.Assets.Scripts.Actors
+namespace Actors
 {
     public class Player : NetworkBehaviour
     {

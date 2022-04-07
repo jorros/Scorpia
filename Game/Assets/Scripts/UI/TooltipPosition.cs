@@ -1,4 +1,4 @@
-﻿namespace Scorpia.Assets.Scripts.UI
+﻿namespace UI
 {
 	public enum TooltipPosition
 	{

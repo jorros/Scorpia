@@ -1,15 +1,11 @@
-﻿namespace Scorpia.Assets.Scripts
+﻿public enum PlayerColour
 {
-	public enum PlayerColour
-	{
-		Blue,
-		Brown,
-		Green,
-		Grey,
-		Orange,
-		Purple,
-		Red,
-		Yellow
-	}
+	Blue,
+	Brown,
+	Green,
+	Grey,
+	Orange,
+	Purple,
+	Red,
+	Yellow
 }
-

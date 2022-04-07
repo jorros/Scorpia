@@ -1,13 +1,13 @@
 using System.Text;
-using Scorpia.Assets.Scripts.Server;
-using Scorpia.Assets.Scripts.Utils;
+using Server;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
-namespace Scorpia.Assets.Scripts.MainMenu
+namespace MainMenu
 {
     public class MainMenuSystem : MonoBehaviour
     {

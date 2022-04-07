@@ -2,49 +2,58 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace Scorpia.Assets.Scripts
+public class Notification : INetworkSerializable
 {
-    public class Notification : INetworkSerializable
+    public string TooltipHeader;
+
+    public string TooltipText;
+
+    public int Icon;
+
+    public int Cover;
+
+    public string Header;
+
+    public string Text;
+
+    public readonly string Id;
+
+    public Vector2Int Position = new Vector2Int(-1, -1);
+
+    public Notification()
     {
-        public string Title;
+        Id = Guid.NewGuid().ToString();
+    }
 
-        public string Text;
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Position);
+        serializer.SerializeValue(ref TooltipHeader);
+        serializer.SerializeValue(ref TooltipText);
+        serializer.SerializeValue(ref Icon);
+        serializer.SerializeValue(ref Cover);
+        serializer.SerializeValue(ref Header);
+        serializer.SerializeValue(ref Text);
+    }
 
-        public int Icon;
-
-        public string Id;
-
-        public Vector2Int Position = new Vector2Int(-1, -1);
-
-        public Notification(string title, string text, int icon)
+    public static Notification Format(Notification notification, Vector2Int? target, params object[] args)
+    {
+        var ret = new Notification
         {
-            Id = Guid.NewGuid().ToString();
-            Title = title;
-            Text = text;
-            Icon = icon;
-        }
+            TooltipHeader = string.Format(notification.TooltipHeader, args), 
+            TooltipText = string.Format(notification.TooltipText, args),
+            Icon = notification.Icon,
+            Cover = notification.Cover,
+            Header = string.Format(notification.Header, args), 
+            Text = string.Format(notification.Text, args),
+            Position = target ?? new Vector2Int(-1, -1)
+        };
 
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref Position);
-            serializer.SerializeValue(ref Title);
-            serializer.SerializeValue(ref Text);
-            serializer.SerializeValue(ref Icon);
-        }
+        return ret;
+    }
 
-        public static Notification Format(Notification @event, Vector2Int? target, params string[] args)
-        {
-            var ret = new Notification(@event.Title, string.Format(@event.Text, args), @event.Icon)
-            {
-                Position = target ?? new Vector2Int(-1, -1)
-            };
-
-            return ret;
-        }
-
-        public static Notification Format(Notification @event, params string[] args)
-        {
-            return Format(@event, null, args);
-        }
+    public static Notification Format(Notification @event, params object[] args)
+    {
+        return Format(@event, null, args);
     }
 }

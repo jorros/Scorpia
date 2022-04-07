@@ -1,4 +1,4 @@
-namespace Scorpia.Assets.Scripts.Server
+namespace Server
 {
     public enum GameState
     {

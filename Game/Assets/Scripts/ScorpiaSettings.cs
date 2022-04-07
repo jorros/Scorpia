@@ -1,51 +1,48 @@
 using System;
 using UnityEngine;
 
-namespace Scorpia.Assets.Scripts
+public static class ScorpiaSettings
 {
-    public static class ScorpiaSettings
+    public static string PlayerName
     {
-        public static string PlayerName
+        get
         {
-            get
-            {
-                return PlayerPrefs.GetString("PlayerName", "");
-            }
-            set
-            {
-                PlayerPrefs.SetString("PlayerName", value);
-                PlayerPrefs.Save();
-            }
+            return PlayerPrefs.GetString("PlayerName", "");
         }
-
-        public static PlayerColour PlayerColour
+        set
         {
-            get
-            {
-                return (PlayerColour)PlayerPrefs.GetInt("PlayerColour", 0);
-            }
-            set
-            {
-                PlayerPrefs.SetInt("PlayerColour", (int)value);
-                PlayerPrefs.Save();
-            }
+            PlayerPrefs.SetString("PlayerName", value);
+            PlayerPrefs.Save();
         }
+    }
 
-        public static string Uid
+    public static PlayerColour PlayerColour
+    {
+        get
         {
-            get
-            {
-                var id = PlayerPrefs.GetString("UID");
+            return (PlayerColour)PlayerPrefs.GetInt("PlayerColour", 0);
+        }
+        set
+        {
+            PlayerPrefs.SetInt("PlayerColour", (int)value);
+            PlayerPrefs.Save();
+        }
+    }
+
+    public static string Uid
+    {
+        get
+        {
+            var id = PlayerPrefs.GetString("UID");
                 
-                if(string.IsNullOrWhiteSpace(id))
-                {
-                    id = Guid.NewGuid().ToString();
-                    PlayerPrefs.SetString("UID", id);
-                    PlayerPrefs.Save();
-                }
-
-                return id;
+            if(string.IsNullOrWhiteSpace(id))
+            {
+                id = Guid.NewGuid().ToString();
+                PlayerPrefs.SetString("UID", id);
+                PlayerPrefs.Save();
             }
+
+            return id;
         }
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace Scorpia.Assets.Scripts.Utils
+namespace Utils
 {
     public static class MathHelper
     {

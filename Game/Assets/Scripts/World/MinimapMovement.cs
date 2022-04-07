@@ -1,8 +1,8 @@
-using Scorpia.Assets.Scripts.Map;
+using Map;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Scorpia.Assets.Scripts.World
+namespace World
 {
     public class MinimapMovement : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {

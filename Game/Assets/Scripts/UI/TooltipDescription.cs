@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Scorpia.Assets.Scripts.UI
+namespace UI
 {
     public class TooltipDescription
     {

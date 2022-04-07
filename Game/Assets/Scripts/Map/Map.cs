@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Scorpia.Assets.Scripts.Map.Generation;
-using Scorpia.Assets.Scripts.Utils;
+using Map.Generation;
 using UnityEngine;
+using Utils;
 
-namespace Scorpia.Assets.Scripts.Map
+namespace Map
 {
     public class Map
     {

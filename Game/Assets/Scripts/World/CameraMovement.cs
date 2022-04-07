@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using Scorpia.Assets.Scripts.Map;
+using Map;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Scorpia.Assets.Scripts.World
+namespace World
 {
     public class CameraMovement : MonoBehaviour
     {
@@ -29,6 +29,8 @@ namespace Scorpia.Assets.Scripts.World
         private MapTile tile;
         private PointerEventData pointData;
         private List<RaycastResult> raycastResults;
+
+        public static bool clickIsBlocked;
 
         void Start()
         {
@@ -68,17 +70,22 @@ namespace Scorpia.Assets.Scripts.World
 
         private void SelectTile()
         {
-            if (Input.GetMouseButtonUp(0) && !isDragging)
+            if (Input.GetMouseButtonUp(0) && !isDragging && !clickIsBlocked)
             {
                 var mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
                 tile = MapRenderer.current.GetTile(mousePos);
                 EventManager.Trigger(EventManager.SelectTile, tile);
             }
 
-            if(Input.GetMouseButtonUp(1) && tile != null)
+            if(Input.GetMouseButtonUp(1) && tile != null && !clickIsBlocked)
             {
                 tile = null;
                 EventManager.Trigger(EventManager.DeselectTile);
+            }
+
+            if (clickIsBlocked)
+            {
+                clickIsBlocked = false;
             }
         }
 

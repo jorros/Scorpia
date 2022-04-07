@@ -1,11 +1,11 @@
+using System.Collections.Generic;
+using Map.Render;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Scorpia.Assets.Scripts.Map.Render;
-using static Scorpia.Assets.Scripts.Map.Render.BiomeRenderer;
-using System.Collections.Generic;
+using static Map.Render.BiomeRenderer;
 
-namespace Scorpia.Assets.Scripts.Map
+namespace Map
 {
     public class MapRenderer : NetworkBehaviour
     {
@@ -24,9 +24,9 @@ namespace Scorpia.Assets.Scripts.Map
         [SerializeField]
         private BiomeRendererTiles biomeTiles;
 
-        private NetworkVariable<int> width = new NetworkVariable<int>();
-        private NetworkVariable<int> height = new NetworkVariable<int>();
-        private NetworkVariable<int> seed = new NetworkVariable<int>();
+        private NetworkVariable<int> width = new();
+        private NetworkVariable<int> height = new();
+        private NetworkVariable<int> seed = new();
 
         private Tilemap groundLayer;
         private Tilemap minimapLayer;
@@ -35,7 +35,7 @@ namespace Scorpia.Assets.Scripts.Map
         private Tilemap selectedLayer;
 
         [HideInInspector]
-        public Map map;
+        public global::Map.Map map;
 
         [HideInInspector]
         public Vector3 mapSize;
@@ -72,7 +72,7 @@ namespace Scorpia.Assets.Scripts.Map
                 width.Value = 60;
             }
 
-            map = new Map(width.Value, height.Value, seed.Value);
+            map = new global::Map.Map(width.Value, height.Value, seed.Value);
             Refresh();
         }
 
@@ -104,9 +104,9 @@ namespace Scorpia.Assets.Scripts.Map
                     var tile = map.GetTile(x, y);
                     var pos = new Vector3Int(x, y, 0);
 
-                    foreach(var renderer in renderers)
+                    foreach(var tileRenderer in renderers)
                     {
-                        renderer.Layer.SetTile(pos, renderer.GetTile(tile));
+                        tileRenderer.Layer.SetTile(pos, tileRenderer.GetTile(tile));
                     }
                 }
             }

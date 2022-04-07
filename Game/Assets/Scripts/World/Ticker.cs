@@ -2,7 +2,7 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.World
+namespace World
 {
     public class Ticker : NetworkBehaviour
     {

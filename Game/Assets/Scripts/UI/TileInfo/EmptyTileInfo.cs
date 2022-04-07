@@ -1,6 +1,6 @@
-﻿using Scorpia.Assets.Scripts.Map;
+﻿using Map;
 
-namespace Scorpia.Assets.Scripts.UI.TileInfo
+namespace UI.TileInfo
 {
 	public class EmptyTileInfo : ITileInfo
 	{

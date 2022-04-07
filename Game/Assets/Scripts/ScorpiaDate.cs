@@ -1,63 +1,60 @@
 using System;
 
-namespace Scorpia.Assets.Scripts
+public class ScorpiaDate
 {
-    public class ScorpiaDate
+    private readonly int ticks;
+
+    private const int START_YEAR = 3000;
+
+    public ScorpiaDate(int ticks = 0)
     {
-        private readonly int ticks;
+        this.ticks = ticks;
+    }
 
-        private const int START_YEAR = 3000;
-
-        public ScorpiaDate(int ticks = 0)
+    public int Day
+    {
+        get
         {
-            this.ticks = ticks;
+            return ticks % 30 + 1;
         }
+    }
 
-        public int Day
+    public int Month
+    {
+        get
         {
-            get
-            {
-                return ticks % 30 + 1;
-            }
+            return (int)Math.Floor(ticks / 30.0) % 12 + 1;
         }
+    }
 
-        public int Month
+    public int Year
+    {
+        get
         {
-            get
-            {
-                return (int)Math.Floor(ticks / 30.0) % 12 + 1;
-            }
+            return START_YEAR + (int)Math.Floor(ticks / 360.0);
         }
+    }
 
-        public int Year
+    public override string ToString()
+    {
+        return ToString(null);
+    }
+
+    public string ToString(string format)
+    {
+        if (format == "D")
         {
-            get
-            {
-                return START_YEAR + (int)Math.Floor(ticks / 360.0);
-            }
+            return $"{Day} {Month} {Year}";
         }
-
-        public override string ToString()
+        else if (format == "m")
         {
-            return ToString(null);
+            return $"{Day}. {Month}";
         }
-
-        public string ToString(string format)
+        else if (format == "M")
         {
-            if (format == "D")
-            {
-                return $"{Day} {Month} {Year}";
-            }
-            else if (format == "m")
-            {
-                return $"{Day}. {Month}";
-            }
-            else if (format == "M")
-            {
-                return $"{Day} {Month}";
-            }
+            return $"{Day} {Month}";
+        }
             
-            return $"{Day.ToString("D2")}-{Month.ToString("D2")}-{Year}";
-        }
+        return $"{Day.ToString("D2")}-{Month.ToString("D2")}-{Year}";
     }
 }

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.UI
+namespace UI
 {
     public class SetCursor : MonoBehaviour
     {

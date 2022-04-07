@@ -1,6 +1,6 @@
 ﻿using Unity.Netcode;
 
-namespace Scorpia.Assets.Scripts.MainMenu
+namespace MainMenu
 {
     public partial class LobbySystem : NetworkBehaviour
     {

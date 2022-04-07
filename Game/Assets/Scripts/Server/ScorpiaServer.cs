@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
-using Scorpia.Assets.Scripts.MainMenu;
+using MainMenu;
 using Unity.Netcode;
-using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.Server
+namespace Server
 {
     public class ScorpiaServer
     {

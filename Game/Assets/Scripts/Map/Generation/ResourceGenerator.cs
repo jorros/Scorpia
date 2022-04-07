@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Scorpia.Assets.Scripts.Map.Generation
+﻿namespace Map.Generation
 {
     public class ResourceGenerator : IGenerator
     {
@@ -42,7 +40,7 @@ namespace Scorpia.Assets.Scripts.Map.Generation
 
         private bool HasChance(Map map, int chance)
         {
-            return map.Rnd.Next(100) <= GOLD_SPAWN_CHANCE;
+            return map.Rnd.Next(100) <= chance;
         }
 
         private bool CheckGold(MapTile tile, Map map)

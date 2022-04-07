@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.MainMenu
+namespace MainMenu
 {
     public class ColourToggle : MonoBehaviour
     {

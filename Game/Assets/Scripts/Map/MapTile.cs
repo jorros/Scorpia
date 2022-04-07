@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.Map
+namespace Map
 {
     public class MapTile : IEquatable<MapTile>
     {

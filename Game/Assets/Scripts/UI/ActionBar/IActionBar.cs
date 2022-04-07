@@ -1,6 +1,6 @@
-﻿using Scorpia.Assets.Scripts.Map;
+﻿using Map;
 
-namespace Scorpia.Assets.Scripts.UI.ActionBar
+namespace UI.ActionBar
 {
 	public interface IActionBar
 	{

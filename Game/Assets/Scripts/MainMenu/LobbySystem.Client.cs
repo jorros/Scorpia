@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace Scorpia.Assets.Scripts.MainMenu
+namespace MainMenu
 {
     public partial class LobbySystem
     {

@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.Utils
+namespace Utils
 {
     public class RandomList<T>
     {

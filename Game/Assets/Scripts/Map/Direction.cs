@@ -1,6 +1,4 @@
-using UnityEngine;
-
-namespace Scorpia.Assets.Scripts.Map
+namespace Map
 {
     public enum Direction
     {

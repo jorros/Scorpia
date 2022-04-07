@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Scorpia.Assets.Scripts.Utils;
+using Utils;
 
-namespace Scorpia.Assets.Scripts.Map
+namespace Map
 {
     public class RiverBuilder
     {

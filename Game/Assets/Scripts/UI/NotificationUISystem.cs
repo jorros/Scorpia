@@ -1,17 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
+using UI.Popup;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scorpia.Assets.Scripts.UI
+namespace UI
 {
     public class NotificationUISystem : MonoBehaviour
     {
-        [SerializeField]
-        private Sprite[] notificationIcons;
+        [SerializeField] private Sprite[] notificationIcons;
 
-        [SerializeField]
-        private GameObject prefab;
+        [SerializeField] private Sprite[] notificationCovers;
+
+        [SerializeField] private GameObject prefab;
 
         private List<GameObject> notifications;
 
@@ -48,31 +49,36 @@ namespace Scorpia.Assets.Scripts.UI
 
         private void Add(Notification notification)
         {
-            var instance = Instantiate(prefab);
+            var instance = Instantiate(prefab, transform);
 
             var positionX = CalculateX(notifications.Count);
-            instance.GetComponent<RectTransform>().position = new Vector3(positionX, POS_Y, 0);
-
-            instance.transform.SetParent(transform, false);
+            instance.GetComponent<RectTransform>().anchoredPosition = new Vector3(positionX, POS_Y, 0);
 
             var icon = instance.GetComponentsInChildren<Image>().First(x => x.name == "Icon");
             icon.sprite = notificationIcons[notification.Icon];
-            icon.rectTransform.sizeDelta = new Vector2(notificationIcons[notification.Icon].rect.width, notificationIcons[notification.Icon].rect.height);
+            icon.rectTransform.sizeDelta = new Vector2(notificationIcons[notification.Icon].rect.width,
+                notificationIcons[notification.Icon].rect.height);
 
             var button = instance.GetComponent<NotificationButton>();
             button.notification = notification;
             button.shouldX = positionX;
 
             var tooltip = instance.GetComponent<TooltipTrigger>();
-            tooltip.header = notification.Title;
-            tooltip.content = notification.Text;
+            tooltip.header = notification.TooltipHeader;
+            tooltip.content = notification.TooltipText;
+
+            var popup = instance.GetComponent<PopupTrigger>();
+            popup.cover = notificationCovers[notification.Cover];
+            popup.header = notification.Header;
+            popup.text = notification.Text;
 
             notifications.Add(instance);
         }
 
         private void Remove(Notification notification)
         {
-            var instance = notifications.First(x => x.GetComponent<NotificationButton>().notification.Id == notification.Id);
+            var instance =
+                notifications.First(x => x.GetComponent<NotificationButton>().notification.Id == notification.Id);
             Destroy(instance);
             notifications.Remove(instance);
 

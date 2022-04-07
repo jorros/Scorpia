@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 
-namespace Scorpia.Assets.Scripts.MainMenu
+namespace MainMenu
 {
     public class PlayerInfo : INetworkSerializable, IEnumerable<PlayerInfo.PlayerDetail>
     {

@@ -1,6 +1,6 @@
-﻿using Scorpia.Assets.Scripts.Utils;
+﻿using Utils;
 
-namespace Scorpia.Assets.Scripts.Map.Render
+namespace Map.Render
 {
 	public class RiverIndexSelector
 	{

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scorpia.Assets.Scripts.UI
+namespace UI
 {
     public class Tooltip : MonoBehaviour
     {

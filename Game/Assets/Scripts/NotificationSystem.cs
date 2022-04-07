@@ -1,20 +1,17 @@
 using Unity.Netcode;
 
-namespace Scorpia.Assets.Scripts
+public class NotificationSystem : NetworkBehaviour
 {
-    public class NotificationSystem : NetworkBehaviour
+    public static NotificationSystem current;
+
+    private void Awake()
     {
-        public static NotificationSystem current;
+        current = this;
+    }
 
-        private void Awake()
-        {
-            current = this;
-        }
-
-        [ClientRpc]
-        public void SendClientRpc(Notification notification, ClientRpcParams clientRpcParams = default)
-        {
-            EventManager.Trigger(EventManager.ReceiveNotification, notification);
-        }
+    [ClientRpc]
+    public void SendClientRpc(Notification notification, ClientRpcParams clientRpcParams = default)
+    {
+        EventManager.Trigger(EventManager.ReceiveNotification, notification);
     }
 }

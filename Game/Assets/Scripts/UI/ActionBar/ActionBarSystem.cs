@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Scorpia.Assets.Scripts.Map;
+using Map;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace Scorpia.Assets.Scripts.UI.ActionBar
+namespace UI.ActionBar
 {
 	public class ActionBarSystem : MonoBehaviour
 	{

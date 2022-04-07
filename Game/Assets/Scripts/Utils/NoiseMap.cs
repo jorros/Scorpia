@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.Utils
+namespace Utils
 {
     public class NoiseMap
     {

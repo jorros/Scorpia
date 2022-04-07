@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using Scorpia.Assets.Scripts.Map;
+using Map;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.UI
+namespace UI
 {
     public class MinimapRenderer : MonoBehaviour
     {

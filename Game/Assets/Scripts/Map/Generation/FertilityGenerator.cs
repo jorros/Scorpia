@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Scorpia.Assets.Scripts.Map.Generation
+﻿namespace Map.Generation
 {
 	public class FertilityGenerator : IGenerator
 	{

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using Scorpia.Assets.Scripts.Utils;
 using UnityEngine.Tilemaps;
+using Utils;
 
-namespace Scorpia.Assets.Scripts.Map.Render
+namespace Map.Render
 {
     public class BiomeRenderer : ITileRenderer
     {

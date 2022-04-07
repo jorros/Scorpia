@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 
-namespace Scorpia.Assets.Scripts.Map.Render
+namespace Map.Render
 {
 	public class FlairTileRenderer : ITileRenderer
 	{

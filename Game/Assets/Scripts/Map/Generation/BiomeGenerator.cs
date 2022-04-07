@@ -1,7 +1,7 @@
-﻿using Scorpia.Assets.Scripts.Utils;
-using UnityEngine;
+﻿using UnityEngine;
+using Utils;
 
-namespace Scorpia.Assets.Scripts.Map.Generation
+namespace Map.Generation
 {
 	public class BiomeGenerator : IGenerator
 	{

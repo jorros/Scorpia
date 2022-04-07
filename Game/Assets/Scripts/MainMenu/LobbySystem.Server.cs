@@ -1,10 +1,10 @@
 using System.Linq;
-using Scorpia.Assets.Scripts.Server;
+using Server;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Scorpia.Assets.Scripts.MainMenu
+namespace MainMenu
 {
     public partial class LobbySystem
     {

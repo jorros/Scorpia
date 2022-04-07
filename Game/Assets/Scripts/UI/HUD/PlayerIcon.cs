@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using Scorpia.Assets.Scripts.UI;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scorpia.Assets.Scripts.HUD
+namespace UI.HUD
 {
     public class PlayerIcon : MonoBehaviour
     {

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Scorpia.Assets.Scripts.Map;
+using Map;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scorpia.Assets.Scripts.UI.TileInfo
+namespace UI.TileInfo
 {
     public class InfoUISystem : MonoBehaviour
     {

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using DevConsole;
-using Scorpia.Assets.Scripts.Map;
+using Map;
 using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.ConsoleCommands
+namespace ConsoleCommands
 {
     [ConsoleCommand(new string[] { "setmap" })]
     public class SetMap

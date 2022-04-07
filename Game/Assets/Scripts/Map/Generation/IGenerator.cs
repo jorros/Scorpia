@@ -1,4 +1,4 @@
-﻿namespace Scorpia.Assets.Scripts.Map.Generation
+﻿namespace Map.Generation
 {
 	public interface IGenerator
 	{

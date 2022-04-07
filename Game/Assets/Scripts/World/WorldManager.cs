@@ -1,9 +1,9 @@
-using Scorpia.Assets.Scripts.Actors;
-using Scorpia.Assets.Scripts.Server;
+using Actors;
+using Server;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace Scorpia.Assets.Scripts.World
+namespace World
 {
     public class WorldManager : NetworkBehaviour
     {
@@ -44,7 +44,7 @@ namespace Scorpia.Assets.Scripts.World
             {
                 var player = ScorpiaServer.Singleton.Players.Get(clientId);
 
-                ScorpiaServer.Singleton.SendNotification(Notification.Format(Notifications.PLAYER_DISCONNECTED, $"{player.Name}"));
+                ScorpiaServer.Singleton.SendNotification(Notification.Format(Notifications.PlayerDisconnected, $"{player.Name}"));
 
                 print($"[{clientId}]{player.Name} disconnected");
             }

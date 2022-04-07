@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Scorpia.Assets.Scripts.Map.Generation
+namespace Map.Generation
 {
     public class RiverGenerator : IGenerator
     {

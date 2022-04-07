@@ -1,7 +1,6 @@
-﻿using Scorpia.Assets.Scripts.Map;
-using UnityEngine;
+﻿using Map;
 
-namespace Scorpia.Assets.Scripts.UI.ActionBar
+namespace UI.ActionBar
 {
 	public class CityActionBar : IActionBar
 	{

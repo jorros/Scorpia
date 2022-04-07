@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using DevConsole;
 
-namespace Scorpia.Assets.Scripts.ConsoleCommands
+namespace ConsoleCommands
 {
 	[ConsoleCommand(new string[] { "notification" })]
 	public class NotificationCommand
@@ -13,7 +13,15 @@ namespace Scorpia.Assets.Scripts.ConsoleCommands
 
         public static string Execute(string[] tokens)
         {
-            var notification = new Notification(tokens[0], tokens[1], int.Parse(tokens[2]));
+            var notification = new Notification
+            {
+                TooltipHeader = tokens[0], 
+                TooltipText = tokens[1], 
+                Icon = int.Parse(tokens[2]),
+                Cover = int.Parse(tokens[2]),
+                Header = tokens[0], 
+                Text = tokens[1], 
+            };
 
             EventManager.Trigger(EventManager.ReceiveNotification, notification);
 
