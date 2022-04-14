@@ -47,6 +47,11 @@ namespace Map
 
             return tiles[y * width + x];
         }
+        
+        public MapTile GetTile(Vector2Int position)
+        {
+            return GetTile(position.x, position.y);
+        }
 
         public MapTile GetTile(int q, int r, int s)
         {

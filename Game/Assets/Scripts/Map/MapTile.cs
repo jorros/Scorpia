@@ -16,6 +16,8 @@ namespace Map
         public Resource Resource { get; set; }
 
         public Vector2Int Position { get; set; }
+        
+        public MapLocation? Location { get; set; }
 
         public double DistanceTo(MapTile other)
         {

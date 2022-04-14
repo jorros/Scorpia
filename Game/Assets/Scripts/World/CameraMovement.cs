@@ -43,17 +43,13 @@ namespace World
             raycaster = GameObject.Find("HUD").GetComponent<GraphicRaycaster>();
             pointData = new PointerEventData(EventSystem.current);
             raycastResults = new List<RaycastResult>();
-
-            EventManager.Register(EventManager.PanCamera, SetPosition);
-            EventManager.Register(EventManager.ZoomInCamera, ZoomIn);
-            EventManager.Register(EventManager.ZoomOutCamera, ZoomOut);
+            
+            EventManager.RegisterAll(this);
         }
 
         void OnDestroy()
         {
-            EventManager.Remove(EventManager.PanCamera, SetPosition);
-            EventManager.Remove(EventManager.ZoomInCamera, ZoomIn);
-            EventManager.Remove(EventManager.ZoomOutCamera, ZoomOut);
+            EventManager.RemoveAll(this);
         }
 
         void Update()
@@ -134,7 +130,8 @@ namespace World
             }
         }
 
-        public void ZoomIn(IReadOnlyList<object> args = null)
+        [Event(EventManager.ZoomInCamera)]
+        public void ZoomIn()
         {
             var newSize = cam.orthographicSize - zoomStep;
             cam.orthographicSize = Mathf.Clamp(newSize, minCamSize, maxCamSize);
@@ -142,7 +139,8 @@ namespace World
             cam.transform.position = ClampCamera(cam.transform.position);
         }
 
-        public void ZoomOut(IReadOnlyList<object> args = null)
+        [Event(EventManager.ZoomOutCamera)]
+        public void ZoomOut()
         {
             var newSize = cam.orthographicSize + zoomStep;
             cam.orthographicSize = Mathf.Clamp(newSize, minCamSize, maxCamSize);
@@ -150,9 +148,9 @@ namespace World
             cam.transform.position = ClampCamera(cam.transform.position);
         }
 
-        private void SetPosition(IReadOnlyList<object> args)
+        [Event(EventManager.PanCamera)]
+        private void SetPosition(Vector3 pos)
         {
-            var pos = (Vector3)args[0];
             cam.transform.position = ClampCamera(pos);
         }
 

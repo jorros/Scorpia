@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UI.Tooltip;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,7 +21,7 @@ namespace UI.HUD
         {
             if (NetworkManager.Singleton.IsClient)
             {
-                EventManager.Register(EventManager.PlayerInfo, SetIcon);
+                EventManager.RegisterAll(this);
             }
         }
 
@@ -28,15 +29,13 @@ namespace UI.HUD
         {
             if (NetworkManager.Singleton.IsClient)
             {
-                EventManager.Remove(EventManager.PlayerInfo, SetIcon);
+                EventManager.RemoveAll(this);
             }
         }
 
-        public void SetIcon(IReadOnlyList<object> list)
+        [Event(EventManager.PlayerInfo)]
+        public void SetIcon(string name, int? colour)
         {
-            var name = list[0] as string;
-            var colour = list[1] as int?;
-
             if (colour != null)
             {
                 image.sprite = icons[colour.Value];

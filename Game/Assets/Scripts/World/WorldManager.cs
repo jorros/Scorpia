@@ -1,4 +1,6 @@
+using System.Linq;
 using Actors;
+using Map;
 using Server;
 using Unity.Netcode;
 using UnityEngine;
@@ -7,17 +9,13 @@ namespace World
 {
     public class WorldManager : NetworkBehaviour
     {
-        [SerializeField]
-        public int Coins { get; set; }
+        [SerializeField] private GameObject mapPrefab;
 
-        [SerializeField]
-        private GameObject mapPrefab;
+        [SerializeField] private GameObject tickerPrefab;
 
-        [SerializeField]
-        private GameObject tickerPrefab;
+        [SerializeField] private GameObject playerPrefab;
 
-        [SerializeField]
-        private GameObject playerPrefab;
+        [SerializeField] private GameObject testPrefab;
 
         private void Start()
         {
@@ -30,8 +28,21 @@ namespace World
 
                 var ticker = Instantiate(tickerPrefab);
                 ticker.GetComponent<NetworkObject>().Spawn();
-            }
 
+                var testLocation = Instantiate(testPrefab,
+                    MapRenderer.current.GetTileWorldPosition(new Vector2Int(5, 5)), Quaternion.identity);
+                testLocation.GetComponent<Location>().location.Value = new MapLocation
+                {
+                    Name = "Test",
+                    Player = "test",
+                    Type = MapLocation.LocationType.Village
+                };
+                testLocation.GetComponent<NetworkObject>().Spawn();
+            }
+        }
+
+        public override void OnNetworkSpawn()
+        {
             if (IsClient)
             {
                 LoginServerRpc(ScorpiaSettings.Uid);
@@ -44,14 +55,15 @@ namespace World
             {
                 var player = ScorpiaServer.Singleton.Players.Get(clientId);
 
-                ScorpiaServer.Singleton.SendNotification(Notification.Format(Notifications.PlayerDisconnected, $"{player.Name}"));
+                ScorpiaServer.Singleton.SendNotification(Notification.Format(Notifications.PlayerDisconnected,
+                    $"{player.Name}"));
 
                 print($"[{clientId}]{player.Name} disconnected");
             }
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void LoginServerRpc(string uid, ServerRpcParams serverRpcParams = default)
+        private void LoginServerRpc(string uid, ServerRpcParams serverRpcParams = default)
         {
             var senderId = serverRpcParams.Receive.SenderClientId;
             var player = ScorpiaServer.Singleton.Players.FindByUID(uid);
@@ -61,13 +73,11 @@ namespace World
                 print($"reconnecting [{player.ID}=>{senderId}]{player.Name}");
 
                 var objs = NetworkManager.SpawnManager.SpawnedObjects;
+                var playersObjs = objs.Where(obj => obj.Key == player.ID);
 
-                foreach (var obj in objs)
+                foreach (var obj in playersObjs)
                 {
-                    if (obj.Key == player.ID)
-                    {
-                        obj.Value.ChangeOwnership(senderId);
-                    }
+                    obj.Value.ChangeOwnership(senderId);
                 }
 
                 player.ID = senderId;
@@ -84,7 +94,7 @@ namespace World
 
             playerInstance.Name.Value = player.Name;
             playerInstance.UID.Value = player.UID;
-            playerInstance.Colour.Value = (int)player.Colour;
+            playerInstance.Colour.Value = (int) player.Colour;
         }
     }
 }

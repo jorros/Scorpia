@@ -3,37 +3,49 @@ using UI.Tooltip;
 
 namespace UI.TileInfo
 {
-	public class EmptyTileInfo : ITileInfo
-	{
+    public class CityTileInfo : ITileInfo
+    {
         private InfoUISystem system;
 
-        public EmptyTileInfo(InfoUISystem system)
+        public CityTileInfo(InfoUISystem system)
         {
             this.system = system;
         }
 
         public bool ShouldRender(MapTile tile)
         {
-            return tile.Location == null;
+            return tile.Location.HasValue;
         }
 
         public void Render(MapTile mapTile)
         {
-            system.SetName("Empty");
+            if (!mapTile.Location.HasValue)
+            {
+                return;
+            }
 
-            SetAvatar(mapTile);
+            var location = mapTile.Location.Value;
+            system.SetName(location.Name.Value);
+
+            SetAvatar(location);
+            AddPlayerIcon(mapTile);
             AddResourceIcon(mapTile);
             AddFertilityIcon(mapTile);
+            AddStats(location);
         }
 
-        private void SetAvatar(MapTile tile)
+        private void AddPlayerIcon(MapTile mapTile)
         {
-            var i = tile switch
+            // system.AddInfoIcon();
+        }
+
+        private void SetAvatar(MapLocation location)
+        {
+            var i = location switch
             {
-                { Biome: Biome.Water } => 8,
-                { Biome: Biome.Grass, Feature: TileFeature.Forest } => 2,
-                { Biome: Biome.Grass } => 3,
-                { Biome: Biome.Mountain } => 4,
+                {Type: MapLocation.LocationType.Village} => 7,
+                {Type: MapLocation.LocationType.Town} => 6,
+                {Type: MapLocation.LocationType.City} => 1,
                 _ => -1
             };
 
@@ -74,6 +86,11 @@ namespace UI.TileInfo
                 system.AddInfoIcon(i.Item1, new TooltipDescription(i.Item2, string.Empty, i.Item3));
             }
         }
+
+        private void AddStats(MapLocation location)
+        {
+            system.AddStat(3, location.Population.ToString(),
+                new TooltipDescription("Population", "Current population of this location."));
+        }
     }
 }
-

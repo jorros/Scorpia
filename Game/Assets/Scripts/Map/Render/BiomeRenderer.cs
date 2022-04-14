@@ -54,14 +54,30 @@ namespace Map.Render
             {
                 { Biome: Biome.Water, Feature: TileFeature.Wave } => tiles.Wave[counter.Next(0)],
                 { Biome: Biome.Water } => tiles.Water,
+                { Biome: Biome.Grass, Feature: TileFeature.Hill, Fertility: Fertility.Low, Location: not null } => tiles.BarrenClear[counter.Next(0)],
                 { Biome: Biome.Grass, Feature: TileFeature.Hill, Fertility: Fertility.Low } => tiles.Barren[counter.Next(0)],
+                
+                { Biome: Biome.Grass, Feature: TileFeature.Hill, Fertility: Fertility.Normal, Location: not null } => tiles.HillClear[counter.Next(0)],
                 { Biome: Biome.Grass, Feature: TileFeature.Hill, Fertility: Fertility.Normal } => tiles.Hill[counter.Next(0)],
+                
+                { Biome: Biome.Grass, Feature: TileFeature.Hill, Location: not null } => tiles.HillClear[counter.Next(10)],
                 { Biome: Biome.Grass, Feature: TileFeature.Hill } => tiles.Hill[counter.Next(10)],
+                
+                { Biome: Biome.Grass, Feature: TileFeature.Forest, Fertility: Fertility.Low, Location: not null } => tiles.ForestClear[counter.Next(0)],
                 { Biome: Biome.Grass, Feature: TileFeature.Forest, Fertility: Fertility.Low } => tiles.Forest[counter.Next(0)],
+                
+                { Biome: Biome.Grass, Feature: TileFeature.Forest, Location: not null } => tiles.ForestClear[counter.Next(10)],
                 { Biome: Biome.Grass, Feature: TileFeature.Forest } => tiles.Forest[counter.Next(10)],
+                
+                { Biome: Biome.Grass, Fertility: Fertility.Low, Location: not null } => tiles.BarrenClear[counter.Next(0)],
                 { Biome: Biome.Grass, Fertility: Fertility.Low } => tiles.Barren[counter.Next(0)],
+                
+                { Biome: Biome.Grass, Fertility: Fertility.Normal, Location: not null } => tiles.GrassClear[counter.Next(0)],
                 { Biome: Biome.Grass, Fertility: Fertility.Normal } => tiles.Grass[counter.Next(0)],
+                
+                { Biome: Biome.Grass, Location: not null } => tiles.GrassClear[counter.Next(10)],
                 { Biome: Biome.Grass } => tiles.Grass[counter.Next(10)],
+                
                 { Biome: Biome.Mountain, Feature: TileFeature.Forest } => tiles.MountainForest[counter.Next(0)],
                 { Biome: Biome.Mountain } => tiles.Mountain[counter.Next(0)],
                 _ => tiles.Grass[counter.Next(0)]

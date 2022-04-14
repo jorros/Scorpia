@@ -9,38 +9,38 @@ namespace Map
 {
     public class MapRenderer : NetworkBehaviour
     {
-        [SerializeField]
-        public Tile[] riverTile;
+        [SerializeField] public Tile[] riverTile;
 
-        [SerializeField]
-        private Tile[] minimapTiles;
+        [SerializeField] private Tile[] minimapTiles;
 
-        [SerializeField]
-        private Tile[] flairTiles;
+        [SerializeField] private Tile[] flairTiles;
 
-        [SerializeField]
-        private TileBase selectedTile;
+        [SerializeField] private Tile[] locationTiles;
 
-        [SerializeField]
-        private BiomeRendererTiles biomeTiles;
+        [SerializeField] private TileBase selectedTile;
 
-        private NetworkVariable<int> width = new();
-        private NetworkVariable<int> height = new();
-        private NetworkVariable<int> seed = new();
+        [SerializeField] private BiomeRendererTiles biomeTiles;
+
+        private readonly NetworkVariable<int> width = new();
+        private readonly NetworkVariable<int> height = new();
+        private readonly NetworkVariable<int> seed = new();
 
         private Tilemap groundLayer;
         private Tilemap minimapLayer;
         private Tilemap riverLayer;
         private Tilemap flairLayer;
+        private Tilemap locationsLayer;
         private Tilemap selectedLayer;
 
-        [HideInInspector]
-        public global::Map.Map map;
+        [HideInInspector] public Map map;
 
-        [HideInInspector]
-        public Vector3 mapSize;
+        [HideInInspector] public Vector3 mapSize;
 
         public static MapRenderer current;
+
+        private LocationsRenderer locationsRenderer;
+
+        private ITileRenderer[] renderers;
 
         private void Awake()
         {
@@ -51,16 +51,24 @@ namespace Map
             minimapLayer = tilemaps[1];
             riverLayer = tilemaps[2];
             flairLayer = tilemaps[3];
-            selectedLayer = tilemaps[4];
+            locationsLayer = tilemaps[4];
+            selectedLayer = tilemaps[5];
 
-            EventManager.Register(EventManager.SelectTile, SelectTile);
-            EventManager.Register(EventManager.DeselectTile, DeselectTile);
+            renderers = new ITileRenderer[]
+            {
+                new BiomeRenderer(groundLayer, biomeTiles),
+                new RiverTileRenderer(riverLayer, riverTile),
+                new MinimapTileRenderer(minimapLayer, minimapTiles),
+                new FlairTileRenderer(flairLayer, flairTiles),
+                new LocationsRenderer(locationsLayer, locationTiles)
+            };
+
+            EventManager.RegisterAll(this);
         }
 
         public override void OnDestroy()
         {
-            EventManager.Remove(EventManager.SelectTile, SelectTile);
-            EventManager.Remove(EventManager.DeselectTile, DeselectTile);
+            EventManager.RemoveAll(this);
         }
 
         public override void OnNetworkSpawn()
@@ -72,7 +80,7 @@ namespace Map
                 width.Value = 60;
             }
 
-            map = new global::Map.Map(width.Value, height.Value, seed.Value);
+            map = new Map(width.Value, height.Value, seed.Value);
             Refresh();
         }
 
@@ -83,48 +91,57 @@ namespace Map
             return map.GetTile(mapPos.x, mapPos.y);
         }
 
+        public Vector3 GetTileWorldPosition(Vector2Int position)
+        {
+            return groundLayer.CellToWorld(new Vector3Int(position.x, position.y));
+        }
+
         public void Refresh()
         {
             print($"S:{seed.Value};H:{height.Value};W:{width.Value}");
 
             map.Generate();
 
-            var renderers = new ITileRenderer[]
+            for (var y = 0; y < height.Value; y++)
             {
-                new BiomeRenderer(groundLayer, biomeTiles),
-                new RiverTileRenderer(riverLayer, riverTile),
-                new MinimapTileRenderer(minimapLayer, minimapTiles),
-                new FlairTileRenderer(flairLayer, flairTiles)
-            };
-
-            for (int y = 0; y < height.Value; y++)
-            {
-                for (int x = 0; x < width.Value; x++)
+                for (var x = 0; x < width.Value; x++)
                 {
-                    var tile = map.GetTile(x, y);
-                    var pos = new Vector3Int(x, y, 0);
-
-                    foreach(var tileRenderer in renderers)
-                    {
-                        tileRenderer.Layer.SetTile(pos, tileRenderer.GetTile(tile));
-                    }
+                    RenderTile(x, y);
                 }
             }
 
-            mapSize = groundLayer.CellToWorld(new Vector3Int(groundLayer.size.x - 1, groundLayer.size.y - 1)) + (groundLayer.cellSize / 2);
+            mapSize = groundLayer.CellToWorld(new Vector3Int(groundLayer.size.x - 1, groundLayer.size.y - 1)) +
+                      (groundLayer.cellSize / 2);
 
             EventManager.Trigger(EventManager.MapRendered);
         }
 
-        private void SelectTile(IReadOnlyList<object> args)
+        private void RenderTile(int x, int y)
         {
-            var selected = args[0] as MapTile;
+            var tile = map.GetTile(x, y);
+            var pos = new Vector3Int(x, y, 0);
 
+            foreach (var tileRenderer in renderers)
+            {
+                tileRenderer.Layer.SetTile(pos, tileRenderer.GetTile(tile));
+            }
+        }
+
+        [Event(EventManager.LocationUpdated)]
+        private void OnLocationUpdate(Vector2Int position)
+        {
+            RenderTile(position.x, position.y);
+        }
+
+        [Event(EventManager.SelectTile)]
+        private void SelectTile(MapTile selected)
+        {
             selectedLayer.ClearAllTiles();
             selectedLayer.SetTile(new Vector3Int(selected.Position.x, selected.Position.y, 0), selectedTile);
         }
 
-        private void DeselectTile(IReadOnlyList<object> args)
+        [Event(EventManager.DeselectTile)]
+        private void DeselectTile()
         {
             selectedLayer.ClearAllTiles();
         }

@@ -1,73 +1,105 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 public class EventManager
 {
-    private Dictionary<string, Action<IReadOnlyList<object>>> eventDictionary;
+    private readonly Dictionary<string, Dictionary<string, Action<object[]>>> eventDictionary;
 
-    private static EventManager eventManager;
+    private static EventManager _eventManager;
 
-    public static string PanCamera => "PanCamera";
-    public static string ZoomOutCamera => "ZoomOutCamera";
-    public static string ZoomInCamera => "ZoomInCamera";
-    public static string SelectTile => "SelectTile";
-    public static string DeselectTile => "DeselectTile";
-    public static string ReceiveNotification => "ReceiveNotification";
-    public static string RemoveNotification => "RemoveNotification";
-    public static string MapRendered => "MapRendered";
-    public static string PlayerInfo => "PlayerInfo";
+    public const string PanCamera = "PanCamera";
+    public const string ZoomOutCamera = "ZoomOutCamera";
+    public const string ZoomInCamera = "ZoomInCamera";
+    public const string SelectTile = "SelectTile";
+    public const string DeselectTile = "DeselectTile";
+    public const string ReceiveNotification = "ReceiveNotification";
+    public const string RemoveNotification = "RemoveNotification";
+    public const string MapRendered = "MapRendered";
+    public const string PlayerInfo = "PlayerInfo";
+    public const string LocationUpdated = "LocationUpdated";
 
-    private static EventManager instance
+    private static EventManager Instance
     {
-        get
+        get { return _eventManager ??= new EventManager(); }
+    }
+
+    private EventManager()
+    {
+        eventDictionary = new Dictionary<string, Dictionary<string, Action<object[]>>>();
+    }
+
+    public static void RegisterAll(object instance)
+    {
+        var type = instance.GetType();
+        foreach (var method in type.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public |
+                                               BindingFlags.NonPublic))
         {
-            if (eventManager == null)
+            var attribute = method.GetCustomAttribute(typeof(EventAttribute));
+
+            if (attribute is null)
             {
-                eventManager = new EventManager();
+                continue;
             }
 
-            return eventManager;
+            var eventAttribute = (EventAttribute) attribute;
+
+            void RunMethod(object[] x)
+            {
+                method.Invoke(instance, x);
+            }
+
+            if (Instance.eventDictionary.TryGetValue(eventAttribute.Name, out var events))
+            {
+                if (!events.TryAdd(instance.GetType().FullName, RunMethod))
+                {
+                    events[instance.GetType().FullName] = RunMethod;
+                }
+            }
+            else
+            {
+                events = new Dictionary<string, Action<object[]>>
+                {
+                    [instance.GetType().FullName] = RunMethod
+                };
+                Instance.eventDictionary.Add(eventAttribute.Name, events);
+            }
         }
     }
 
-    public EventManager()
+    public static void RemoveAll(object instance)
     {
-        eventDictionary = new Dictionary<string, Action<IReadOnlyList<object>>>();
-    }
-
-    public static void Register(string eventName, Action<IReadOnlyList<object>> listener)
-    {
-        Action<IReadOnlyList<object>> thisEvent;
-
-        if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
+        var type = instance.GetType();
+        foreach (var method in type.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public |
+                                               BindingFlags.NonPublic))
         {
-            thisEvent += listener;
-            instance.eventDictionary[eventName] = thisEvent;
-        }
-        else
-        {
-            thisEvent += listener;
-            instance.eventDictionary.Add(eventName, thisEvent);
-        }
-    }
+            var attribute = method.GetCustomAttribute(typeof(EventAttribute));
 
-    public static void Remove(string eventName, Action<IReadOnlyList<object>> listener)
-    {
-        if (eventManager == null) return;
-        Action<IReadOnlyList<object>> thisEvent;
-        if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
-        {
-            thisEvent -= listener;
-            instance.eventDictionary[eventName] = thisEvent;
+            if (attribute is null)
+            {
+                continue;
+            }
+
+            var eventAttribute = (EventAttribute) attribute;
+
+            if (Instance.eventDictionary.TryGetValue(eventAttribute.Name, out var events))
+            {
+                events.Remove(instance.GetType().FullName);
+            }
         }
     }
 
     public static void Trigger(string eventName, params object[] message)
     {
-        Action<IReadOnlyList<object>> thisEvent = null;
-        if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
+        if (!Instance.eventDictionary.TryGetValue(eventName, out var events))
         {
-            thisEvent?.Invoke(message);
+            return;
+        }
+
+        foreach (var evt in events)
+        {
+            evt.Value(message.Any() ? message : null);
         }
     }
 }

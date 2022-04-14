@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UI.Popup;
+using UI.Tooltip;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,29 +22,25 @@ namespace UI
 
         private void Awake()
         {
-            EventManager.Register(EventManager.ReceiveNotification, ReceiveNotification);
-            EventManager.Register(EventManager.RemoveNotification, RemoveNotification);
+            EventManager.RegisterAll(this);
 
             notifications = new List<GameObject>();
         }
 
         private void OnDestroy()
         {
-            EventManager.Remove(EventManager.ReceiveNotification, ReceiveNotification);
-            EventManager.Remove(EventManager.RemoveNotification, RemoveNotification);
+            EventManager.RemoveAll(this);
         }
 
-        private void ReceiveNotification(IReadOnlyList<object> args)
+        [Event(EventManager.ReceiveNotification)]
+        private void ReceiveNotification(Notification notification)
         {
-            var notification = args[0] as Notification;
-
             Add(notification);
         }
-
-        private void RemoveNotification(IReadOnlyList<object> args)
+        
+        [Event(EventManager.RemoveNotification)]
+        private void RemoveNotification(Notification notification)
         {
-            var notification = args[0] as Notification;
-
             Remove(notification);
         }
 

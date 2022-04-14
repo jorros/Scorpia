@@ -69,7 +69,7 @@ namespace MainMenu
             else
             {
                 var message = "in progress";
-                using FastBufferWriter writer = new FastBufferWriter(message.Length * 4, Allocator.Temp);
+                using var writer = new FastBufferWriter(message.Length * 4, Allocator.Temp);
                 writer.WriteValueSafe(message);
                 NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("ErrorMessage", clientId, writer, NetworkDelivery.Reliable);
             }

@@ -35,7 +35,7 @@ namespace Utils
             if (isCloneFileExistCache == null)
             {
                 /// The project is a clone if its root directory contains an empty file named ".clone".
-                string cloneFilePath = Path.Combine(ParrelSyncHelper.GetCurrentProjectPath(), ParrelSyncHelper.CloneFileName);
+                string cloneFilePath = Path.Combine(GetCurrentProjectPath(), CloneFileName);
                 isCloneFileExistCache = File.Exists(cloneFilePath);
             }
 

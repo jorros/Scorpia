@@ -1,4 +1,5 @@
 ﻿using Map;
+using UI.Tooltip;
 
 namespace UI.ActionBar
 {
@@ -11,7 +12,10 @@ namespace UI.ActionBar
             this.system = system;
         }
 
-        public string Type => "city";
+        public bool ShouldRender(MapTile tile)
+        {
+            return tile.Location.HasValue;
+        }
 
         public void Render(MapTile tile)
         {

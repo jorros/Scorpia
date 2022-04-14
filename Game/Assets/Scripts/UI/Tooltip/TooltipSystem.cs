@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 
-namespace UI
+namespace UI.Tooltip
 {
     public class TooltipSystem : MonoBehaviour
     {
         private static TooltipSystem current;
 
         [SerializeField]
-        private Tooltip tooltip;
+        private UI.Tooltip.Tooltip tooltip;
 
         void Awake()
         {

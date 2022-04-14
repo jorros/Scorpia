@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Map;
+using UI.Tooltip;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -37,8 +38,7 @@ namespace UI.ActionBar
 
 		private void Awake()
         {
-			EventManager.Register(EventManager.SelectTile, SelectTile);
-			EventManager.Register(EventManager.DeselectTile, Deselect);
+	        EventManager.RegisterAll(this);
 
 			mButtons = new List<GameObject>();
 			sButtons = new List<GameObject>();
@@ -52,8 +52,7 @@ namespace UI.ActionBar
 
 		private void OnDestroy()
 		{
-			EventManager.Remove(EventManager.SelectTile, SelectTile);
-			EventManager.Remove(EventManager.DeselectTile, Deselect);
+			EventManager.RemoveAll(this);
 		}
 
 		private void FixedUpdate()
@@ -64,7 +63,7 @@ namespace UI.ActionBar
 				sButtonCounter = 0;
 				extraCounter = 0;
 
-				actionBars.First().Render(selected);
+				actionBars.First(x => x.ShouldRender(selected)).Render(selected);
 
 				for (var i = mButtonCounter; i < mButtons.Count; i++)
 				{
@@ -219,15 +218,23 @@ namespace UI.ActionBar
 			extraCounter++;
 		}
 
-		private void SelectTile(IReadOnlyList<object> args)
+		[Event(EventManager.SelectTile)]
+		private void SelectTile(MapTile tile)
 		{
-			selected = args[0] as MapTile;
-
+			if (!actionBars.Any(x => x.ShouldRender(tile)))
+			{
+				Deselect();
+				return;
+			}
+			
+			selected = tile;
+			
 			actionBar.SetActive(true);
 			extraActionBar.SetActive(false);
 		}
-
-		private void Deselect(IReadOnlyList<object> args)
+		
+		[Event(EventManager.DeselectTile)]
+		private void Deselect()
 		{
 			selected = null;
 

@@ -21,7 +21,7 @@ namespace Server
             });
         }
 
-        public ScorpiaServer()
+        private ScorpiaServer()
         {
             State = GameState.Lobby;
         }

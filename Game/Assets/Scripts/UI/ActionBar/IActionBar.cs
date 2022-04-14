@@ -4,7 +4,7 @@ namespace UI.ActionBar
 {
 	public interface IActionBar
 	{
-		string Type { get; }
+		bool ShouldRender(MapTile tile);
 		void Render(MapTile tile);
 	}
 }

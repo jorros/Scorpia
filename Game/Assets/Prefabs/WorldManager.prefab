@@ -65,6 +65,7 @@ MonoBehaviour:
   mapPrefab: {fileID: 1289163006786682392, guid: 850f8d2c898264eaa862703b9b3db3d9, type: 3}
   tickerPrefab: {fileID: 6206678866969412336, guid: 5d3d527e6a48949d89ee5eb09a25d0ef, type: 3}
   playerPrefab: {fileID: 358556898896846951, guid: c4e8610ac0c6f4358a7d970bfe626b0e, type: 3}
+  testPrefab: {fileID: 7907598844982776895, guid: 8a73e069717544448a6dbbe36279e0e4, type: 3}
 --- !u!114 &4448699577843421613
 MonoBehaviour:
   m_ObjectHideFlags: 0

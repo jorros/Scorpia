@@ -2,6 +2,7 @@
 using System.Linq;
 using Map;
 using TMPro;
+using UI.Tooltip;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -50,19 +51,18 @@ namespace UI.TileInfo
 
         private void Start()
         {
-            EventManager.Register(EventManager.SelectTile, SelectTile);
-            EventManager.Register(EventManager.DeselectTile, Deselect);
+            EventManager.RegisterAll(this);
 
-            tileInfos = new[]
+            tileInfos = new ITileInfo[]
             {
-                new EmptyTileInfo(this)
+                new EmptyTileInfo(this),
+                new CityTileInfo(this)
             };
         }
 
         private void OnDestroy()
         {
-            EventManager.Remove(EventManager.SelectTile, SelectTile);
-            EventManager.Remove(EventManager.DeselectTile, Deselect);
+            EventManager.RemoveAll(this);
         }
 
         private void FixedUpdate()
@@ -72,7 +72,16 @@ namespace UI.TileInfo
                 infoCounter = 0;
                 statCounter = 0;
 
-                tileInfos.First().Render(selected);
+                foreach (var tileInfo in tileInfos)
+                {
+                    if (!tileInfo.ShouldRender(selected))
+                    {
+                        continue;
+                    }
+                    
+                    tileInfo.Render(selected);
+                    break;
+                }
 
                 for(var i = infoCounter; i < 6; i++)
                 {
@@ -86,15 +95,16 @@ namespace UI.TileInfo
                 }
             }
         }
-
-        private void SelectTile(IReadOnlyList<object> args)
+        
+        [Event(EventManager.SelectTile)]
+        private void SelectTile(MapTile tile)
         {
-            selected = args[0] as MapTile;
-
+            selected = tile;
             instance.SetActive(true);
         }
 
-        private void Deselect(IReadOnlyList<object> args)
+        [Event(EventManager.DeselectTile)]
+        private void Deselect()
         {
             selected = null;
 

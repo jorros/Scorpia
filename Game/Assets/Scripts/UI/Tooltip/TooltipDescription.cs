@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UI
+namespace UI.Tooltip
 {
     public class TooltipDescription
     {

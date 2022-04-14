@@ -19,7 +19,7 @@ namespace UI
         private void Awake()
         {
             cam = GetComponent<Camera>();
-            EventManager.Register(EventManager.MapRendered, Refresh);
+            EventManager.RegisterAll(this);
         }
 
         private void Start()
@@ -29,7 +29,7 @@ namespace UI
 
         private void OnDestroy()
         {
-            EventManager.Remove(EventManager.MapRendered, Refresh);
+            EventManager.RemoveAll(this);
         }
 
         private Vector3 GetCameraFrustumPoint(Vector3 position)
@@ -82,7 +82,8 @@ namespace UI
             GL.PopMatrix();
         }
 
-        public void Refresh(IReadOnlyList<object> args = null)
+        [Event(EventManager.MapRendered)]
+        private void Refresh()
         {
             if (NetworkManager.Singleton.IsClient)
             {

@@ -1,4 +1,4 @@
-﻿namespace UI
+﻿namespace UI.Tooltip
 {
 	public enum TooltipPosition
 	{
