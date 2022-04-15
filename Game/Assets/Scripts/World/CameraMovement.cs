@@ -70,13 +70,13 @@ namespace World
             {
                 var mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
                 tile = MapRenderer.current.GetTile(mousePos);
-                EventManager.Trigger(EventManager.SelectTile, tile);
+                EventManager.Trigger(Events.SelectTile, tile);
             }
 
             if(Input.GetMouseButtonUp(1) && tile != null && !clickIsBlocked)
             {
                 tile = null;
-                EventManager.Trigger(EventManager.DeselectTile);
+                EventManager.Trigger(Events.DeselectTile);
             }
 
             if (clickIsBlocked)
@@ -130,7 +130,7 @@ namespace World
             }
         }
 
-        [Event(EventManager.ZoomInCamera)]
+        [Event(Events.ZoomInCamera)]
         public void ZoomIn()
         {
             var newSize = cam.orthographicSize - zoomStep;
@@ -139,7 +139,7 @@ namespace World
             cam.transform.position = ClampCamera(cam.transform.position);
         }
 
-        [Event(EventManager.ZoomOutCamera)]
+        [Event(Events.ZoomOutCamera)]
         public void ZoomOut()
         {
             var newSize = cam.orthographicSize + zoomStep;
@@ -148,7 +148,7 @@ namespace World
             cam.transform.position = ClampCamera(cam.transform.position);
         }
 
-        [Event(EventManager.PanCamera)]
+        [Event(Events.PanCamera)]
         private void SetPosition(Vector3 pos)
         {
             cam.transform.position = ClampCamera(pos);

@@ -28,16 +28,6 @@ namespace World
 
                 var ticker = Instantiate(tickerPrefab);
                 ticker.GetComponent<NetworkObject>().Spawn();
-
-                var testLocation = Instantiate(testPrefab,
-                    MapRenderer.current.GetTileWorldPosition(new Vector2Int(5, 5)), Quaternion.identity);
-                testLocation.GetComponent<Location>().location.Value = new MapLocation
-                {
-                    Name = "Test",
-                    Player = "test",
-                    Type = MapLocation.LocationType.Village
-                };
-                testLocation.GetComponent<NetworkObject>().Spawn();
             }
         }
 
@@ -88,13 +78,29 @@ namespace World
             print($"connecting {uid} ({senderId})");
 
             var instance = Instantiate(playerPrefab);
-            instance.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
-
             var playerInstance = instance.GetComponent<Player>();
 
             playerInstance.Name.Value = player.Name;
-            playerInstance.UID.Value = player.UID;
-            playerInstance.Colour.Value = (int) player.Colour;
+            playerInstance.Uid.Value = player.UID;
+            playerInstance.Colour.Value = player.Colour;
+            
+            instance.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
+            
+            var testLocation = Instantiate(testPrefab,
+                MapRenderer.current.GetTileWorldPosition(new Vector2Int(5, 5)), Quaternion.identity);
+            testLocation.GetComponent<Location>().location.Value = new MapLocation
+            {
+                Name = "Inglewood",
+                Player = player.UID,
+                Type = MapLocation.LocationType.Village,
+                Income = 20,
+                Garrison = 1000,
+                Population = 500,
+                MaxPopulation = 2000,
+                FoodProduction = 2,
+                FoodStorage = 100
+            };
+            testLocation.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
         }
     }
 }

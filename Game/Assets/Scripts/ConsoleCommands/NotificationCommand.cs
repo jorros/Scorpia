@@ -23,7 +23,7 @@ namespace ConsoleCommands
                 Text = tokens[1], 
             };
 
-            EventManager.Trigger(EventManager.ReceiveNotification, notification);
+            EventManager.Trigger(Events.ReceiveNotification, notification);
 
             return "Notification triggered";
         }

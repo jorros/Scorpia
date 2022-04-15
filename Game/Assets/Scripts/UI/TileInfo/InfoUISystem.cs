@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Map;
 using TMPro;
 using UI.Tooltip;
@@ -96,14 +95,14 @@ namespace UI.TileInfo
             }
         }
         
-        [Event(EventManager.SelectTile)]
+        [Event(Events.SelectTile)]
         private void SelectTile(MapTile tile)
         {
             selected = tile;
             instance.SetActive(true);
         }
 
-        [Event(EventManager.DeselectTile)]
+        [Event(Events.DeselectTile)]
         private void Deselect()
         {
             selected = null;

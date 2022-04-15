@@ -5,20 +5,9 @@ using System.Reflection;
 
 public class EventManager
 {
-    private readonly Dictionary<string, Dictionary<string, Action<object[]>>> eventDictionary;
+    private readonly Dictionary<string, Dictionary<int, Action<object[]>>> eventDictionary;
 
     private static EventManager _eventManager;
-
-    public const string PanCamera = "PanCamera";
-    public const string ZoomOutCamera = "ZoomOutCamera";
-    public const string ZoomInCamera = "ZoomInCamera";
-    public const string SelectTile = "SelectTile";
-    public const string DeselectTile = "DeselectTile";
-    public const string ReceiveNotification = "ReceiveNotification";
-    public const string RemoveNotification = "RemoveNotification";
-    public const string MapRendered = "MapRendered";
-    public const string PlayerInfo = "PlayerInfo";
-    public const string LocationUpdated = "LocationUpdated";
 
     private static EventManager Instance
     {
@@ -27,7 +16,7 @@ public class EventManager
 
     private EventManager()
     {
-        eventDictionary = new Dictionary<string, Dictionary<string, Action<object[]>>>();
+        eventDictionary = new Dictionary<string, Dictionary<int, Action<object[]>>>();
     }
 
     public static void RegisterAll(object instance)
@@ -52,16 +41,16 @@ public class EventManager
 
             if (Instance.eventDictionary.TryGetValue(eventAttribute.Name, out var events))
             {
-                if (!events.TryAdd(instance.GetType().FullName, RunMethod))
+                if (!events.TryAdd(instance.GetHashCode(), RunMethod))
                 {
-                    events[instance.GetType().FullName] = RunMethod;
+                    events[instance.GetHashCode()] = RunMethod;
                 }
             }
             else
             {
-                events = new Dictionary<string, Action<object[]>>
+                events = new Dictionary<int, Action<object[]>>
                 {
-                    [instance.GetType().FullName] = RunMethod
+                    [instance.GetHashCode()] = RunMethod
                 };
                 Instance.eventDictionary.Add(eventAttribute.Name, events);
             }
@@ -85,7 +74,7 @@ public class EventManager
 
             if (Instance.eventDictionary.TryGetValue(eventAttribute.Name, out var events))
             {
-                events.Remove(instance.GetType().FullName);
+                events.Remove(instance.GetHashCode());
             }
         }
     }

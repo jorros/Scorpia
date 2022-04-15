@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Actors
 {
-    public class Location : NetworkBehaviour
+    public class Location : NetworkBehaviour, IActor
     {
         [HideInInspector] public NetworkVariable<MapLocation> location = new();
         private GameObject title;
@@ -13,12 +13,9 @@ namespace Actors
 
         public override void OnNetworkSpawn()
         {
-            print("location spawn");
-            var currentPosition = transform.position;
-
-            var tile = MapRenderer.current.GetTile(currentPosition);
+            var tile = MapRenderer.current.GetTile(transform.position);
             tile.Location = location.Value;
-            EventManager.Trigger(EventManager.LocationUpdated, tile.Position);
+            EventManager.Trigger(Events.LocationUpdated, tile.Position);
         }
 
         private void Update()
@@ -54,6 +51,11 @@ namespace Actors
             
             var tile = MapRenderer.current.GetTile(transform.position);
             tile.Location = null;
+        }
+
+        public void Tick()
+        {
+            
         }
     }
 }

@@ -23,6 +23,16 @@ namespace Map
 
         public int Population;
 
+        public int MaxPopulation;
+
+        public int Garrison;
+
+        public int FoodProduction;
+
+        public int FoodStorage;
+
+        public int Income;
+
         public bool Equals(MapLocation other)
         {
             return Type == other.Type && Name.Equals(other.Name) && Player.Equals(other.Player);

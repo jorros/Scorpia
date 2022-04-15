@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Map;
 using Unity.Netcode;
 using UnityEngine;
@@ -82,7 +81,7 @@ namespace UI
             GL.PopMatrix();
         }
 
-        [Event(EventManager.MapRendered)]
+        [Event(Events.MapRendered)]
         private void Refresh()
         {
             if (NetworkManager.Singleton.IsClient)

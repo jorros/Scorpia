@@ -113,7 +113,7 @@ namespace Map
             mapSize = groundLayer.CellToWorld(new Vector3Int(groundLayer.size.x - 1, groundLayer.size.y - 1)) +
                       (groundLayer.cellSize / 2);
 
-            EventManager.Trigger(EventManager.MapRendered);
+            EventManager.Trigger(Events.MapRendered);
         }
 
         private void RenderTile(int x, int y)
@@ -127,20 +127,20 @@ namespace Map
             }
         }
 
-        [Event(EventManager.LocationUpdated)]
+        [Event(Events.LocationUpdated)]
         private void OnLocationUpdate(Vector2Int position)
         {
             RenderTile(position.x, position.y);
         }
 
-        [Event(EventManager.SelectTile)]
+        [Event(Events.SelectTile)]
         private void SelectTile(MapTile selected)
         {
             selectedLayer.ClearAllTiles();
             selectedLayer.SetTile(new Vector3Int(selected.Position.x, selected.Position.y, 0), selectedTile);
         }
 
-        [Event(EventManager.DeselectTile)]
+        [Event(Events.DeselectTile)]
         private void DeselectTile()
         {
             selectedLayer.ClearAllTiles();

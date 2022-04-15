@@ -1,5 +1,6 @@
 using System;
 
+[AttributeUsage(AttributeTargets.Method)]
 public class EventAttribute : Attribute
 {
     public string Name { get; }

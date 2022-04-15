@@ -1,3 +1,4 @@
+using Actors;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -8,13 +9,13 @@ namespace World
     {
         public static Ticker current;
 
-        public NetworkVariable<int> currentTick = new NetworkVariable<int>(0);
+        public NetworkVariable<int> currentTick = new(0);
 
-        private float step = 0f;
+        private float step;
 
         private TextMeshProUGUI dateText;
 
-        void Awake()
+        private void Awake()
         {
             current = this;
         }
@@ -32,7 +33,7 @@ namespace World
             }
         }
 
-        void FixedUpdate()
+        private void FixedUpdate()
         {
             if (IsServer)
             {
@@ -48,19 +49,30 @@ namespace World
             }
         }
 
-        void Tick()
+        private void Tick()
         {
             if (IsServer)
             {
+                if (currentTick.Value % 30 != 0)
+                {
+                    return;
+                }
+                
+                var locations = FindObjectsOfType<Location>();
+
+                foreach (var location in locations)
+                {
+                    location.Tick();
+                }
             }
             else
             {
                 if (dateText == null)
                 {
-                    dateText = GameObject.Find("DateText")?.GetComponent<TextMeshProUGUI>();
+                    dateText = GameObject.Find("DateText").GetComponent<TextMeshProUGUI>();
                 }
 
-                dateText?.SetText(new ScorpiaDate(currentTick.Value).ToString());
+                dateText.SetText(new ScorpiaDate(currentTick.Value).ToString());
             }
         }
     }

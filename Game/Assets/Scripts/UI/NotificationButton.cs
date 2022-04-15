@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using World;
 
 namespace UI
@@ -12,7 +13,7 @@ namespace UI
 
         private RectTransform rectTransform;
 
-        [SerializeField] private float MOVE_SPEED = 400;
+        [FormerlySerializedAs("MOVE_SPEED")] [SerializeField] private float moveSpeed = 400;
 
         void Awake()
         {
@@ -22,7 +23,7 @@ namespace UI
         public void OnPointerClick(PointerEventData eventData)
         {
             CameraMovement.clickIsBlocked = true;
-            EventManager.Trigger(EventManager.RemoveNotification, notification);
+            EventManager.Trigger(Events.RemoveNotification, notification);
         }
 
         void Update()
@@ -32,7 +33,7 @@ namespace UI
                 var moveTo = new Vector2(shouldX, rectTransform.anchoredPosition.y);
 
                 rectTransform.anchoredPosition = Vector2.MoveTowards(rectTransform.anchoredPosition, moveTo,
-                    Time.deltaTime * MOVE_SPEED);
+                    Time.deltaTime * moveSpeed);
             }
         }
     }

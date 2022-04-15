@@ -45,7 +45,7 @@ namespace World
                     uiPos.x / uiSize.x * terrainSize.x,
                     uiPos.y / uiSize.y * terrainSize.y
                 );
-                EventManager.Trigger(EventManager.PanCamera, realPos);
+                EventManager.Trigger(Events.PanCamera, realPos);
             }
         }
 

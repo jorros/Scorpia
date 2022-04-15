@@ -12,6 +12,6 @@ public class NotificationSystem : NetworkBehaviour
     [ClientRpc]
     public void SendClientRpc(Notification notification, ClientRpcParams clientRpcParams = default)
     {
-        EventManager.Trigger(EventManager.ReceiveNotification, notification);
+        EventManager.Trigger(Events.ReceiveNotification, notification);
     }
 }

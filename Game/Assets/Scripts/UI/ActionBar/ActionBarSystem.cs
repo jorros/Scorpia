@@ -218,7 +218,7 @@ namespace UI.ActionBar
 			extraCounter++;
 		}
 
-		[Event(EventManager.SelectTile)]
+		[Event(Events.SelectTile)]
 		private void SelectTile(MapTile tile)
 		{
 			if (!actionBars.Any(x => x.ShouldRender(tile)))
@@ -233,7 +233,7 @@ namespace UI.ActionBar
 			extraActionBar.SetActive(false);
 		}
 		
-		[Event(EventManager.DeselectTile)]
+		[Event(Events.DeselectTile)]
 		private void Deselect()
 		{
 			selected = null;

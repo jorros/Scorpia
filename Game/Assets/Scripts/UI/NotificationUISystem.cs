@@ -32,13 +32,13 @@ namespace UI
             EventManager.RemoveAll(this);
         }
 
-        [Event(EventManager.ReceiveNotification)]
+        [Event(Events.ReceiveNotification)]
         private void ReceiveNotification(Notification notification)
         {
             Add(notification);
         }
         
-        [Event(EventManager.RemoveNotification)]
+        [Event(Events.RemoveNotification)]
         private void RemoveNotification(Notification notification)
         {
             Remove(notification);
