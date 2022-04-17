@@ -1,3 +1,4 @@
+using Actors;
 using TMPro;
 using UnityEngine;
 
@@ -7,9 +8,9 @@ namespace Map
     {
         [SerializeField] private TextMeshProUGUI text;
 
-        public void SetLocation(MapLocation mapLocation)
+        public void SetLocation(Location location)
         {
-            text.text = mapLocation.Name.Value;
+            text.text = location.Name.Value.Value;
         }
     }
 }

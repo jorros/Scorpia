@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5815319225553786565}
   - component: {fileID: 3319769849860449143}
   - component: {fileID: -8462592884268341961}
+  - component: {fileID: 5796970667512823804}
   m_Layer: 5
   m_Name: ActionS
   m_TagString: Untagged
@@ -140,6 +141,25 @@ MonoBehaviour:
   offset: 40
   position: 2
   content: 
+--- !u!114 &5796970667512823804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 512276749509395083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be01b9dbb17b4308bd6f234d641462ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 3277469242051868381}
+  upgradeIcon: {fileID: 0}
+  inProgressIcon: {fileID: 0}
+  levelText: {fileID: 0}
+  progressBar: {fileID: 0}
+  button: {fileID: 3319769849860449143}
+  tooltip: {fileID: -8462592884268341961}
 --- !u!1 &2156662321068124594
 GameObject:
   m_ObjectHideFlags: 0

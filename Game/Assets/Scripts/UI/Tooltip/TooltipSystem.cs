@@ -7,7 +7,7 @@ namespace UI.Tooltip
         private static TooltipSystem current;
 
         [SerializeField]
-        private UI.Tooltip.Tooltip tooltip;
+        private Tooltip tooltip;
 
         void Awake()
         {

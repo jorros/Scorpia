@@ -1,12 +1,8 @@
-using System.Collections.Generic;
-using System.Globalization;
 using Actors;
-using TMPro;
 using UI.Tooltip;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 
 namespace UI.HUD
 {

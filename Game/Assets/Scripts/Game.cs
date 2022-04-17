@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Actors;
 using UnityEngine;
 using World;
@@ -14,6 +15,16 @@ public static class Game
     public static Player GetPlayer(string uid)
     {
         return Players[uid];
+    }
+
+    public static Player GetSelf()
+    {
+        return GetPlayer(ScorpiaSettings.Uid);
+    }
+
+    public static Player GetPlayer(ulong nid)
+    {
+        return Players.Values.First(x => x.OwnerClientId == nid);
     }
 
     public static void AddPlayer(Player player)

@@ -1,4 +1,5 @@
 using System;
+using Actors;
 using UnityEngine;
 
 namespace Map
@@ -17,7 +18,7 @@ namespace Map
 
         public Vector2Int Position { get; set; }
         
-        public MapLocation? Location { get; set; }
+        public Location Location { get; set; }
 
         public double DistanceTo(MapTile other)
         {

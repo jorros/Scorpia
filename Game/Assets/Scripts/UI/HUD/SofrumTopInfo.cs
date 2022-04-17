@@ -1,7 +1,6 @@
 using Actors;
 using TMPro;
 using UI.Tooltip;
-using Unity.Netcode;
 using UnityEngine;
 using Utils;
 

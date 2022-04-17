@@ -83,23 +83,38 @@ namespace World
             playerInstance.Name.Value = player.Name;
             playerInstance.Uid.Value = player.UID;
             playerInstance.Colour.Value = player.Colour;
-            
+
             instance.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
-            
+
             var testLocation = Instantiate(testPrefab,
                 MapRenderer.current.GetTileWorldPosition(new Vector2Int(5, 5)), Quaternion.identity);
-            testLocation.GetComponent<Location>().location.Value = new MapLocation
+            var location = testLocation.GetComponent<Location>();
+
+            location.Name.Value = "Inglewood";
+            location.Player.Value = player.UID;
+            location.Type.Value = LocationType.Village;
+            location.Income.Value = 20;
+            location.Garrison.Value = 1000;
+            location.Population.Value = 500;
+            location.MaxPopulation.Value = 2000;
+            location.FoodProduction.Value = 2;
+            location.FoodStorage.Value = 100;
+            location.InvestedConstruction.Value = 20;
+            
+            location.Buildings.Add(new Building
             {
-                Name = "Inglewood",
-                Player = player.UID,
-                Type = MapLocation.LocationType.Village,
-                Income = 20,
-                Garrison = 1000,
-                Population = 500,
-                MaxPopulation = 2000,
-                FoodProduction = 2,
-                FoodStorage = 100
-            };
+                IsBuilding = false,
+                Type = BuildingType.Residence,
+                Level = 2
+            });
+            
+            location.Buildings.Add(new Building
+            {
+                IsBuilding = true,
+                Type = BuildingType.Smallholding,
+                Level = 1
+            });
+
             testLocation.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
         }
     }

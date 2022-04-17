@@ -15,6 +15,26 @@ namespace Utils
             return $"{GetColourCode(amount)}{amount.Format()}</color>";
         }
 
+        public static string FormatValid(this int amount, bool valid)
+        {
+            if (valid)
+            {
+                return $"<color=#{Colours.Green}>{amount}</color>";
+            }
+            
+            return $"<color=#{Colours.Red}>{amount}</color>";
+        }
+        
+        public static string FormatValid(this string text, bool valid)
+        {
+            if (valid)
+            {
+                return $"<color=#{Colours.Green}>{text}</color>";
+            }
+            
+            return $"<color=#{Colours.Red}>{text}</color>";
+        }
+
         public static string Format(this int num)
         {
             if (num >= 100000000) {
@@ -36,20 +56,8 @@ namespace Utils
         public static string Format(this float num)
         {
             var rounded = (int)Math.Floor(num);
-            if (rounded >= 100000000) {
-                return (rounded / 1000000D).ToString("0.#M");
-            }
-            if (rounded >= 1000000) {
-                return (rounded / 1000000D).ToString("0.##M");
-            }
-            if (rounded >= 100000) {
-                return (rounded / 1000D).ToString("0.#k");
-            }
-            if (rounded >= 10000) {
-                return (rounded / 1000D).ToString("0.##k");
-            }
-
-            return rounded.ToString();
+            
+            return Format(rounded);
         }
         
         private static string GetColourCode(float amount)

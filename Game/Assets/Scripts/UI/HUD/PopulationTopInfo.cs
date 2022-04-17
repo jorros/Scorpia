@@ -1,7 +1,6 @@
 using Actors;
 using TMPro;
 using UI.Tooltip;
-using Unity.Netcode;
 using UnityEngine;
 using Utils;
 
@@ -26,7 +25,7 @@ namespace UI.HUD
         [Event(Events.PlayerInfo)]
         public void UpdateInfo(Player player)
         {
-            population.text = player.Coins.Value.Format();
+            population.text = player.Population.Value.Format();
             tooltip.content = "Population text yadayada";
         }
     }

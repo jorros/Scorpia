@@ -1,7 +1,6 @@
 using Actors;
 using TMPro;
 using UI.Tooltip;
-using Unity.Netcode;
 using UnityEngine;
 using Utils;
 
@@ -26,7 +25,6 @@ namespace UI.HUD
         [Event(Events.PlayerInfo)]
         public void UpdateInfo(Player player)
         {
-            print("set info");
             storage.text = player.Zellos.Value.Format();
             production.text = player.ZellosProduction.Value.FormatBalance();
             tooltip.content = "Zellos text yadayada";

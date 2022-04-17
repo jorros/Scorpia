@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Map;
+using TMPro;
 using UI.Tooltip;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8,239 +9,283 @@ using UnityEngine.UI;
 
 namespace UI.ActionBar
 {
-	public class ActionBarSystem : MonoBehaviour
-	{
-		[SerializeField]
-		private Sprite[] sIcons;
+    public class ActionBarSystem : MonoBehaviour
+    {
+        [SerializeField] private Sprite[] sIcons;
 
-		[SerializeField]
-		private Sprite[] mIcons;
+        [SerializeField] private Sprite[] mIcons;
 
-		[SerializeField]
-		private GameObject sPrefab;
+        [SerializeField] private GameObject sPrefab;
 
-		[SerializeField]
-		private GameObject mPrefab;
+        [SerializeField] private GameObject mPrefab;
 
-		[SerializeField]
-		private GameObject actionBar;
+        [SerializeField] private GameObject actionBar;
 
-		[SerializeField]
-		private GameObject extraActionBar;
+        [SerializeField] private GameObject extraActionBar;
 
-		private int mButtonCounter, sButtonCounter, extraCounter;
+        private int mButtonCounter, sButtonCounter, extraCounter;
 
-		private List<GameObject> mButtons, sButtons, extraButtons;
+        private List<GameObject> mButtons, sButtons, extraButtons;
 
-		private MapTile selected;
+        private MapTile selected;
 
-		private IReadOnlyList<IActionBar> actionBars;
+        private IReadOnlyList<IActionBar> actionBars;
 
-		private void Awake()
+        private void Awake()
         {
-	        EventManager.RegisterAll(this);
+            EventManager.RegisterAll(this);
 
-			mButtons = new List<GameObject>();
-			sButtons = new List<GameObject>();
-			extraButtons = new List<GameObject>();
+            mButtons = new List<GameObject>();
+            sButtons = new List<GameObject>();
+            extraButtons = new List<GameObject>();
 
-			actionBars = new[]
-			{
-				new CityActionBar(this)
-			};
-		}
-
-		private void OnDestroy()
-		{
-			EventManager.RemoveAll(this);
-		}
-
-		private void FixedUpdate()
-        {
-			if(selected != null)
+            actionBars = new[]
             {
-				mButtonCounter = 0;
-				sButtonCounter = 0;
-				extraCounter = 0;
-
-				actionBars.First(x => x.ShouldRender(selected)).Render(selected);
-
-				for (var i = mButtonCounter; i < mButtons.Count; i++)
-				{
-					AddMAction(0, TooltipDescription.Empty, null);
-				}
-				for (var i = sButtonCounter; i < sButtons.Count; i++)
-				{
-					AddSAction(0, TooltipDescription.Empty, null);
-				}
-			}
+                new CityActionBar(this)
+            };
         }
 
-		public void SetMButtons(int count)
-		{
-			if(mButtons.Count == count)
+        private void OnDestroy()
+        {
+            EventManager.RemoveAll(this);
+        }
+
+        private void FixedUpdate()
+        {
+            if (selected != null)
             {
-				return;
+                mButtonCounter = 0;
+                sButtonCounter = 0;
+                extraCounter = 0;
+
+                actionBars.First(x => x.ShouldRender(selected)).Render(selected);
+
+                for (var i = mButtonCounter; i < mButtons.Count; i++)
+                {
+                    AddMAction(0, TooltipDescription.Empty, null);
+                }
+
+                for (var i = sButtonCounter; i < sButtons.Count; i++)
+                {
+                    AddSAction(0, TooltipDescription.Empty, null);
+                }
+            }
+        }
+
+        public void SetMButtons(int count)
+        {
+            if (mButtons.Count == count)
+            {
+                return;
             }
 
-			if(mButtons.Any())
+            if (mButtons.Any())
             {
-				foreach(var button in mButtons)
+                foreach (var button in mButtons)
                 {
-					Destroy(button);
+                    Destroy(button);
                 }
             }
 
-			mButtons.Clear();
+            mButtons.Clear();
 
-			for (var i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-				var action = Instantiate(mPrefab, actionBar.transform);
+                var action = Instantiate(mPrefab, actionBar.transform);
 
                 mButtons.Add(action);
             }
         }
 
-		public void SetSButtons(int count)
-		{
-			if (sButtons.Count == count)
-			{
-				return;
-			}
-
-			if (sButtons.Any())
-			{
-				foreach (var button in mButtons)
-				{
-					Destroy(button);
-				}
-			}
-
-			sButtons.Clear();
-
-			for (var i = 0; i < count; i++)
-			{
-				var action = Instantiate(sPrefab, actionBar.transform);
-
-				sButtons.Add(action);
-			}
-		}
-
-		public bool ToggleExtra()
+        public void SetSButtons(int count)
         {
-			var toggle = !extraActionBar.activeInHierarchy;
+            if (sButtons.Count == count)
+            {
+                return;
+            }
 
-			print(toggle);
+            if (sButtons.Any())
+            {
+                foreach (var button in sButtons)
+                {
+                    Destroy(button);
+                }
+            }
 
-			extraActionBar.SetActive(toggle);
-			return toggle;
+            sButtons.Clear();
+
+            for (var i = 0; i < count; i++)
+            {
+                var action = Instantiate(sPrefab, actionBar.transform);
+
+                sButtons.Add(action);
+            }
         }
 
-		public void SetExtraButtons(int count)
-		{
-			if (extraButtons.Count == count)
-			{
-				return;
-			}
-
-			if (extraButtons.Any())
-			{
-				foreach (var button in mButtons)
-				{
-					Destroy(button);
-				}
-			}
-
-			extraButtons.Clear();
-
-			for (var i = 0; i < count; i++)
-			{
-				var action = Instantiate(mPrefab, extraActionBar.transform);
-
-				extraButtons.Add(action);
-			}
-
-			extraActionBar.SetActive(true);
-		}
-
-		public void AddMAction(int icon, TooltipDescription tooltipDesc, UnityAction action)
+        public bool ToggleExtra()
         {
-			mButtons[mButtonCounter].GetComponentsInChildren<Image>().First(x => x.name == "Image").sprite = mIcons[icon];
+            var toggle = !extraActionBar.activeInHierarchy;
 
-			if (action != null)
-			{
-				mButtons[mButtonCounter].GetComponent<Button>().onClick.RemoveAllListeners();
-				mButtons[mButtonCounter].GetComponent<Button>().onClick.AddListener(action);
-			}
+            extraActionBar.SetActive(toggle);
+            return toggle;
+        }
 
-			var tooltip = mButtons[mButtonCounter].GetComponent<TooltipTrigger>();
-			tooltip.header = tooltipDesc.Header;
-			tooltip.content = tooltipDesc.Content;
-			tooltip.subHeader = tooltipDesc.SubHeader;
+        public void SetExtraButtons(int count)
+        {
+            if (extraButtons.Count == count)
+            {
+                return;
+            }
 
-			mButtonCounter++;
-		}
+            if (extraButtons.Any())
+            {
+                foreach (var button in extraButtons)
+                {
+                    Destroy(button);
+                }
+            }
 
-		public void AddSAction(int icon, TooltipDescription tooltipDesc, UnityAction action)
-		{
-			sButtons[sButtonCounter].GetComponentsInChildren<Image>().First(x => x.name == "Image").sprite = sIcons[icon];
+            extraButtons.Clear();
 
-			if (action != null)
-			{
-				sButtons[sButtonCounter].GetComponent<Button>().onClick.RemoveAllListeners();
-				sButtons[sButtonCounter].GetComponent<Button>().onClick.AddListener(action);
-			}
+            for (var i = 0; i < count; i++)
+            {
+                var action = Instantiate(mPrefab, extraActionBar.transform);
 
-			var tooltip = sButtons[sButtonCounter].GetComponent<TooltipTrigger>();
-			tooltip.header = tooltipDesc.Header;
-			tooltip.content = tooltipDesc.Content;
-			tooltip.subHeader = tooltipDesc.SubHeader;
+                extraButtons.Add(action);
+            }
 
-			sButtonCounter++;
-		}
+            extraActionBar.SetActive(true);
+        }
 
-		public void AddExtraAction(int icon, TooltipDescription tooltipDesc, UnityAction action)
-		{
-			extraButtons[extraCounter].GetComponentsInChildren<Image>().First(x => x.name == "Image").sprite = mIcons[icon];
+        public void AddMAction(int icon, TooltipDescription tooltipDesc, UnityAction action,
+            ActionButtonOptions options = null)
+        {
+            if (mButtonCounter >= mButtons.Count)
+            {
+                return;
+            }
+            
+            var button = mButtons[mButtonCounter].GetComponent<ActionButton>();
 
-			if (action != null)
-			{
-				extraButtons[extraCounter].GetComponent<Button>().onClick.RemoveAllListeners();
-				extraButtons[extraCounter].GetComponent<Button>().onClick.AddListener(action);
-			}
+            button.SetImage(mIcons[icon]);
+            ApplyOptions(options, button);
 
-			var tooltip = extraButtons[extraCounter].GetComponent<TooltipTrigger>();
-			tooltip.header = tooltipDesc.Header;
-			tooltip.content = tooltipDesc.Content;
-			tooltip.subHeader = tooltipDesc.SubHeader;
-			tooltip.position = TooltipPosition.ExtraAction;
+            if (action != null)
+            {
+                button.SetClickAction(action);
+            }
+            
+            tooltipDesc.Position = TooltipPosition.Action;
+            if (extraActionBar.activeInHierarchy)
+            {
+                tooltipDesc.Position = TooltipPosition.ExtraAction;
+            }
 
-			extraCounter++;
-		}
+            button.SetTooltip(tooltipDesc);
 
-		[Event(Events.SelectTile)]
-		private void SelectTile(MapTile tile)
-		{
-			if (!actionBars.Any(x => x.ShouldRender(tile)))
-			{
-				Deselect();
-				return;
-			}
-			
-			selected = tile;
-			
-			actionBar.SetActive(true);
-			extraActionBar.SetActive(false);
-		}
-		
-		[Event(Events.DeselectTile)]
-		private void Deselect()
-		{
-			selected = null;
+            mButtonCounter++;
+        }
 
-			actionBar.SetActive(false);
-			extraActionBar.SetActive(false);
-		}
-	}
+        public void AddSAction(int icon, TooltipDescription tooltipDesc, UnityAction action,
+            ActionButtonOptions options = null)
+        {
+            if (sButtonCounter >= sButtons.Count)
+            {
+                return;
+            }
+            
+            var button = sButtons[sButtonCounter].GetComponent<ActionButton>();
+
+            button.SetImage(sIcons[icon]);
+            ApplyOptions(options, button);
+
+            if (action != null)
+            {
+                button.SetClickAction(action);
+            }
+
+            tooltipDesc.Position = TooltipPosition.Action;
+            if (extraActionBar.activeInHierarchy)
+            {
+                tooltipDesc.Position = TooltipPosition.ExtraAction;
+            }
+
+            button.SetTooltip(tooltipDesc);
+
+            sButtonCounter++;
+        }
+
+        public void AddExtraAction(int icon, TooltipDescription tooltipDesc, UnityAction action,
+            ActionButtonOptions options = null)
+        {
+            if (extraCounter >= extraButtons.Count)
+            {
+                return;
+            }
+            
+            var button = extraButtons[extraCounter].GetComponent<ActionButton>();
+
+            button.SetImage(mIcons[icon]);
+            ApplyOptions(options, button);
+
+            if (action != null)
+            {
+                button.SetClickAction(action);
+            }
+            
+            tooltipDesc.Position = TooltipPosition.ExtraAction;
+            button.SetTooltip(tooltipDesc);
+
+            extraCounter++;
+        }
+
+        private static void ApplyOptions(ActionButtonOptions options, ActionButton button)
+        {
+            if (options == null)
+            {
+                return;
+            }
+
+            if (options.Type != null)
+            {
+                button.SetIcon(options.Type.Value);
+            }
+            
+            button.SetEnabled(!options.Disabled);
+            
+            if (options.UpgradeLevel != null)
+            {
+                button.SetLevel(options.UpgradeLevel.Value);
+            }
+
+            if (options.Progress != null)
+            {
+                button.SetProgress(options.Progress.Value);
+            }
+        }
+
+        [Event(Events.SelectTile)]
+        private void SelectTile(MapTile tile)
+        {
+            if (!actionBars.Any(x => x.ShouldRender(tile)))
+            {
+                Deselect();
+                return;
+            }
+
+            selected = tile;
+
+            actionBar.SetActive(true);
+            extraActionBar.SetActive(false);
+        }
+
+        [Event(Events.DeselectTile)]
+        private void Deselect()
+        {
+            selected = null;
+
+            actionBar.SetActive(false);
+            extraActionBar.SetActive(false);
+        }
+    }
 }
-

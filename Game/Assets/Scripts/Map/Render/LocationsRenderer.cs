@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Actors;
 using UnityEngine.Tilemaps;
 
 namespace Map.Render
@@ -17,14 +18,14 @@ namespace Map.Render
 
         public Tile GetTile(MapTile tile)
         {
-            return tile.Location?.Type switch
+            return tile.Location?.Type.Value switch
             {
-                MapLocation.LocationType.Village => tiles[0],
-                MapLocation.LocationType.Town => tiles[1],
-                MapLocation.LocationType.City => tiles[2],
-                MapLocation.LocationType.Outpost => tiles[3],
-                MapLocation.LocationType.Fob => tiles[4],
-                MapLocation.LocationType.MilitaryBase => tiles[5],
+                LocationType.Village => tiles[0],
+                LocationType.Town => tiles[1],
+                LocationType.City => tiles[2],
+                LocationType.Outpost => tiles[3],
+                LocationType.Fob => tiles[4],
+                LocationType.MilitaryBase => tiles[5],
                 _ => null
             };
         }
