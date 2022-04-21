@@ -2,6 +2,8 @@ namespace Actors
 {
     public interface IActor
     {
-        void Tick();
+        void DailyTick();
+
+        void MonthlyTick();
     }
 }

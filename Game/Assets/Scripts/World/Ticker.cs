@@ -1,4 +1,5 @@
 using Actors;
+using Server;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -53,16 +54,21 @@ namespace World
         {
             if (IsServer)
             {
+                var locations = ScorpiaServer.Singleton.GetLocations();
+                
+                foreach (var location in locations)
+                {
+                    location.DailyTick();
+                }
+                
                 if (currentTick.Value % 30 != 0)
                 {
                     return;
                 }
-                
-                var locations = FindObjectsOfType<Location>();
 
                 foreach (var location in locations)
                 {
-                    location.Tick();
+                    location.MonthlyTick();
                 }
             }
             else

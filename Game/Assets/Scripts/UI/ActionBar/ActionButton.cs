@@ -16,13 +16,13 @@ namespace UI.ActionBar
         [SerializeField] private Button button;
         [SerializeField] private TooltipTrigger tooltip;
 
-        public void SetIcon(ActionButtonOptions.ActionButtonType icon)
+        public void SetIcon(ActionButtonOptions.ActionButtonType? icon)
         {
             if (upgradeIcon == null || inProgressIcon == null)
             {
                 return;
             }
-            
+
             switch (icon)
             {
                 case ActionButtonOptions.ActionButtonType.Upgrade:
@@ -33,6 +33,10 @@ namespace UI.ActionBar
                     upgradeIcon.SetActive(false);
                     inProgressIcon.SetActive(true);
                     break;
+                default:
+                    upgradeIcon.SetActive(false);
+                    inProgressIcon.SetActive(false);
+                    break;
             }
         }
 
@@ -41,13 +45,19 @@ namespace UI.ActionBar
             image.sprite = sprite;
         }
 
-        public void SetLevel(int level)
+        public void SetLevel(int? level)
         {
             if (levelText == null)
             {
                 return;
             }
-            
+
+            if (level == null)
+            {
+                levelText.gameObject.SetActive(false);
+                return;
+            }
+
             levelText.text = level.ToString();
             levelText.gameObject.SetActive(true);
         }
@@ -58,7 +68,7 @@ namespace UI.ActionBar
             {
                 return;
             }
-            
+
             progressBar.rectTransform.sizeDelta =
                 new Vector2(progressBar.rectTransform.sizeDelta.x, 100 - progress);
         }

@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using Blueprints;
 using Map;
+using Server;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -35,6 +37,11 @@ namespace Actors
 
         public override void OnNetworkSpawn()
         {
+            if (IsServer)
+            {
+                ScorpiaServer.Singleton.AddLocation(this);
+            }
+            
             mapTile = MapRenderer.current.GetTile(transform.position);
             mapTile.Location = this;
             EventManager.Trigger(Events.LocationUpdated, mapTile.Position);
@@ -64,6 +71,19 @@ namespace Actors
             mapTitle.SetLocation(this);
         }
 
+        public Building? GetCurrentConstruction()
+        {
+            foreach (var building in Buildings)
+            {
+                if (building.IsBuilding)
+                {
+                    return building;
+                }
+            }
+
+            return null;
+        }
+
         [ServerRpc]
         public void DemolishServerRpc(BuildingType type)
         {
@@ -77,13 +97,15 @@ namespace Actors
                 }
 
                 player.Refund(BuildingBlueprints.GetRequirements(type), building.IsBuilding ? 1f : 0.5f);
+
+                if (building.IsBuilding)
+                {
+                    InvestedConstruction.Value = 0;
+                }
                 
-                var idx = Buildings.IndexOf(building);
                 var downgrade = BuildingBlueprints.GetDowngrade(building.Type);
                 
-                Buildings.Remove(building);
-
-                if (downgrade != null)
+                if (downgrade != null && building.Level > 0)
                 {
                     var build = new Building
                     {
@@ -92,8 +114,11 @@ namespace Actors
                         Level = building.Level - 1
                     };
                     
-                    Buildings.Insert(idx, build);
+                    Buildings.Replace(building, build);
+                    break;
                 }
+
+                Buildings.Remove(building);
                 
                 break;
             }
@@ -116,7 +141,7 @@ namespace Actors
             };
             
             player.Pay(BuildingBlueprints.GetRequirements(type));
-            InvestedConstruction.Value = 0;
+            InvestedConstruction.Value = 1;
 
             var started = false;
 
@@ -129,9 +154,7 @@ namespace Actors
 
                 build.Level = building.Level + 1;
                 
-                var idx = Buildings.IndexOf(building);
-                Buildings.RemoveAt(idx);
-                Buildings.Insert(idx, build);
+                Buildings.Replace(building, build);
                 started = true;
                 break;
             }
@@ -145,6 +168,11 @@ namespace Actors
 
         public override void OnNetworkDespawn()
         {
+            if (IsServer)
+            {
+                ScorpiaServer.Singleton.RemoveLocation(this);
+            }
+            
             if (title != null)
             {
                 Destroy(title);
@@ -154,9 +182,29 @@ namespace Actors
             tile.Location = null;
         }
 
-        public void Tick()
+        public void DailyTick()
         {
-            
+            if (InvestedConstruction.Value > 0)
+            {
+                InvestedConstruction.Value += 10;
+
+                var building = Buildings.ToEnumerable().FirstOrDefault(x => x.IsBuilding);
+                var constructionCost = BuildingBlueprints.GetConstructionCost(building.Type);
+                if (InvestedConstruction.Value >= constructionCost)
+                {
+                    var finishedBuilding = new Building
+                    {
+                        Level = building.Level,
+                        Type = building.Type
+                    };
+                    InvestedConstruction.Value = 0;
+                    Buildings.Replace(building, finishedBuilding);
+                }
+            }
+        }
+
+        public void MonthlyTick()
+        {
         }
     }
 }

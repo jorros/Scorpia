@@ -28,7 +28,10 @@ namespace UI.ActionBar
         public void Render(MapTile tile)
         {
             var location = tile.Location;
-            system.SetMButtons(LocationBlueprint.GetMaxSlots(location.Type.Value));
+            var maxSlots = LocationBlueprint.GetMaxSlots(location.Type.Value);
+            system.SetMButtons(maxSlots);
+
+            var isAlreadyBuilding = location.GetCurrentConstruction() != null;
 
             foreach (var building in location.Buildings)
             {
@@ -38,17 +41,20 @@ namespace UI.ActionBar
                     continue;
                 }
 
-                AddCompletedBuildingButton(tile, building);
+                AddCompletedBuildingButton(tile, building, isAlreadyBuilding);
             }
 
-            AddEmptyButton(tile);
+            if (!isAlreadyBuilding && location.Buildings.Count < maxSlots)
+            {
+                AddEmptyButton(tile);
+            }
 
             system.SetSButtons(0);
         }
 
         private void AddBuildingList(MapTile mapTile, MapTile tile)
         {
-            var buildList = new List<(BuildingType type, bool enabled)>();
+            var buildList = new List<BuildingType>();
             var buildings = mapTile.Location.Buildings.ToEnumerable().ToArray();
 
             var toBeDisplayed = new[]
@@ -66,16 +72,15 @@ namespace UI.ActionBar
             {
                 if (buildings.All(x => !BuildingBlueprints.IsSameFamily(display, x.Type)))
                 {
-                    buildList.Add((display,
-                        BuildingBlueprints.FulfillsRequirements(Game.GetSelf(), tile, display)));
+                    buildList.Add(display);
                 }
             }
 
             system.SetExtraButtons(buildList.Count);
 
-            foreach (var (type, enabled) in buildList)
+            foreach (var type in buildList)
             {
-                AddBuildExtraButton(type, mapTile, new ActionButtonOptions {Disabled = !enabled});
+                AddBuildExtraButton(type, mapTile);
             }
         }
 
@@ -85,6 +90,10 @@ namespace UI.ActionBar
             var buildName = BuildingBlueprints.GetName(type);
             var buildReqs = RequirementsToText(type, Game.GetSelf(), mapTile);
             var buildDesc = BuildingBlueprints.GetDescription(type);
+            options ??= new ActionButtonOptions();
+
+            var canBuild = BuildingBlueprints.FulfillsRequirements(Game.GetSelf(), mapTile, type);
+            options.Disabled = !canBuild;
 
             system.AddExtraAction(buildIcon, new TooltipDescription($"Build {buildName}", buildDesc, buildReqs),
                 () =>
@@ -99,7 +108,11 @@ namespace UI.ActionBar
         {
             var name = BuildingBlueprints.GetName(building.Type);
             system.AddExtraAction(16, new TooltipDescription($"Demolish {name}", $"Instantly demolishes {name}."),
-                () => { location.DemolishServerRpc(building.Type); });
+                () =>
+                {
+                    system.ToggleExtra();
+                    location.DemolishServerRpc(building.Type);
+                });
         }
 
         private void AddEmptyButton(MapTile tile)
@@ -115,7 +128,7 @@ namespace UI.ActionBar
             });
         }
 
-        private void AddCompletedBuildingButton(MapTile mapTile, Building building)
+        private void AddCompletedBuildingButton(MapTile mapTile, Building building, bool isAlreadyBuilding)
         {
             var icon = BuildingTypeToIcon(building.Type);
             var name = BuildingBlueprints.GetName(building.Type);
@@ -123,7 +136,8 @@ namespace UI.ActionBar
             var desc = BuildingBlueprints.GetDescription(building.Type);
             var options = new ActionButtonOptions
             {
-                UpgradeLevel = building.Level
+                UpgradeLevel = building.Level,
+                Disabled = isAlreadyBuilding
             };
 
             system.AddMAction(icon, new TooltipDescription(name, desc, reqs), () =>
@@ -141,7 +155,8 @@ namespace UI.ActionBar
                 {
                     AddBuildExtraButton(upgradeBlueprint.Value, mapTile, new ActionButtonOptions
                     {
-                        Type = ActionButtonOptions.ActionButtonType.Upgrade
+                        Type = ActionButtonOptions.ActionButtonType.Upgrade,
+                        UpgradeLevel = building.Level + 1
                     });
                 }
 

@@ -12,7 +12,13 @@ namespace Actors
         
         public bool Equals(Building other)
         {
-            return Type == other.Type;
+            return Type == other.Type && Level == other.Level;
+        }
+
+        public override string ToString()
+        {
+            var buildText = IsBuilding ? "B" : "F";
+            return $"{Type}:{Level}:{buildText}";
         }
     }
 }

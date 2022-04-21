@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Actors;
 using MainMenu;
 using Unity.Netcode;
 
@@ -9,6 +10,22 @@ namespace Server
         public GameState State { get; set; }
         public PlayerInfo Players { get; set; }
         private static ScorpiaServer _singleton;
+        private readonly List<Location> locations = new();
+
+        public void AddLocation(Location location)
+        {
+            locations.Add(location);
+        }
+
+        public void RemoveLocation(Location location)
+        {
+            locations.Remove(location);
+        }
+
+        public IReadOnlyList<Location> GetLocations()
+        {
+            return locations;
+        }
 
         public void SendNotification(Notification @event, IReadOnlyList<ulong> clients = null)
         {

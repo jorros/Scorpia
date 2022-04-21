@@ -6,6 +6,7 @@ using UI.Tooltip;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using World;
 
 namespace UI.ActionBar
 {
@@ -164,7 +165,7 @@ namespace UI.ActionBar
             {
                 return;
             }
-            
+
             var button = mButtons[mButtonCounter].GetComponent<ActionButton>();
 
             button.SetImage(mIcons[icon]);
@@ -174,7 +175,7 @@ namespace UI.ActionBar
             {
                 button.SetClickAction(action);
             }
-            
+
             tooltipDesc.Position = TooltipPosition.Action;
             if (extraActionBar.activeInHierarchy)
             {
@@ -193,7 +194,7 @@ namespace UI.ActionBar
             {
                 return;
             }
-            
+
             var button = sButtons[sButtonCounter].GetComponent<ActionButton>();
 
             button.SetImage(sIcons[icon]);
@@ -222,7 +223,7 @@ namespace UI.ActionBar
             {
                 return;
             }
-            
+
             var button = extraButtons[extraCounter].GetComponent<ActionButton>();
 
             button.SetImage(mIcons[icon]);
@@ -230,9 +231,13 @@ namespace UI.ActionBar
 
             if (action != null)
             {
-                button.SetClickAction(action);
+                button.SetClickAction(() =>
+                {
+                    CameraMovement.clickIsBlocked = true;
+                    action.Invoke();
+                });
             }
-            
+
             tooltipDesc.Position = TooltipPosition.ExtraAction;
             button.SetTooltip(tooltipDesc);
 
@@ -241,27 +246,10 @@ namespace UI.ActionBar
 
         private static void ApplyOptions(ActionButtonOptions options, ActionButton button)
         {
-            if (options == null)
-            {
-                return;
-            }
-
-            if (options.Type != null)
-            {
-                button.SetIcon(options.Type.Value);
-            }
-            
-            button.SetEnabled(!options.Disabled);
-            
-            if (options.UpgradeLevel != null)
-            {
-                button.SetLevel(options.UpgradeLevel.Value);
-            }
-
-            if (options.Progress != null)
-            {
-                button.SetProgress(options.Progress.Value);
-            }
+            button.SetIcon(options?.Type);
+            button.SetEnabled(options is not {Disabled: true});
+            button.SetLevel(options?.UpgradeLevel);
+            button.SetProgress(options?.Progress ?? 100);
         }
 
         [Event(Events.SelectTile)]
