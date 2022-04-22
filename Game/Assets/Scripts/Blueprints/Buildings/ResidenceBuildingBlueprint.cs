@@ -18,5 +18,18 @@ namespace Blueprints.Buildings
         {
             new CostRequirement(10)
         };
+
+        public IDictionary<int, IEnumerable<Requirement>> AdditionalLevelRequirements =>
+            new Dictionary<int, IEnumerable<Requirement>>
+            {
+                [2] = new Requirement[]
+                {
+                    new LocationTypeRequirement(LocationType.Town)
+                },
+                [4] = new Requirement[]
+                {
+                    new LocationTypeRequirement(LocationType.City)
+                }
+            };
     }
 }

@@ -21,5 +21,6 @@ namespace Blueprints.Buildings
             R.Or(new LocationTypeRequirement(LocationType.Town), new LocationTypeRequirement(LocationType.City)),
             new ZellosDepositRequirement()
         };
+        public IDictionary<int, IEnumerable<Requirement>> AdditionalLevelRequirements => null;
     }
 }

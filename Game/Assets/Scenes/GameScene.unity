@@ -8383,8 +8383,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df19dff52e1f243acbc082480beb30b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  header: Doubloons
-  subHeader: 
+  header: Scorpions
+  subHeader: Total earnings of the past month
   offset: 40
   position: 4
   content: 

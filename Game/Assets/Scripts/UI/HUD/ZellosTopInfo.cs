@@ -26,8 +26,10 @@ namespace UI.HUD
         public void UpdateInfo(Player player)
         {
             storage.text = player.Zellos.Value.Format();
-            production.text = player.ZellosProduction.Value.FormatBalance();
-            tooltip.content = "Zellos text yadayada";
+            production.text = player.ZellosBalance.Value.Total.FormatBalance();
+            
+            var formatter = new BalanceSheetFormatter(player.ZellosBalance.Value);
+            tooltip.content = formatter.GetSummary();
         }
     }
 }

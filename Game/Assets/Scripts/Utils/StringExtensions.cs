@@ -5,14 +5,14 @@ namespace Utils
 {
     public static class StringExtensions
     {
-        public static string FormatBalance(this int amount)
+        public static string FormatBalance(this int amount, bool inverse = false)
         {
-            return $"{GetColourCode(amount)}{amount.Format()}</color>";
+            return $"{GetColourCode(amount, inverse)}{amount.Format()}</color>";
         }
         
-        public static string FormatBalance(this float amount)
+        public static string FormatBalance(this float amount, bool inverse = false)
         {
-            return $"{GetColourCode(amount)}{amount.Format()}</color>";
+            return $"{GetColourCode(amount, inverse)}{amount.Format()}</color>";
         }
 
         public static string FormatValid(this int amount, bool valid)
@@ -60,12 +60,12 @@ namespace Utils
             return Format(rounded);
         }
         
-        private static string GetColourCode(float amount)
+        private static string GetColourCode(float amount, bool inverse)
         {
             var colour = amount switch
             {
-                > 0 => $"<color=#{Colours.Green}>",
-                < 0 => $"<color=#{Colours.Red}>",
+                > 0 => inverse ? $"<color=#{Colours.Red}>" : $"<color=#{Colours.Green}>",
+                < 0 => inverse ? $"<color=#{Colours.Green}>" : $"<color=#{Colours.Red}>",
                 _ => ""
             };
 

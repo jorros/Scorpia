@@ -26,8 +26,10 @@ namespace UI.HUD
         public void UpdateInfo(Player player)
         {
             storage.text = player.Nitra.Value.Format();
-            production.text = player.NitraProduction.Value.FormatBalance();
-            tooltip.content = "Nitra text yadayada";
+            production.text = player.NitraBalance.Value.Total.FormatBalance();
+            
+            var formatter = new BalanceSheetFormatter(player.NitraBalance.Value);
+            tooltip.content = formatter.GetSummary();
         }
     }
 }

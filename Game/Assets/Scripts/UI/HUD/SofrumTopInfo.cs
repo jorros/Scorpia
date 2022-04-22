@@ -26,8 +26,10 @@ namespace UI.HUD
         public void UpdateInfo(Player player)
         {
             storage.text = player.Sofrum.Value.Format();
-            production.text = player.SofrumProduction.Value.FormatBalance();
-            tooltip.content = "Sofrum text yadayada";
+            production.text = player.SofrumBalance.Value.Total.FormatBalance();
+            
+            var formatter = new BalanceSheetFormatter(player.SofrumBalance.Value);
+            tooltip.content = formatter.GetSummary();
         }
     }
 }

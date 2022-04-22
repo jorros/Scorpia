@@ -3,6 +3,7 @@ using System.Linq;
 using Actors;
 using Blueprints.Buildings;
 using Blueprints.Requirements;
+using JetBrains.Annotations;
 using Map;
 
 namespace Blueprints
@@ -77,12 +78,40 @@ namespace Blueprints
         {
             var blueprint = GetBlueprint(type);
 
-            return blueprint.Requirements.All(requirement => requirement.IsFulfilled(player, mapTile));
+            var basicRequirement = blueprint.Requirements.All(requirement => requirement.IsFulfilled(player, mapTile));
+
+            var currentLevel = 0;
+            var currentBuilding = mapTile.Location.GetBuildingByFamily(type);
+
+            if (currentBuilding != null)
+            {
+                currentLevel = currentBuilding.Value.Level;
+            }
+
+            if (blueprint.AdditionalLevelRequirements == null ||
+                !blueprint.AdditionalLevelRequirements.ContainsKey(currentLevel + 1))
+            {
+                return basicRequirement;
+            }
+
+            var additionalRequirements = blueprint.AdditionalLevelRequirements[currentLevel + 1];
+            var additionalRequirement =
+                additionalRequirements.All(requirement => requirement.IsFulfilled(player, mapTile));
+
+            return basicRequirement && additionalRequirement;
         }
 
         public static IEnumerable<Requirement> GetRequirements(BuildingType type)
         {
             return GetBlueprint(type).Requirements;
+        }
+
+        [CanBeNull]
+        public static IEnumerable<Requirement> GetAdditionalRequirements(BuildingType type, int level)
+        {
+            return GetBlueprint(type).AdditionalLevelRequirements?.ContainsKey(level) == true
+                ? GetBlueprint(type).AdditionalLevelRequirements[level]
+                : null;
         }
     }
 }

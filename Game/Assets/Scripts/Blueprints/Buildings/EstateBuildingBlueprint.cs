@@ -21,5 +21,6 @@ namespace Blueprints.Buildings
             R.Or(new LocationTypeRequirement(LocationType.Town), new LocationTypeRequirement(LocationType.City)),
             R.Or(new FertilityRequirement(Fertility.Normal), new FertilityRequirement(Fertility.High)),
         };
+        public IDictionary<int, IEnumerable<Requirement>> AdditionalLevelRequirements => null;
     }
 }

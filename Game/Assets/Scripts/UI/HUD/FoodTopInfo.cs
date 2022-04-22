@@ -27,8 +27,10 @@ namespace UI.HUD
         public void UpdateInfo(Player player)
         {
             food.text = player.Food.Value.Format();
-            foodProduction.text = player.FoodProduction.Value.FormatBalance();
-            tooltip.content = "Food text yadayada";
+            foodProduction.text = player.FoodBalance.Value.Total.FormatBalance();
+            
+            var formatter = new BalanceSheetFormatter(player.FoodBalance.Value);
+            tooltip.content = formatter.GetSummary();
         }
     }
 }

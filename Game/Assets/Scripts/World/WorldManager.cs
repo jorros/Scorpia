@@ -93,7 +93,6 @@ namespace World
             location.Name.Value = "Inglewood";
             location.Player.Value = player.UID;
             location.Type.Value = LocationType.Village;
-            location.Income.Value = 20;
             location.Garrison.Value = 1000;
             location.Population.Value = 500;
             location.MaxPopulation.Value = 2000;
@@ -105,13 +104,6 @@ namespace World
             {
                 IsBuilding = false,
                 Type = BuildingType.Residence,
-                Level = 2
-            });
-            
-            location.Buildings.Add(new Building
-            {
-                IsBuilding = true,
-                Type = BuildingType.Smallholding,
                 Level = 1
             });
 

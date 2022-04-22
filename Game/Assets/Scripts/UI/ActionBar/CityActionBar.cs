@@ -132,7 +132,7 @@ namespace UI.ActionBar
         {
             var icon = BuildingTypeToIcon(building.Type);
             var name = BuildingBlueprints.GetName(building.Type);
-            var reqs = RequirementsToText(building.Type, Game.GetSelf(), mapTile);
+            var reqs = RequirementsToText(building.Type, Game.GetSelf(), mapTile, (0, 20));
             var desc = BuildingBlueprints.GetDescription(building.Type);
             var options = new ActionButtonOptions
             {
@@ -169,7 +169,7 @@ namespace UI.ActionBar
             var icon = BuildingTypeToIcon(building.Type);
             var name = BuildingBlueprints.GetName(building.Type);
             var desc = BuildingBlueprints.GetDescription(building.Type);
-            var reqs = RequirementsToText(building.Type, Game.GetSelf(), mapTile);
+            var reqs = RequirementsToText(building.Type, Game.GetSelf(), mapTile, (0, 20));
             var progress = (int) Math.Round((float) mapTile.Location.InvestedConstruction.Value /
                                             BuildingBlueprints.GetConstructionCost(building.Type) *
                                             100f);
@@ -193,9 +193,24 @@ namespace UI.ActionBar
             }, options);
         }
 
-        private static string RequirementsToText(BuildingType type, Player player, MapTile mapTile)
+        private static string RequirementsToText(BuildingType type, Player player, MapTile mapTile, (int from, int to)? indexRange = null)
         {
             var requirements = BuildingBlueprints.GetRequirements(type).ToArray();
+            
+            var currentLevel = 0;
+            var currentBuilding = mapTile.Location.GetBuildingByFamily(type);
+
+            if (currentBuilding != null)
+            {
+                currentLevel = currentBuilding.Value.Level;
+            }
+
+            var additionalRequirements = BuildingBlueprints.GetAdditionalRequirements(type, currentLevel + 1);
+
+            if (additionalRequirements != null)
+            {
+                requirements = requirements.Concat(additionalRequirements).ToArray();
+            }
 
             Array.Sort(requirements);
 
@@ -204,6 +219,14 @@ namespace UI.ActionBar
             var sb = new StringBuilder();
             foreach (var requirement in requirements)
             {
+                if (indexRange != null)
+                {
+                    if (requirement.Index < indexRange.Value.from || requirement.Index >= indexRange.Value.to)
+                    {
+                        continue;
+                    }
+                }
+                
                 var valid = requirement.IsFulfilled(player, mapTile);
 
                 switch (requirement.Index)
@@ -236,7 +259,7 @@ namespace UI.ActionBar
             (NitraRequirement, _) => $"<sprite name=tooltip_icon_nitra>{requirement.Value.FormatValid(valid)}",
             (SofrumRequirement, _) => $"<sprite name=tooltip_icon_sofrum>{requirement.Value.FormatValid(valid)}",
             (ZellosRequirement, _) => $"<sprite name=tooltip_icon_zellos>{requirement.Value.FormatValid(valid)}",
-            (UpkeepRequirement, _) => $"<sprite name=tooltip_icon_coin>{requirement.Value.FormatValid(valid)}",
+            (UpkeepRequirement, _) => $"<sprite name=tooltip_icon_coin>{requirement.Value.FormatBalance(true)}",
             (FertilityRequirement, false) => $"<sprite name=tooltip_icon_fertility>{(Fertility) requirement.Value}"
                 .FormatValid(false),
             (GoldDepositRequirement, false) => $"<sprite name=tooltip_icon_gold> deposit".FormatValid(false),

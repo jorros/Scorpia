@@ -21,5 +21,6 @@ namespace Blueprints.Buildings
             new GoldDepositRequirement(),
             new CostRequirement(30)
         };
+        public IDictionary<int, IEnumerable<Requirement>> AdditionalLevelRequirements => null;
     }
 }

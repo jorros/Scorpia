@@ -20,5 +20,6 @@ namespace Blueprints.Buildings
             new CostRequirement(20),
             R.Or(new NitraDepositRequirement(), new SofrumDepositRequirement())
         };
+        public IDictionary<int, IEnumerable<Requirement>> AdditionalLevelRequirements => null;
     }
 }

@@ -1,3 +1,4 @@
+using System.Linq;
 using Actors;
 using Server;
 using TMPro;
@@ -36,17 +37,19 @@ namespace World
 
         private void FixedUpdate()
         {
-            if (IsServer)
+            if (!IsServer)
             {
-                // 1 Tick = 1 second; Every update is 0.02s
-                step += 0.02f;
+                return;
+            }
+            
+            // 1 Tick = 1 second; Every update is 0.02s
+            step += 0.02f;
 
-                if (step >= 1)
-                {
-                    step = 0;
-                    currentTick.Value++;
-                    Tick();
-                }
+            if (step >= 0.4f)
+            {
+                step = 0;
+                currentTick.Value++;
+                Tick();
             }
         }
 
@@ -55,20 +58,36 @@ namespace World
             if (IsServer)
             {
                 var locations = ScorpiaServer.Singleton.GetLocations();
-                
+                var players = Game.GetPlayers().ToArray();
+
                 foreach (var location in locations)
                 {
                     location.DailyTick();
+                }
+                
+                foreach (var player in players)
+                {
+                    player.DailyTick();
                 }
                 
                 if (currentTick.Value % 30 != 0)
                 {
                     return;
                 }
+                
+                foreach (var player in players)
+                {
+                    player.PreTick();
+                }
 
                 foreach (var location in locations)
                 {
                     location.MonthlyTick();
+                }
+
+                foreach (var player in players)
+                {
+                    player.MonthlyTick();
                 }
             }
             else

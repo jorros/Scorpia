@@ -20,5 +20,6 @@ namespace Blueprints.Buildings
             new UpkeepRequirement(3),
             new CostRequirement(10)
         };
+        public IDictionary<int, IEnumerable<Requirement>> AdditionalLevelRequirements => null;
     }
 }

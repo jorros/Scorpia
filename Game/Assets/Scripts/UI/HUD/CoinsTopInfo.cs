@@ -1,3 +1,4 @@
+using System.Text;
 using Actors;
 using TMPro;
 using UI.Tooltip;
@@ -26,8 +27,18 @@ namespace UI.HUD
         public void UpdateInfo(Player player)
         {
             coins.text = player.Scorpions.Value.Format();
-            income.text = player.Income.Value.FormatBalance();
-            tooltip.content = "Income text yadayada";
+            income.text = player.ScorpionsBalance.Value.Total.FormatBalance();
+
+            var formatter = new BalanceSheetFormatter(player.ScorpionsBalance.Value);
+            tooltip.content = formatter.GetSummary();
+        }
+
+        private void Append(StringBuilder sb, string infoName, float? value)
+        {
+            if (value is not null)
+            {
+                sb.AppendLine($"{infoName}: {value.Value.FormatBalance()}");
+            }
         }
     }
 }

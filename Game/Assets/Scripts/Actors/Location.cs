@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Actors.Entities;
 using Blueprints;
 using Map;
 using Server;
@@ -25,7 +26,7 @@ namespace Actors
         [NonSerialized] public NetworkVariable<int> Garrison = new();
         [NonSerialized] public NetworkVariable<int> FoodProduction = new();
         [NonSerialized] public NetworkVariable<int> FoodStorage = new();
-        [NonSerialized] public NetworkVariable<int> Income = new();
+        [NonSerialized] public NetworkVariable<BalanceSheet> Income = new();
         [NonSerialized] public NetworkVariable<int> InvestedConstruction = new();
 
         private MapTile mapTile;
@@ -79,6 +80,21 @@ namespace Actors
                 {
                     return building;
                 }
+            }
+
+            return null;
+        }
+
+        public Building? GetBuildingByFamily(BuildingType type)
+        {
+            foreach (var building in mapTile.Location.Buildings)
+            {
+                if (!BuildingBlueprints.IsSameFamily(building.Type, type))
+                {
+                    continue;
+                }
+
+                return building;
             }
 
             return null;
@@ -205,6 +221,19 @@ namespace Actors
 
         public void MonthlyTick()
         {
+            var player = Game.GetPlayer(Player.Value.Value);
+            
+            Income.Value = new BalanceSheet();
+
+            foreach (var building in Buildings)
+            {
+                if (building.IsBuilding)
+                {
+                    continue;
+                }
+
+                building.Tick(player, this);
+            }
         }
     }
 }

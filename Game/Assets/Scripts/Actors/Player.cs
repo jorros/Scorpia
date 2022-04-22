@@ -1,18 +1,18 @@
-using System;
 using System.Collections.Generic;
+using Actors.Entities;
 using Blueprints.Requirements;
 using Unity.Collections;
 using Unity.Netcode;
 
 namespace Actors
 {
-    public class Player : NetworkBehaviour
+    public class Player : NetworkBehaviour, IActor
     {
         public NetworkVariable<FixedString64Bytes> Name { get; } = new();
         public NetworkVariable<FixedString64Bytes> Uid { get; } = new();
         public NetworkVariable<PlayerColour> Colour { get; } = new();
 
-        public NetworkVariable<float> Scorpions { get; set; } = new(1000, NetworkVariableReadPermission.Owner);
+        public NetworkVariable<float> Scorpions { get; set; } = new(100, NetworkVariableReadPermission.Owner);
         public NetworkVariable<float> Zellos { get; } = new(0, NetworkVariableReadPermission.Owner);
         public NetworkVariable<float> Nitra { get; } = new(0, NetworkVariableReadPermission.Owner);
         public NetworkVariable<float> Sofrum { get; } = new(0, NetworkVariableReadPermission.Owner);
@@ -20,11 +20,11 @@ namespace Actors
 
         public NetworkVariable<int> Population { get; } = new(0, NetworkVariableReadPermission.Owner);
 
-        public NetworkVariable<float> Income { get; } = new(0, NetworkVariableReadPermission.Owner);
-        public NetworkVariable<float> FoodProduction { get; } = new(0, NetworkVariableReadPermission.Owner);
-        public NetworkVariable<float> ZellosProduction { get; } = new(0, NetworkVariableReadPermission.Owner);
-        public NetworkVariable<float> NitraProduction { get; } = new(0, NetworkVariableReadPermission.Owner);
-        public NetworkVariable<float> SofrumProduction { get; } = new(0, NetworkVariableReadPermission.Owner);
+        public NetworkVariable<BalanceSheet> ScorpionsBalance { get; } = new(new BalanceSheet(), NetworkVariableReadPermission.Owner);
+        public NetworkVariable<BalanceSheet> FoodBalance { get; } = new(new BalanceSheet(), NetworkVariableReadPermission.Owner);
+        public NetworkVariable<BalanceSheet> ZellosBalance { get; } = new(new BalanceSheet(), NetworkVariableReadPermission.Owner);
+        public NetworkVariable<BalanceSheet> NitraBalance { get; } = new(new BalanceSheet(), NetworkVariableReadPermission.Owner);
+        public NetworkVariable<BalanceSheet> SofrumBalance { get; } = new(new BalanceSheet(), NetworkVariableReadPermission.Owner);
 
 
         public override void OnNetworkSpawn()
@@ -36,23 +36,28 @@ namespace Actors
                 return;
             }
 
-            void ProductionChange(float a, float b)
+            void StorageChange(float a, float b)
             {
                 EventManager.Trigger(Events.PlayerInfo, this);
             }
 
-            Scorpions.OnValueChanged += ProductionChange;
-            Zellos.OnValueChanged += ProductionChange;
-            Nitra.OnValueChanged += ProductionChange;
-            Sofrum.OnValueChanged += ProductionChange;
-            Food.OnValueChanged += ProductionChange;
-            NitraProduction.OnValueChanged += ProductionChange;
-            Income.OnValueChanged += ProductionChange;
-            FoodProduction.OnValueChanged += ProductionChange;
-            ZellosProduction.OnValueChanged += ProductionChange;
-            SofrumProduction.OnValueChanged += ProductionChange;
+            void ProductionChange(BalanceSheet a, BalanceSheet b)
+            {
+                EventManager.Trigger(Events.PlayerInfo, this);
+            }
 
-            Population.OnValueChanged += (_, _) => { EventManager.Trigger(Events.PlayerInfo, this); };
+            Scorpions.OnValueChanged += StorageChange;
+            Zellos.OnValueChanged += StorageChange;
+            Nitra.OnValueChanged += StorageChange;
+            Sofrum.OnValueChanged += StorageChange;
+            Food.OnValueChanged += StorageChange;
+            NitraBalance.OnValueChanged += ProductionChange;
+            ScorpionsBalance.OnValueChanged += ProductionChange;
+            FoodBalance.OnValueChanged += ProductionChange;
+            ZellosBalance.OnValueChanged += ProductionChange;
+            SofrumBalance.OnValueChanged += ProductionChange;
+
+            Population.OnValueChanged += (_, _) => EventManager.Trigger(Events.PlayerInfo, this);
 
             Name.OnValueChanged += (_, currentVal) =>
             {
@@ -137,6 +142,25 @@ namespace Actors
         public override void OnNetworkDespawn()
         {
             Game.RemovePlayer(Uid.Value.Value);
+        }
+
+        public void PreTick()
+        {
+            ScorpionsBalance.Value = new BalanceSheet();
+            FoodBalance.Value = new BalanceSheet();
+            NitraBalance.Value = new BalanceSheet();
+            SofrumBalance.Value = new BalanceSheet();
+            ZellosBalance.Value = new BalanceSheet();
+        }
+
+        public void DailyTick()
+        {
+            
+        }
+
+        public void MonthlyTick()
+        {
+            Scorpions.Value += ScorpionsBalance.Value.Total;
         }
     }
 }

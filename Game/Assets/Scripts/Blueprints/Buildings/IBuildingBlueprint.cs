@@ -19,5 +19,7 @@ namespace Blueprints.Buildings
         string Description { get; }
         
         IEnumerable<Requirement> Requirements { get; }
+        
+        IDictionary<int, IEnumerable<Requirement>> AdditionalLevelRequirements { get; }
     }
 }

@@ -17,6 +17,11 @@ public static class Game
         return Players[uid];
     }
 
+    public static IEnumerable<Player> GetPlayers()
+    {
+        return Players.Values;
+    }
+
     public static Player GetSelf()
     {
         return GetPlayer(ScorpiaSettings.Uid);
