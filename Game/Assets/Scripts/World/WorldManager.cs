@@ -1,7 +1,10 @@
 using System.Linq;
 using Actors;
+using Actors.Entities;
+using Blueprints;
 using Map;
 using Server;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -80,34 +83,49 @@ namespace World
             var instance = Instantiate(playerPrefab);
             var playerInstance = instance.GetComponent<Player>();
 
-            playerInstance.Name.Value = player.Name;
-            playerInstance.Uid.Value = player.UID;
+            playerInstance.Name.Value = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>(player.Name);
+            playerInstance.Uid.Value = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>(player.UID);
             playerInstance.Colour.Value = player.Colour;
 
             instance.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
 
             var testLocation = Instantiate(testPrefab,
-                MapRenderer.current.GetTileWorldPosition(new Vector2Int(5, 5)), Quaternion.identity);
+                MapRenderer.current.GetTileWorldPosition(new Vector2Int(9, 7)), Quaternion.identity);
             var location = testLocation.GetComponent<Location>();
 
-            location.Name.Value = "Inglewood";
-            location.Player.Value = player.UID;
-            location.Type.Value = LocationType.Village;
-            location.Garrison.Value = 1000;
-            location.Population.Value = 500;
-            location.MaxPopulation.Value = 2000;
-            location.FoodProduction.Value = 2;
-            location.FoodStorage.Value = 100;
-            location.InvestedConstruction.Value = 20;
-            
-            location.Buildings.Add(new Building
-            {
-                IsBuilding = false,
-                Type = BuildingType.Residence,
-                Level = 1
-            });
+            location.Name.Value = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>("Inglewood");
+            location.Player.Value = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>(player.UID);
+            location.Type.Value = LocationType.Town;
+            location.Population.Value = 2000;
+            location.MaxPopulation.Value = LocationBlueprint.GetMaxPopulation(LocationType.Town);
+            location.IsCapital.Value = true;
+            // location.FoodStorage.Value = 200;
 
             testLocation.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
+            
+            var adminTown = Instantiate(testPrefab,
+                MapRenderer.current.GetTileWorldPosition(new Vector2Int(3, 4)), Quaternion.identity);
+            var adminLocation = adminTown.GetComponent<Location>();
+
+            adminLocation.Name.Value = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>("Zorn des Admin");
+            adminLocation.Player.Value = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>(player.UID);
+            adminLocation.Type.Value = LocationType.Village;
+            adminLocation.Population.Value = 100;
+            adminLocation.MaxPopulation.Value = LocationBlueprint.GetMaxPopulation(LocationType.Village);
+
+            adminLocation.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
+            
+            var towerTown = Instantiate(testPrefab,
+                MapRenderer.current.GetTileWorldPosition(new Vector2Int(13, 12)), Quaternion.identity);
+            var towerLocation = towerTown.GetComponent<Location>();
+
+            towerLocation.Name.Value = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>("Diver of towers");
+            towerLocation.Player.Value = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>(player.UID);
+            towerLocation.Type.Value = LocationType.Village;
+            towerLocation.Population.Value = 100;
+            towerLocation.MaxPopulation.Value = LocationBlueprint.GetMaxPopulation(LocationType.Village);
+
+            towerLocation.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
         }
     }
 }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Actors;
+using Actors.Entities;
+using Blueprints.Production;
 using Blueprints.Requirements;
-using Map;
 
 namespace Blueprints.Buildings
 {
@@ -20,6 +20,13 @@ namespace Blueprints.Buildings
             new CostRequirement(20),
             R.Or(new NitraDepositRequirement(), new SofrumDepositRequirement())
         };
+
+        public IEnumerable<Production.Production> Production => new Production.Production[]
+        {
+            new NitraProduction(2),
+            new SofrumProduction(2)
+        };
+
         public IDictionary<int, IEnumerable<Requirement>> AdditionalLevelRequirements => null;
     }
 }

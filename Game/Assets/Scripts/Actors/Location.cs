@@ -14,26 +14,30 @@ namespace Actors
     public class Location : NetworkBehaviour, IActor
     {
         private GameObject title;
+        private MapTitle mapTitle;
 
         [SerializeField] private GameObject titlePrefab;
 
         public NetworkList<Building> Buildings;
         [NonSerialized] public NetworkVariable<LocationType> Type = new();
-        [NonSerialized] public NetworkVariable<FixedString64Bytes> Name = new();
-        [NonSerialized] public NetworkVariable<FixedString64Bytes> Player = new();
+        [NonSerialized] public NetworkVariable<ForceNetworkSerializeByMemcpy<FixedString64Bytes>> Name = new();
+        [NonSerialized] public NetworkVariable<ForceNetworkSerializeByMemcpy<FixedString64Bytes>> Player = new();
         [NonSerialized] public NetworkVariable<int> Population = new();
         [NonSerialized] public NetworkVariable<int> MaxPopulation = new();
         [NonSerialized] public NetworkVariable<int> Garrison = new();
-        [NonSerialized] public NetworkVariable<int> FoodProduction = new();
-        [NonSerialized] public NetworkVariable<int> FoodStorage = new();
+        [NonSerialized] public NetworkVariable<BalanceSheet> FoodProduction = new();
+        [NonSerialized] public NetworkVariable<float> FoodStorage = new();
         [NonSerialized] public NetworkVariable<BalanceSheet> Income = new();
         [NonSerialized] public NetworkVariable<int> InvestedConstruction = new();
+        [NonSerialized] public NetworkVariable<bool> IsCapital = new();
+        public NetworkList<ForceNetworkSerializeByMemcpy<FixedString64Bytes>> Tags;
 
-        private MapTile mapTile;
+        public MapTile MapTile;
 
         private void Awake()
         {
             Buildings = new NetworkList<Building>();
+            Tags = new NetworkList<ForceNetworkSerializeByMemcpy<FixedString64Bytes>>();
         }
 
         public override void OnNetworkSpawn()
@@ -42,10 +46,12 @@ namespace Actors
             {
                 ScorpiaServer.Singleton.AddLocation(this);
             }
-            
-            mapTile = MapRenderer.current.GetTile(transform.position);
-            mapTile.Location = this;
-            EventManager.Trigger(Events.LocationUpdated, mapTile.Position);
+
+            Tags.OnListChanged += evt => mapTitle.SetLocation(this);
+
+            MapTile = MapRenderer.current.GetTile(transform.position);
+            MapTile.Location = this;
+            EventManager.Trigger(Events.LocationUpdated, MapTile.Position);
         }
 
         private void Update()
@@ -54,21 +60,21 @@ namespace Actors
             {
                 return;
             }
-            
+
             var titleCanvas = GameObject.FindGameObjectWithTag("TitleCanvas");
 
             if (titleCanvas == null)
             {
                 return;
             }
-            
+
             title = Instantiate(titlePrefab, titleCanvas.GetComponent<RectTransform>());
-            
+
             var worldPos = transform.position;
             worldPos.y += 10;
             title.transform.position = worldPos;
-            
-            var mapTitle = title.GetComponent<MapTitle>();
+
+            mapTitle = title.GetComponent<MapTitle>();
             mapTitle.SetLocation(this);
         }
 
@@ -87,7 +93,7 @@ namespace Actors
 
         public Building? GetBuildingByFamily(BuildingType type)
         {
-            foreach (var building in mapTile.Location.Buildings)
+            foreach (var building in MapTile.Location.Buildings)
             {
                 if (!BuildingBlueprints.IsSameFamily(building.Type, type))
                 {
@@ -118,9 +124,9 @@ namespace Actors
                 {
                     InvestedConstruction.Value = 0;
                 }
-                
+
                 var downgrade = BuildingBlueprints.GetDowngrade(building.Type);
-                
+
                 if (downgrade != null && building.Level > 0)
                 {
                     var build = new Building
@@ -129,13 +135,14 @@ namespace Actors
                         Type = downgrade.Value,
                         Level = building.Level - 1
                     };
-                    
+
                     Buildings.Replace(building, build);
                     break;
                 }
 
+                building.OnFinishBuilding(this, true);
                 Buildings.Remove(building);
-                
+
                 break;
             }
         }
@@ -145,7 +152,7 @@ namespace Actors
         {
             var player = Game.GetPlayer(OwnerClientId);
 
-            if (!BuildingBlueprints.FulfillsRequirements(player, mapTile, type))
+            if (!BuildingBlueprints.FulfillsRequirements(player, MapTile, type))
             {
                 return;
             }
@@ -155,7 +162,7 @@ namespace Actors
                 Type = type,
                 IsBuilding = true
             };
-            
+
             player.Pay(BuildingBlueprints.GetRequirements(type));
             InvestedConstruction.Value = 1;
 
@@ -169,7 +176,7 @@ namespace Actors
                 }
 
                 build.Level = building.Level + 1;
-                
+
                 Buildings.Replace(building, build);
                 started = true;
                 break;
@@ -188,12 +195,12 @@ namespace Actors
             {
                 ScorpiaServer.Singleton.RemoveLocation(this);
             }
-            
+
             if (title != null)
             {
                 Destroy(title);
             }
-            
+
             var tile = MapRenderer.current.GetTile(transform.position);
             tile.Location = null;
         }
@@ -215,15 +222,28 @@ namespace Actors
                     };
                     InvestedConstruction.Value = 0;
                     Buildings.Replace(building, finishedBuilding);
+
+                    ScorpiaServer.Singleton.SendNotification(Notification.Format(Notifications.BuildingFinished,
+                        building.Type.ToString(), Name.Value));
+                    finishedBuilding.OnFinishBuilding(this, false);
                 }
             }
         }
 
         public void MonthlyTick()
         {
-            var player = Game.GetPlayer(Player.Value.Value);
-            
+            var player = Game.GetPlayer(Player.Value.Value.Value);
+
             Income.Value = new BalanceSheet();
+            
+            // Tax collection
+            var collectedTax = Population.Value * 0.001f;
+            Income.Value = Income.Value.Add(nameof(BalanceSheet.PopulationIn), collectedTax);
+            player.ScorpionsBalance.Value =
+                player.ScorpionsBalance.Value.Add(nameof(BalanceSheet.PopulationIn), collectedTax);
+
+            // Pop consumption
+            FoodProduction.Value = FoodProduction.Value.Set(nameof(BalanceSheet.PopulationOut), Population.Value * 0.0005f);
 
             foreach (var building in Buildings)
             {
@@ -234,6 +254,58 @@ namespace Actors
 
                 building.Tick(player, this);
             }
+
+            var foodAfterConsumption = FoodStorage.Value + FoodProduction.Value.Total;
+
+            FoodStorage.Value = Math.Max(0, foodAfterConsumption);
+
+            var maxStorage = LocationBlueprint.GetMaxFoodStorage(Type.Value);
+            var difference = 0f;
+
+            if (foodAfterConsumption > 0)
+            {
+                Tags.Remove(LocationTags.Famine);
+            }
+            
+            if (foodAfterConsumption > maxStorage)
+            {
+                difference = FoodStorage.Value - maxStorage;
+                player.Food.Value += difference;
+                FoodStorage.Value = maxStorage;
+            }
+            else if (foodAfterConsumption < 0)
+            {
+                difference = Math.Abs(foodAfterConsumption);
+                var globalFood = player.Food.Value;
+                foodAfterConsumption += globalFood;
+
+                player.Food.Value = Math.Max(0, foodAfterConsumption);
+
+                if (foodAfterConsumption < 0 && !Tags.Contains(LocationTags.Famine))
+                {
+                    ScorpiaServer.Singleton.SendNotification(Notification.Format(Notifications.Hunger, Name.Value));
+                    Tags.Add(LocationTags.Famine);
+                }
+                else if (foodAfterConsumption > 0)
+                {
+                    Tags.Remove(LocationTags.Famine);
+                }
+            }
+            
+            player.FoodBalance.Value = player.FoodBalance.Value.Add(nameof(BalanceSheet.PopulationOut), difference);
+
+            Population.Value += GrowPop(foodAfterConsumption);
+            player.Population.Value += Population.Value;
+        }
+
+        private int GrowPop(float food)
+        {
+            const float growthRate = 0.2f;
+            var growthByFood = Mathf.Clamp(food, -1f, 0);
+            growthByFood = growthByFood == 0 ? growthRate : growthByFood;
+
+            return (int) Math.Round(growthByFood * Population.Value *
+                                    (((float) MaxPopulation.Value - Population.Value) / MaxPopulation.Value));
         }
     }
 }

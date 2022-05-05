@@ -190,7 +190,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 4.725, y: 0}
+  m_AnchoredPosition: {x: 10.255, y: 0}
   m_SizeDelta: {x: 0, y: 4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2026606557142916170
@@ -221,9 +221,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Title
-
-'
+  m_text: "<sprite name=title_icon_blue> Title <sprite name=title_icon_capital> <sprite
+    name=title_icon_hunger> \n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e8e07ae1fe1194b40a429da507711dbe, type: 2}
   m_sharedMaterial: {fileID: -5790757714311936613, guid: e8e07ae1fe1194b40a429da507711dbe, type: 2}
@@ -242,7 +241,7 @@ MonoBehaviour:
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
+  m_spriteAsset: {fileID: 11400000, guid: e6c9f2a8eba6e48d9b291a6670b1d8d0, type: 2}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
   m_TextStyleHashCode: -1183493901

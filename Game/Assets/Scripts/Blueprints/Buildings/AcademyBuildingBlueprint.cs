@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Actors;
+using Actors.Entities;
 using Blueprints.Requirements;
 
 namespace Blueprints.Buildings
@@ -19,6 +19,8 @@ namespace Blueprints.Buildings
             new UpkeepRequirement(5),
             new CostRequirement(40)
         };
+
+        public IEnumerable<Production.Production> Production => null;
 
         public IDictionary<int, IEnumerable<Requirement>> AdditionalLevelRequirements => null;
     }

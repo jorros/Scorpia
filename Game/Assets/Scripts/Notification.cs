@@ -1,6 +1,5 @@
 using System;
 using Unity.Netcode;
-using UnityEngine;
 
 public class Notification : INetworkSerializable
 {
@@ -18,8 +17,6 @@ public class Notification : INetworkSerializable
 
     public readonly string Id;
 
-    public Vector2Int Position = new Vector2Int(-1, -1);
-
     public Notification()
     {
         Id = Guid.NewGuid().ToString();
@@ -27,7 +24,6 @@ public class Notification : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        serializer.SerializeValue(ref Position);
         serializer.SerializeValue(ref TooltipHeader);
         serializer.SerializeValue(ref TooltipText);
         serializer.SerializeValue(ref Icon);
@@ -36,7 +32,7 @@ public class Notification : INetworkSerializable
         serializer.SerializeValue(ref Text);
     }
 
-    public static Notification Format(Notification notification, Vector2Int? target, params object[] args)
+    public static Notification Format(Notification notification, params object[] args)
     {
         var ret = new Notification
         {
@@ -46,14 +42,8 @@ public class Notification : INetworkSerializable
             Cover = notification.Cover,
             Header = string.Format(notification.Header, args), 
             Text = string.Format(notification.Text, args),
-            Position = target ?? new Vector2Int(-1, -1)
         };
 
         return ret;
-    }
-
-    public static Notification Format(Notification @event, params object[] args)
-    {
-        return Format(@event, null, args);
     }
 }

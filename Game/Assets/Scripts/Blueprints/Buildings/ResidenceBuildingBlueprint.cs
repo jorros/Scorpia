@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Actors;
+using Actors.Entities;
 using Blueprints.Requirements;
-using Map;
 
 namespace Blueprints.Buildings
 {
@@ -18,6 +17,8 @@ namespace Blueprints.Buildings
         {
             new CostRequirement(10)
         };
+
+        public IEnumerable<Production.Production> Production => null;
 
         public IDictionary<int, IEnumerable<Requirement>> AdditionalLevelRequirements =>
             new Dictionary<int, IEnumerable<Requirement>>

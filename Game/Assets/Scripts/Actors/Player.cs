@@ -3,13 +3,14 @@ using Actors.Entities;
 using Blueprints.Requirements;
 using Unity.Collections;
 using Unity.Netcode;
+using Utils;
 
 namespace Actors
 {
     public class Player : NetworkBehaviour, IActor
     {
-        public NetworkVariable<FixedString64Bytes> Name { get; } = new();
-        public NetworkVariable<FixedString64Bytes> Uid { get; } = new();
+        public NetworkVariable<ForceNetworkSerializeByMemcpy<FixedString64Bytes>> Name { get; } = new();
+        public NetworkVariable<ForceNetworkSerializeByMemcpy<FixedString64Bytes>> Uid { get; } = new();
         public NetworkVariable<PlayerColour> Colour { get; } = new();
 
         public NetworkVariable<float> Scorpions { get; set; } = new(100, NetworkVariableReadPermission.Owner);
@@ -61,14 +62,14 @@ namespace Actors
 
             Name.OnValueChanged += (_, currentVal) =>
             {
-                var playerName = currentVal.Value;
+                var playerName = currentVal.Value.Value;
                 if (!string.IsNullOrWhiteSpace(playerName))
                 {
                     EventManager.Trigger(Events.PlayerInfo, this);
                 }
             };
 
-            Colour.OnValueChanged += (_, currentVal) =>
+            Colour.OnValueChanged += (_, _) =>
             {
                 if (!string.IsNullOrWhiteSpace(name))
                 {
@@ -141,7 +142,7 @@ namespace Actors
 
         public override void OnNetworkDespawn()
         {
-            Game.RemovePlayer(Uid.Value.Value);
+            Game.RemovePlayer(Uid.ValueAsString());
         }
 
         public void PreTick()
@@ -151,6 +152,7 @@ namespace Actors
             NitraBalance.Value = new BalanceSheet();
             SofrumBalance.Value = new BalanceSheet();
             ZellosBalance.Value = new BalanceSheet();
+            Population.Value = 0;
         }
 
         public void DailyTick()
@@ -161,6 +163,9 @@ namespace Actors
         public void MonthlyTick()
         {
             Scorpions.Value += ScorpionsBalance.Value.Total;
+            Nitra.Value += NitraBalance.Value.Total;
+            Sofrum.Value += SofrumBalance.Value.Total;
+            Zellos.Value += ZellosBalance.Value.Total;
         }
     }
 }

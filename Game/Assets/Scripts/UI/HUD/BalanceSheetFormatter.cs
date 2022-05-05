@@ -17,10 +17,10 @@ namespace UI.HUD
         {
             var sb = new StringBuilder();
             sb.AppendLine("<b>Incoming</b>");
-            Append(sb, "Taxes", balance.TaxIn);
+            Append(sb, "Taxes", balance.PopulationIn);
             Append(sb, "Buildings", balance.BuildingIn);
 
-            if (balance.TaxIn == null && balance.BuildingIn == null)
+            if (balance.PopulationIn == null && balance.BuildingIn == null)
             {
                 sb.AppendLine("<i>None</i>");
             }
@@ -29,8 +29,9 @@ namespace UI.HUD
             
             sb.AppendLine("<b>Outgoing</b>");
             Append(sb, "Buildings", balance.BuildingOut, true);
+            Append(sb, "Population", balance.PopulationOut, true);
             
-            if (balance.BuildingOut == null)
+            if (balance.BuildingOut == null && balance.PopulationOut == null)
             {
                 sb.AppendLine("<i>None</i>");
             }
@@ -39,7 +40,7 @@ namespace UI.HUD
             return sb.ToString();
         }
         
-        private void Append(StringBuilder sb, string infoName, float? value, bool inverse = false)
+        private static void Append(StringBuilder sb, string infoName, float? value, bool inverse = false)
         {
             if (value is not null)
             {

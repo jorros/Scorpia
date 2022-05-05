@@ -11,7 +11,10 @@ namespace UI.Popup
         
         public void OnPointerClick(PointerEventData eventData)
         {
-            PopupSystem.Show(cover, header, text);
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                PopupSystem.Show(cover, header, text);
+            }
         }
     }
 }

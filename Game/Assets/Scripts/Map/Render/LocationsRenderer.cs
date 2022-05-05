@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Actors;
+using Actors.Entities;
 using UnityEngine.Tilemaps;
 
 namespace Map.Render

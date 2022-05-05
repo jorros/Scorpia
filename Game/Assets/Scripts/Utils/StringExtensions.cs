@@ -1,5 +1,5 @@
-using System;
 using UI;
+using UnityEngine;
 
 namespace Utils
 {
@@ -55,8 +55,8 @@ namespace Utils
         
         public static string Format(this float num)
         {
-            var rounded = (int)Math.Floor(num);
-            
+            var rounded = Mathf.RoundToInt(num);
+
             return Format(rounded);
         }
         

@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Map;
-using TMPro;
 using UI.Tooltip;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using World;
 
 namespace UI.ActionBar

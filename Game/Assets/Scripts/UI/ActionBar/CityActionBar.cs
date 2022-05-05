@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Actors;
+using Actors.Entities;
 using Blueprints;
 using Blueprints.Requirements;
 using Map;

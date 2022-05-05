@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Actors;
+using Actors.Entities;
 using Blueprints.Buildings;
 using Blueprints.Requirements;
 using JetBrains.Annotations;
@@ -104,6 +105,11 @@ namespace Blueprints
         public static IEnumerable<Requirement> GetRequirements(BuildingType type)
         {
             return GetBlueprint(type).Requirements;
+        }
+
+        public static IEnumerable<Production.Production> GetProduction(BuildingType type)
+        {
+            return GetBlueprint(type).Production;
         }
 
         [CanBeNull]

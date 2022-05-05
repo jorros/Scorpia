@@ -1,11 +1,12 @@
 using System;
-using Actors.Entities;
 using Blueprints;
 using Blueprints.Requirements;
+using Unity.Netcode;
+using UnityEngine;
 
-namespace Actors
+namespace Actors.Entities
 {
-    public struct Building : IEquatable<Building>
+    public struct Building : IEquatable<Building>, INetworkSerializeByMemcpy
     {
         public BuildingType Type { get; set; }
 
@@ -38,6 +39,36 @@ namespace Actors
                         break;
                 }
             }
+
+            // Production
+            var productions = BuildingBlueprints.GetProduction(Type);
+            if (productions != null)
+            {
+                foreach (var production in productions)
+                {
+                    production.Apply(player, location);
+                }
+            }
+        }
+
+        public void OnFinishBuilding(Location location, bool demolished)
+        {
+            // Population
+            if (Type == BuildingType.Residence)
+            {
+                location.MaxPopulation.Value = LocationBlueprint.GetMaxPopulation(location.Type.Value) + Level * 1000;
+            }
+
+            if (Type is BuildingType.Forts or BuildingType.Bunker)
+            {
+                var garrison = 2000;
+                if (demolished)
+                {
+                    garrison *= -1;
+                }
+                
+                location.Garrison.Value = Mathf.Clamp(location.Garrison.Value + garrison, 0, 4000);
+            }
         }
 
         private static void UpdateIncome(Player player, Location location, string fieldName, int value)
@@ -47,14 +78,14 @@ namespace Actors
             var origVal = (float?) field.GetValue(balance) ?? 0;
             object boxed = balance;
             field.SetValue(boxed, origVal + value);
-            location.Income.Value = (BalanceSheet)boxed;
+            location.Income.Value = (BalanceSheet) boxed;
 
             balance = player.ScorpionsBalance.Value;
             field = balance.GetType().GetField(fieldName);
             origVal = (float?) field.GetValue(balance) ?? 0;
             boxed = balance;
             field.SetValue(boxed, origVal + value);
-            player.ScorpionsBalance.Value = (BalanceSheet)boxed;
+            player.ScorpionsBalance.Value = (BalanceSheet) boxed;
         }
     }
 }

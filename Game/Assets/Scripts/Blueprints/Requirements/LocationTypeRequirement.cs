@@ -1,4 +1,5 @@
 using Actors;
+using Actors.Entities;
 using Map;
 
 namespace Blueprints.Requirements

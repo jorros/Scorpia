@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Actors;
 using UnityEngine;
+using Utils;
 using World;
 
 public static class Game
@@ -34,7 +35,7 @@ public static class Game
 
     public static void AddPlayer(Player player)
     {
-        Players.Add(player.Uid.Value.Value, player);
+        Players.Add(player.Uid.ValueAsString(), player);
     }
 
     public static void RemovePlayer(string uid)

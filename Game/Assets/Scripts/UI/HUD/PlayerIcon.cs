@@ -3,6 +3,7 @@ using UI.Tooltip;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 namespace UI.HUD
 {
@@ -34,7 +35,7 @@ namespace UI.HUD
         public void UpdateInfo(Player player)
         {
             image.sprite = icons[(int) player.Colour.Value];
-            tooltip.header = player.Name.Value.Value;
+            tooltip.header = player.Name.ValueAsString();
         }
     }
 }

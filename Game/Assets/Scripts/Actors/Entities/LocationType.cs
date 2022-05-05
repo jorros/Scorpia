@@ -1,4 +1,4 @@
-namespace Actors
+namespace Actors.Entities
 {
     public enum LocationType
     {
