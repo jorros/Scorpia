@@ -10,6 +10,8 @@ public static class Game
     public static int CurrentTick => Ticker.current.currentTick?.Value ?? default(int);
 
     private static readonly Dictionary<string, Player> Players = new();
+    
+    private static readonly List<Location> Locations = new();
 
     private static string _version;
 
@@ -41,6 +43,21 @@ public static class Game
     public static void RemovePlayer(string uid)
     {
         Players.Remove(uid);
+    }
+
+    public static void AddLocation(Location location)
+    {
+        Locations.Add(location);
+    }
+
+    public static void RemoveLocation(Location location)
+    {
+        Locations.Remove(location);
+    }
+
+    public static IReadOnlyList<Location> GetLocations()
+    {
+        return Locations;
     }
 
     public static string Version

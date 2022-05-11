@@ -10,4 +10,5 @@ public static class Events
     public const string MapRendered = "MapRendered";
     public const string PlayerInfo = "PlayerInfo";
     public const string LocationUpdated = "LocationUpdated";
+    public const string UpdateFog = "UpdateFog";
 }

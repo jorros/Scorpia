@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Blueprints;
 using Map.Render;
 using Unity.Netcode;
 using UnityEngine;
@@ -20,6 +22,8 @@ namespace Map
 
         [SerializeField] private BiomeRendererTiles biomeTiles;
 
+        [SerializeField] private Tile fogTile;
+
         private readonly NetworkVariable<int> width = new();
         private readonly NetworkVariable<int> height = new();
         private readonly NetworkVariable<int> seed = new();
@@ -30,10 +34,13 @@ namespace Map
         private Tilemap flairLayer;
         private Tilemap locationsLayer;
         private Tilemap selectedLayer;
+        private Tilemap fogLayer;
 
-        [HideInInspector] public Map map;
+        public Map map;
 
         [HideInInspector] public Vector3 mapSize;
+
+        public int maxFogUpdateDistance;
 
         public static MapRenderer current;
 
@@ -52,6 +59,7 @@ namespace Map
             flairLayer = tilemaps[3];
             locationsLayer = tilemaps[4];
             selectedLayer = tilemaps[5];
+            fogLayer = tilemaps[6];
 
             renderers = new ITileRenderer[]
             {
@@ -105,17 +113,19 @@ namespace Map
             {
                 for (var x = 0; x < width.Value; x++)
                 {
-                    RenderTile(x, y);
+                    RenderTile(x, y, true);
                 }
             }
 
-            mapSize = groundLayer.CellToWorld(new Vector3Int(groundLayer.size.x - 1, groundLayer.size.y - 1)) +
+            var groundSize = groundLayer.size;
+
+            mapSize = groundLayer.CellToWorld(new Vector3Int(groundSize.x - 1, groundSize.y - 1)) +
                       (groundLayer.cellSize / 2);
 
             EventManager.Trigger(Events.MapRendered);
         }
 
-        private void RenderTile(int x, int y)
+        private void RenderTile(int x, int y, bool initial)
         {
             var tile = map.GetTile(x, y);
             var pos = new Vector3Int(x, y, 0);
@@ -124,12 +134,49 @@ namespace Map
             {
                 tileRenderer.Layer.SetTile(pos, tileRenderer.GetTile(tile));
             }
+
+            if (initial)
+            {
+                fogLayer.SetTile(pos, fogTile);
+            }
         }
 
         [Event(Events.LocationUpdated)]
         private void OnLocationUpdate(Vector2Int position)
         {
-            RenderTile(position.x, position.y);
+            RenderTile(position.x, position.y, false);
+        }
+
+        [Event(Events.UpdateFog)]
+        private void OnUpdateFog()
+        {
+            var locations = Game.GetLocations();
+
+            var fogMap = new bool[width.Value * height.Value];
+
+            foreach (var location in locations)
+            {
+                var range = LocationBlueprint.GetViewDistance(location);
+                var tiles = map.GetNeighbours(location.MapTile, range: range);
+
+                var locationPos = location.MapTile.Position;
+                fogMap[locationPos.y * width.Value + locationPos.x] = true;
+
+                foreach (var tile in tiles)
+                {
+                    var pos = tile.Position;
+                    fogMap[pos.y * width.Value + pos.x] = true;
+                }
+            }
+
+            for (var x = 0; x < width.Value; x++)
+            {
+                for (var y = 0; y < height.Value; y++)
+                {
+                    var tile = fogMap[y * width.Value + x] ? null : fogTile;
+                    fogLayer.SetTile(new Vector3Int(x, y), tile);
+                }
+            }
         }
 
         [Event(Events.SelectTile)]

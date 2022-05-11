@@ -56,7 +56,7 @@ namespace World
         {
             if (IsServer)
             {
-                var locations = ScorpiaServer.Singleton.GetLocations();
+                var locations = Game.GetLocations();
                 var players = Game.GetPlayers().ToArray();
 
                 foreach (var location in locations)

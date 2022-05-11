@@ -42,16 +42,14 @@ namespace Actors
 
         public override void OnNetworkSpawn()
         {
-            if (IsServer)
-            {
-                ScorpiaServer.Singleton.AddLocation(this);
-            }
+            Game.AddLocation(this);
 
             Tags.OnListChanged += evt => mapTitle.SetLocation(this);
 
             MapTile = MapRenderer.current.GetTile(transform.position);
             MapTile.Location = this;
             EventManager.Trigger(Events.LocationUpdated, MapTile.Position);
+            EventManager.Trigger(Events.UpdateFog);
         }
 
         private void Update()
@@ -191,18 +189,15 @@ namespace Actors
 
         public override void OnNetworkDespawn()
         {
-            if (IsServer)
-            {
-                ScorpiaServer.Singleton.RemoveLocation(this);
-            }
+            Game.RemoveLocation(this);
 
             if (title != null)
             {
                 Destroy(title);
             }
-
-            var tile = MapRenderer.current.GetTile(transform.position);
-            tile.Location = null;
+            
+            EventManager.Trigger(Events.UpdateFog, MapTile.Position);
+            MapTile.Location = null;
         }
 
         public void DailyTick()
@@ -235,7 +230,7 @@ namespace Actors
             var player = Game.GetPlayer(Player.Value.Value.Value);
 
             Income.Value = new BalanceSheet();
-            
+
             // Tax collection
             var collectedTax = Population.Value * 0.001f;
             Income.Value = Income.Value.Add(nameof(BalanceSheet.PopulationIn), collectedTax);
@@ -243,7 +238,8 @@ namespace Actors
                 player.ScorpionsBalance.Value.Add(nameof(BalanceSheet.PopulationIn), collectedTax);
 
             // Pop consumption
-            FoodProduction.Value = FoodProduction.Value.Set(nameof(BalanceSheet.PopulationOut), Population.Value * 0.0005f);
+            FoodProduction.Value =
+                FoodProduction.Value.Set(nameof(BalanceSheet.PopulationOut), Population.Value * 0.0005f);
 
             foreach (var building in Buildings)
             {
@@ -266,7 +262,7 @@ namespace Actors
             {
                 Tags.Remove(LocationTags.Famine);
             }
-            
+
             if (foodAfterConsumption > maxStorage)
             {
                 difference = FoodStorage.Value - maxStorage;
@@ -291,7 +287,7 @@ namespace Actors
                     Tags.Remove(LocationTags.Famine);
                 }
             }
-            
+
             player.FoodBalance.Value = player.FoodBalance.Value.Add(nameof(BalanceSheet.PopulationOut), difference);
 
             Population.Value += GrowPop(foodAfterConsumption);
