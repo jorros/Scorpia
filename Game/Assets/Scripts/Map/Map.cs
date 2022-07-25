@@ -20,8 +20,6 @@ namespace Map
         public int Width => width;
         public int Height => height;
         public IReadOnlyList<MapTile> Tiles => tiles;
-        
-        public PathFinder PathFinder { get; }
 
         public Map(int width, int height, int seed)
         {
@@ -39,8 +37,6 @@ namespace Map
                 new FertilityGenerator(),
                 new ResourceGenerator()
             };
-
-            PathFinder = new PathFinder(this);
         }
 
         public MapTile GetTile(int x, int y)

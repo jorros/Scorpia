@@ -7,6 +7,11 @@ namespace Map
 {
     public class MapTile : IEquatable<MapTile>
     {
+        public MapTile(Vector2Int position)
+        {
+            Position = position;
+        }
+        
         public Biome Biome { get; set; }
 
         public TileFeature Feature { get; set; } = TileFeature.None;
@@ -19,7 +24,7 @@ namespace Map
 
         public Resource Resource { get; set; }
 
-        public Vector2Int Position { get; set; }
+        public Vector2Int Position { get; }
 
         public Vector3Int HexPosition
         {

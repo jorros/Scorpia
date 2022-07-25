@@ -28,26 +28,21 @@ namespace PlayerActions
 
         public void Hover(MapTile mapTile)
         {
-            var stopwatch = new Stopwatch();
-            
-            stopwatch.Start();
             if (mapTile.Location == null)
             {
                 EventManager.Trigger(Events.ResetTempTile);
                 return;
             }
-
-            var path = MapRenderer.current.map.PathFinder.Find(start, mapTile);
+            
+            var path = PathFinder.Find(start, mapTile);
 
             foreach (var tile in path)
             {
                 EventManager.Trigger(Events.DrawTempTile, tile, TempTileType.Road);
             }
-            
-            Debug.Log($"Draw road from {start.Location.Name.Value.Value.Value} to {mapTile.Location.Name.Value.Value.Value}");
-            stopwatch.Stop();
-            
-            Debug.Log($"Total execution: {stopwatch.ElapsedMilliseconds} ms");
+
+            Debug.Log(
+                $"Draw road from {start.Location.Name.Value.Value.Value} to {mapTile.Location.Name.Value.Value.Value}");
         }
     }
 }

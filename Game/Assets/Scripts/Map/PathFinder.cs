@@ -1,93 +1,77 @@
 using System.Collections.Generic;
 using System.Linq;
+using DataStructures.PriorityQueue;
 using UnityEngine;
 
 namespace Map
 {
-    public class PathFinder
+    public static class PathFinder
     {
-        private readonly Map map;
-
-        public PathFinder(Map map)
+        public static IReadOnlyList<MapTile> Find(MapTile startTile, MapTile endTile)
         {
-            this.map = map;
-        }
+            var start = new Node(startTile);
+            var end = new Node(endTile);
+            
+            var openList = new PriorityQueue<Node, float>(0);
+            var closedList = new List<Node>();
+            var path = new Stack<Node>();
+            var current = start;
 
-        public IReadOnlyList<MapTile> Find(MapTile start, MapTile end)
-        {
-            var openPathTiles = new List<PFTile>();
-            var closedPathTiles = new List<PFTile>();
+            openList.Insert(start, start.F);
 
-            var currentTile = new PFTile(start)
+            while (openList.Count != 0 && !closedList.Contains(end))
             {
-                G = 0,
-                H = GetEstimatedPathCost(start.HexPosition, end.HexPosition)
-            };
+                current = openList.Pop();
+                closedList.Add(current);
 
-            openPathTiles.Add(currentTile);
+                var neighbours = current.MapTile.Neighbours.Select(x => new Node(x));
 
-            while (openPathTiles.Count != 0)
-            {
-                openPathTiles = openPathTiles.OrderBy(x => x.F).ThenByDescending(x => x.G).ToList();
-                currentTile = openPathTiles[0];
-
-                openPathTiles.Remove(currentTile);
-                closedPathTiles.Add(currentTile);
-
-                var g = currentTile.G + 1;
-
-                if (openPathTiles.Exists(x => x.MapTile == end))
+                foreach (var n in neighbours)
                 {
-                    break;
-                }
-
-                var adjacentTiles = currentTile.MapTile.Neighbours;
-                foreach (var adjacentTile in adjacentTiles)
-                {
-                    if (closedPathTiles.Exists(x => x.MapTile == adjacentTile))
+                    if (closedList.Contains(n))
                     {
                         continue;
                     }
-
-                    var adjacentPFTile = openPathTiles.FirstOrDefault(x => x.MapTile == adjacentTile);
-                    if (adjacentPFTile == null)
+                    
+                    var isFound = false;
+                    foreach (var oLNode in openList.UnorderedItems)
                     {
-                        openPathTiles.Add(new PFTile(adjacentTile)
+                        if (oLNode.Equals(n))
                         {
-                            G = g,
-                            H = GetEstimatedPathCost(adjacentTile.HexPosition, end.HexPosition)
-                        });
+                            isFound = true;
+                        }
                     }
-                    else if (adjacentPFTile.F > g + adjacentPFTile.H)
+
+                    if (isFound)
                     {
-                        adjacentPFTile.G = g;
+                        continue;
                     }
+                    
+                    n.Parent = current;
+                    n.DistanceToTarget = GetEstimatedPathCost(n.MapTile.HexPosition, endTile.HexPosition);
+                    n.Cost = n.Weight + n.Parent.Cost;
+                    openList.Insert(n, n.F);
                 }
             }
 
-            var finalPathTiles = new List<MapTile>();
-
-            var endTile = closedPathTiles.FirstOrDefault(x => x.MapTile == end);
-
-            if (endTile == null)
+            if (!closedList.Contains(end))
             {
-                return finalPathTiles;
-            }
-            
-            currentTile = endTile;
-            finalPathTiles.Add(currentTile.MapTile);
-
-            for (var i = endTile.G - 1; i >= 0; i--)
-            {
-                currentTile = closedPathTiles.Find(x =>
-                    x.G == i && currentTile.MapTile.Neighbours.Contains(x.MapTile));
-                finalPathTiles.Add(currentTile.MapTile);
+                return path.Select(x => x.MapTile).ToList();
             }
 
-            finalPathTiles.Reverse();
+            var temp = closedList[closedList.IndexOf(current)];
+            if (temp == null)
+            {
+                return path.Select(x => x.MapTile).ToList();
+            }
 
+            do
+            {
+                path.Push(temp);
+                temp = temp.Parent;
+            } while (!start.Equals(temp) && temp != null);
 
-            return finalPathTiles;
+            return path.Select(x => x.MapTile).ToList();
         }
 
         private static int GetEstimatedPathCost(Vector3Int startPosition, Vector3Int targetPosition)
@@ -97,20 +81,50 @@ namespace Map
                     Mathf.Abs(startPosition.y - targetPosition.y)));
         }
 
-        private class PFTile
+        private class Node
         {
-            public PFTile(MapTile tile)
+            public Node(MapTile tile, int weight = 1)
             {
                 MapTile = tile;
+                DistanceToTarget = -1;
+                Cost = 1;
+                Weight = weight;
+            }
+            
+            public Node Parent { get; set; }
+
+            public int F
+            {
+                get
+                {
+                    if (DistanceToTarget != -1 && Cost != -1)
+                        return DistanceToTarget + Cost;
+                    else
+                        return -1;
+                }
             }
 
-            public int F => G + H;
+            public int DistanceToTarget { get; set; }
+            
+            public int Cost { get; set; }
 
-            public int G { get; set; }
-
-            public int H { get; set; }
+            public int Weight { get; set; }
 
             public MapTile MapTile { get; }
+
+            public override bool Equals(object obj)
+            {
+                return obj switch
+                {
+                    Node pfTile => MapTile.Equals(pfTile.MapTile),
+                    _ => false
+                };
+            }
+
+            public override int GetHashCode()
+            {
+                return MapTile.GetHashCode();
+            }
         }
     }
 }

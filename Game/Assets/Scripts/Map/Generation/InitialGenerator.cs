@@ -10,10 +10,7 @@ namespace Map.Generation
             {
                 for (var y = 0; y < map.Height; y++)
                 {
-                    var tile = new MapTile
-                    {
-                        Position = new Vector2Int(x, y)
-                    };
+                    var tile = new MapTile(new Vector2Int(x, y));
 
                     map.SetTile(x, y, tile);
                 }
