@@ -20,22 +20,12 @@ namespace Map.Generation
 
             noiseMap.Generate(map.Seed, SCALE, OCTAVES, PERSISTENCE, LACUNARITY, new Vector2(0, 0));
 
-            for (int x = 0; x < map.Width; x++)
+            foreach (var tile in map.Tiles)
             {
-                for (int y = 0; y < map.Height; y++)
-                {
-                    var noise = noiseMap.GetPosition(x, y);
-
-                    var tile = new MapTile
-                    {
-                        Biome = MapBiome(noise),
-                        Position = new Vector2Int(x, y)
-                    };
-
-                    tile.Feature = MapFeature(tile.Biome, map.Rnd);
-
-                    map.SetTile(x, y, tile);
-                }
+                var noise = noiseMap.GetPosition(tile.Position.x, tile.Position.y);
+                
+                tile.Biome = MapBiome(noise);
+                tile.Feature = MapFeature(tile.Biome, map.Rnd);
             }
         }
 

@@ -7,6 +7,7 @@ using Actors.Entities;
 using Blueprints;
 using Blueprints.Requirements;
 using Map;
+using PlayerActions;
 using UI.Tooltip;
 using Utils;
 
@@ -50,7 +51,12 @@ namespace UI.ActionBar
                 AddEmptyButton(tile);
             }
 
-            system.SetSButtons(0);
+            system.SetSButtons(1);
+            
+            system.AddSAction(1, new TooltipDescription("Build road", "You need to connect your city to your capital in order to access the countries market. Once connected this city can contribute to your economy."), () =>
+            {
+                Game.SetPlayerAction(new BuildRoadPlayerAction(tile));
+            });
         }
 
         private void AddBuildingList(MapTile mapTile, MapTile tile)

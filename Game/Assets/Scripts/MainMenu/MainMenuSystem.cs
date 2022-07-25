@@ -53,28 +53,26 @@ namespace MainMenu
             }
         }
 
-        private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
+        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
-            var approve = false;
-            var uid = Encoding.ASCII.GetString(connectionData);
+            var uid = Encoding.ASCII.GetString(request.Payload);
 
             if (ScorpiaServer.Singleton.State == GameState.Lobby)
             {
-                approve = true;
+                response.Approved = true;
             }
             else if (ScorpiaServer.Singleton.Players.FindByUID(uid) != null)
             {
-                approve = true;
+                response.Approved = true;
             }
             else
             {
-                var message = "in progress";
+                response.Approved = false;
+                const string message = "in progress";
                 using var writer = new FastBufferWriter(message.Length * 4, Allocator.Temp);
                 writer.WriteValueSafe(message);
-                NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("ErrorMessage", clientId, writer, NetworkDelivery.Reliable);
+                NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("ErrorMessage", request.ClientNetworkId, writer, NetworkDelivery.Reliable);
             }
-
-            callback(false, null, approve, null, null);
         }
 
         private void CheckConnectivity()
@@ -108,7 +106,7 @@ namespace MainMenu
 
             Debug.Log("Starting server");
         }
-
+        
         private void StartClient()
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnConnect;

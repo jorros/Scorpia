@@ -32,6 +32,8 @@ namespace World
 
         public static bool clickIsBlocked;
 
+        private MapTile currentTile;
+
         void Start()
         {
             if (NetworkManager.Singleton.IsServer)
@@ -59,9 +61,25 @@ namespace World
                 return;
             }
 
+            ProcessHover();
+
             StartDragging();
             SelectTile();
             StopDragging();
+        }
+
+        private void ProcessHover()
+        {
+            var mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+            tile = MapRenderer.current.GetTile(mousePos);
+
+            if (tile == currentTile)
+            {
+                return;
+            }
+            
+            currentTile = tile;
+            Game.GetPlayerAction().Hover(currentTile);
         }
 
         private void SelectTile()
@@ -70,13 +88,14 @@ namespace World
             {
                 var mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
                 tile = MapRenderer.current.GetTile(mousePos);
-                EventManager.Trigger(Events.SelectTile, tile);
+                Game.GetPlayerAction().LeftClick(tile);
+                
             }
 
             if(Input.GetMouseButtonUp(1) && tile != null && !clickIsBlocked)
             {
                 tile = null;
-                EventManager.Trigger(Events.DeselectTile);
+                Game.GetPlayerAction().RightClick(tile);
             }
 
             if (clickIsBlocked)

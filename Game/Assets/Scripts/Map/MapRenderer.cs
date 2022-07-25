@@ -35,6 +35,7 @@ namespace Map
         private Tilemap locationsLayer;
         private Tilemap selectedLayer;
         private Tilemap fogLayer;
+        private Tilemap tempLayer;
 
         public Map map;
 
@@ -56,10 +57,11 @@ namespace Map
             groundLayer = tilemaps[0];
             minimapLayer = tilemaps[1];
             riverLayer = tilemaps[2];
-            flairLayer = tilemaps[3];
-            locationsLayer = tilemaps[4];
-            selectedLayer = tilemaps[5];
-            fogLayer = tilemaps[6];
+            locationsLayer = tilemaps[3];
+            fogLayer = tilemaps[4];
+            flairLayer = tilemaps[5];
+            tempLayer = tilemaps[6];
+            selectedLayer = tilemaps[7];
 
             renderers = new ITileRenderer[]
             {
@@ -184,6 +186,18 @@ namespace Map
         {
             selectedLayer.ClearAllTiles();
             selectedLayer.SetTile(new Vector3Int(selected.Position.x, selected.Position.y, 0), selectedTile);
+        }
+
+        [Event(Events.DrawTempTile)]
+        private void DrawTemporaryTile(MapTile tile, TempTileType type)
+        {
+            tempLayer.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), selectedTile);
+        }
+
+        [Event(Events.ResetTempTile)]
+        private void ResetTempTile()
+        {
+            tempLayer.ClearAllTiles();
         }
 
         [Event(Events.DeselectTile)]

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Actors;
 using UnityEngine;
 
@@ -9,6 +10,8 @@ namespace Map
         public Biome Biome { get; set; }
 
         public TileFeature Feature { get; set; } = TileFeature.None;
+        
+        public IReadOnlyList<MapTile> Neighbours { get; set; }
 
         public River River { get; set; }
 
@@ -17,7 +20,18 @@ namespace Map
         public Resource Resource { get; set; }
 
         public Vector2Int Position { get; set; }
-        
+
+        public Vector3Int HexPosition
+        {
+            get
+            {
+                var q = Position.x - (Position.y - (Position.y & 1)) / 2;
+                var r = Position.y;
+
+                return new Vector3Int(q, r, -q - r);
+            }
+        }
+
         public Location Location { get; set; }
 
         public double DistanceTo(MapTile other)

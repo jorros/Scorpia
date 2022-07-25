@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Actors;
+using PlayerActions;
+using TMPro;
 using UnityEngine;
 using Utils;
 using World;
@@ -14,6 +16,41 @@ public static class Game
     private static readonly List<Location> Locations = new();
 
     private static string _version;
+    
+    private static readonly DefaultPlayerAction DefaultPlayerAction = new();
+
+    private static IPlayerAction _playerAction = DefaultPlayerAction;
+
+    private static TextMeshProUGUI _playerActionDescription;
+
+    public static IPlayerAction GetPlayerAction()
+    {
+        return _playerAction;
+    }
+
+    public static void SetPlayerAction(IPlayerAction playerAction)
+    {
+        _playerAction = playerAction;
+        
+        if (_playerActionDescription == null)
+        {
+            _playerActionDescription = GameObject.Find("PlayerActionDescription").GetComponent<TextMeshProUGUI>();
+        }
+
+        if (_playerAction.Description == null)
+        {
+            _playerActionDescription.text = "";
+
+            return;
+        }
+        
+        _playerActionDescription.text = _playerAction.Description;
+    }
+
+    public static void ResetPlayerAction()
+    {
+        SetPlayerAction(DefaultPlayerAction);
+    }
 
     public static Player GetPlayer(string uid)
     {

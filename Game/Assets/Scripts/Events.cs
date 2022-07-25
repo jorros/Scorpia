@@ -11,4 +11,6 @@ public static class Events
     public const string PlayerInfo = "PlayerInfo";
     public const string LocationUpdated = "LocationUpdated";
     public const string UpdateFog = "UpdateFog";
+    public const string DrawTempTile = "DrawTempTile";
+    public const string ResetTempTile = "ResetTempTile";
 }
