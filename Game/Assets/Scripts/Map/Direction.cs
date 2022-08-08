@@ -1,13 +1,18 @@
+using System;
+using UnityEngine;
+using Utils;
+
 namespace Map
 {
+    [Flags]
     public enum Direction
     {
-        NorthEast,
-        East,
-        SouthEast,
-        SouthWest,
-        West,
-        NorthWest
+        NorthEast = 1,
+        East = 2,
+        SouthEast = 4,
+        SouthWest = 8,
+        West = 16,
+        NorthWest = 32
     }
 
     public static class DirectionExtensions

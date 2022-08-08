@@ -31,7 +31,7 @@ namespace UI.TileInfo
             var i = tile switch
             {
                 { Biome: Biome.Water } => 8,
-                { Biome: Biome.Grass, Feature: TileFeature.Forest } => 2,
+                { Biome: Biome.Grass } t when t.HasFeature(MapTileFeature.Forest) => 2,
                 { Biome: Biome.Grass } => 3,
                 { Biome: Biome.Mountain } => 4,
                 _ => -1

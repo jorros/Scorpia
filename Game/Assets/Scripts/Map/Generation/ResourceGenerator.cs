@@ -1,13 +1,15 @@
-﻿namespace Map.Generation
+﻿using Utils;
+
+namespace Map.Generation
 {
     public class ResourceGenerator : IGenerator
     {
-        private const int GOLD_SPAWN_CHANCE = 6;
-        private const int SOFRUM_SPAWN_CHANCE = 4;
-        private const int NITRA_SPAWN_CHANCE = 1;
-        private const int ZELLOS_SPAWN_CHANCE = 4;
+        private const int GoldSpawnChance = 6;
+        private const int SofrumSpawnChance = 4;
+        private const int NitraSpawnChance = 1;
+        private const int ZellosSpawnChance = 4;
 
-        public void Generate(Map map)
+        public void Generate(Map map, NoiseMap noiseMap)
         {
             foreach (var tile in map.Tiles)
             {
@@ -45,7 +47,7 @@
 
         private bool CheckGold(MapTile tile, Map map)
         {
-            if (HasChance(map, GOLD_SPAWN_CHANCE) && map.HasNeighbour(tile, x => x.Biome == Biome.Mountain, 2))
+            if (HasChance(map, GoldSpawnChance) && map.HasNeighbour(tile, x => x.Biome == Biome.Mountain, 2))
             {
                 tile.Resource = Resource.Gold;
 
@@ -57,7 +59,7 @@
 
         private bool CheckSofrum(MapTile tile, Map map)
         {
-            if (HasChance(map, SOFRUM_SPAWN_CHANCE) && tile.Feature == TileFeature.Forest)
+            if (HasChance(map, SofrumSpawnChance) && tile.HasFeature(MapTileFeature.Forest))
             {
                 tile.Resource = Resource.Sofrum;
 
@@ -69,7 +71,7 @@
 
         private bool CheckNitra(MapTile tile, Map map)
         {
-            if (HasChance(map, NITRA_SPAWN_CHANCE))
+            if (HasChance(map, NitraSpawnChance))
             {
                 tile.Resource = Resource.Nitra;
 
@@ -81,7 +83,7 @@
 
         private bool CheckZellos(MapTile tile, Map map)
         {
-            if (HasChance(map, ZELLOS_SPAWN_CHANCE) && map.HasNeighbour(tile, x => x.Biome == Biome.Water || x.River != null, 4))
+            if (HasChance(map, ZellosSpawnChance) && map.HasNeighbour(tile, x => x.Biome == Biome.Water || x.River != null, 4))
             {
                 tile.Resource = Resource.Zellos;
 

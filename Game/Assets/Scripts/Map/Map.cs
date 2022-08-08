@@ -20,6 +20,11 @@ namespace Map
         public int Width => width;
         public int Height => height;
         public IReadOnlyList<MapTile> Tiles => tiles;
+        
+        private const float Scale = 20;
+        private const int Octaves = 5;
+        private const float Persistence = 0.35f;
+        private const float Lacunarity = 5f;
 
         public Map(int width, int height, int seed)
         {
@@ -52,6 +57,11 @@ namespace Map
         public MapTile GetTile(Vector2Int position)
         {
             return GetTile(position.x, position.y);
+        }
+
+        public MapTile GetTile(Vector3Int position)
+        {
+            return GetTile(position.x, position.y, position.z);
         }
 
         public MapTile GetTile(int q, int r, int s)
@@ -136,31 +146,6 @@ namespace Map
             return list;
         }
 
-        public Direction? GetDirection(MapTile from, MapTile to)
-        {
-            var vectors = new [] { new Vector3Int(1, -1, 0), new Vector3Int(1, 0, -1), new Vector3Int(0, 1, -1), new Vector3Int(-1, 1, 0), new Vector3Int(-1, 0, 1), new Vector3Int(0, -1, 1) };
-            var directions = new[] { Direction.SouthEast, Direction.East, Direction.NorthEast, Direction.NorthWest, Direction.West, Direction.SouthWest };
-
-            var vector = to.Position.ToCube() - from.Position.ToCube();
-            var index = -1;
-
-            for(var i = 0; i < vectors.Length; i++)
-            {
-                if(vectors[i] == vector)
-                {
-                    index = i;
-                    break;
-                }
-            }
-
-            if(index < 0)
-            {
-                return null;
-            }
-
-            return directions[index];
-        }
-
         public MapTile GetRandomTile(Func<MapTile, bool> predicate = null)
         {
             var validTiles = tiles;
@@ -177,9 +162,12 @@ namespace Map
 
         public void Generate()
         {
+            var noiseMap = new NoiseMap(Width, Height);
+            noiseMap.Generate(Seed, Scale, Octaves, Persistence, Lacunarity, new Vector2(0, 0));
+            
             foreach(var generator in generators)
             {
-                generator.Generate(this);
+                generator.Generate(this, noiseMap);
             }
         }       
     }

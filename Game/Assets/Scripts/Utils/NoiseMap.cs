@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Utils
@@ -6,6 +8,18 @@ namespace Utils
     {
         private float[] noiseMap;
         private int mapWidth, mapHeight;
+        
+        static readonly List<Vector2Int> Directions = new()
+        {
+            new Vector2Int( 0, 1), //N
+            new Vector2Int( 1, 1), //NE
+            new Vector2Int( 1, 0), //E
+            new Vector2Int(-1, 1), //SE
+            new Vector2Int(-1, 0), //S
+            new Vector2Int(-1,-1), //SW
+            new Vector2Int( 0,-1), //W
+            new Vector2Int( 1,-1)  //NW
+        };
 
         public NoiseMap(int width, int height)
         {
@@ -16,6 +30,61 @@ namespace Utils
         public float GetPosition(int x, int y)
         {
             return noiseMap[y * mapWidth + x];
+        }
+
+        public IReadOnlyList<Vector2Int> FindLocalMaxima()
+        {
+            var maximas = new List<Vector2Int>();
+            for (var x = 0; x < mapWidth; x++)
+            {
+                for (var y = 0; y < mapHeight; y++)
+                {
+                    var noiseVal = GetPosition(x, y);
+                    if (CheckNeighbours(x, y, neighbourNoise => neighbourNoise > noiseVal))
+                    {
+                        maximas.Add(new Vector2Int(x, y));
+                    }
+                }
+            }
+
+            return maximas;
+        }
+        
+        public IReadOnlyList<Vector2Int> FindLocalMinima()
+        {
+            var minimas = new List<Vector2Int>();
+            for (var x = 0; x < mapWidth; x++)
+            {
+                for (var y = 0; y < mapHeight; y++)
+                {
+                    var noiseVal = GetPosition(x, y);
+                    if (CheckNeighbours(x, y, neighbourNoise => neighbourNoise < noiseVal))
+                    {
+                        minimas.Add(new Vector2Int(x, y));
+                    }
+                }
+            }
+
+            return minimas;
+        }
+        
+        private bool CheckNeighbours(int x, int y, Func<float, bool> failCondition)
+        {
+            foreach (var dir in Directions)
+            {
+                var newPost = new Vector2Int(x + dir.x, y + dir.y);
+
+                if (newPost.x < 0 || newPost.x >= mapWidth || newPost.y < 0 || newPost.y >= mapHeight)
+                {
+                    continue;
+                }
+
+                if (failCondition(GetPosition(x + dir.x, y + dir.y)))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public void Generate(int seed, float scale, int octaves, float persistance, float lacunarity, Vector2 offset)

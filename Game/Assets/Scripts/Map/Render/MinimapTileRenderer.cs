@@ -20,8 +20,8 @@ namespace Map.Render
             tile switch
             {
                 { Biome: Biome.Water } => tiles[0],
-                { Biome: Biome.Grass, River: not null } => tiles[3],
-                { Biome: Biome.Grass, Feature: TileFeature.Forest } => tiles[2],
+                { Biome: Biome.Grass } t when t.River != null => tiles[3],
+                { Biome: Biome.Grass } t when t.HasFeature(MapTileFeature.Forest) => tiles[2],
                 { Biome: Biome.Mountain } => tiles[4],
                 _ => tiles[1]
             };

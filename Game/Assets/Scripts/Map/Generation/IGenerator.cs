@@ -1,8 +1,10 @@
-﻿namespace Map.Generation
+﻿using Utils;
+
+namespace Map.Generation
 {
 	public interface IGenerator
 	{
-		void Generate(Map map);
+		void Generate(Map map, NoiseMap noiseMap);
 	}
 }
 

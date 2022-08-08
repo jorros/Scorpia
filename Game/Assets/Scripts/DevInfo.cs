@@ -52,7 +52,7 @@ public class DevInfo : MonoBehaviour
         var direction = string.Empty;
         if(selected != null)
         {
-            direction = $"D:{map.map.GetDirection(selected, currentTile)}";
+            direction = $"D:{selected.GetDirection(currentTile)}";
         }
 
         return $"{PrintTileInfo(currentTile)} {direction}";
@@ -60,14 +60,7 @@ public class DevInfo : MonoBehaviour
 
     private string PrintTileInfo(MapTile tile)
     {
-        var riverInfo = string.Empty;
-
-        if (tile.River != null)
-        {
-            riverInfo = $"River: {tile.River.From} / {tile.River.To}";
-        }
-
-        return $"{tile.Position} {tile.Biome} {tile.Feature} {riverInfo}";
+        return $"{tile.Position} {tile.Biome} {string.Join(" ", tile.Features.Select(x => x.ToString()))}";
     }
 
     private string GetNetworkDetails()

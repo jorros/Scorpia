@@ -1,10 +1,11 @@
 using UnityEngine;
+using Utils;
 
 namespace Map.Generation
 {
     public class InitialGenerator : IGenerator
     {
-        public void Generate(Map map)
+        public void Generate(Map map, NoiseMap noiseMap)
         {
             for (var x = 0; x < map.Width; x++)
             {
