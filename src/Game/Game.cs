@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine;
 using Scorpia.Engine.SceneManagement;
+using Scorpia.Game.Nodes;
 using Scorpia.Game.Scenes;
 
 namespace Scorpia.Game;

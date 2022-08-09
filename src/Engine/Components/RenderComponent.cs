@@ -5,10 +5,10 @@ namespace Scorpia.Engine.Components;
 
 public class RenderComponent : Component
 {
-    public Sprite Sprite { get; }
-    public OffsetVector Position { get; }
+    public Sprite Sprite { get; set; }
+    public OffsetVector Position { get; set; }
 
-    public RenderComponent(Node node, Sprite sprite, OffsetVector position) : base(node)
+    public RenderComponent(Sprite sprite, OffsetVector position)
     {
         Sprite = sprite;
         Position = position;

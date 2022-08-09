@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.Graphics;
 
 namespace Scorpia.Engine.SceneManagement;
 
 public abstract class Scene : IDisposable
 {
-    private IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
 
-    internal void SetServiceProvider(IServiceProvider serviceProvider)
+    public Scene(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
@@ -20,18 +19,8 @@ public abstract class Scene : IDisposable
 
     public Node CreateNode<T>() where T : Node
     {
-        var node = _serviceProvider.GetRequiredService<T>();
-        var type = node.GetType();
-
-        type.GetProperty("Identifier")!.SetValue(node, _nodeIdCounter);
-        type.GetProperty("ServiceProvider")!.SetValue(node, _serviceProvider);
-        type.GetProperty("Scene")!.SetValue(node, this);
-        
-        node.OnInit();
-        foreach (var component in node.Components)
-        {
-            component.OnInit();
-        }
+        var node = Activator.CreateInstance<T>();
+        node.Create(_nodeIdCounter, _serviceProvider, this);
 
         Nodes.Add(_nodeIdCounter, node);
 

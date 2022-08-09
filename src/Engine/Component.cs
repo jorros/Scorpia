@@ -1,16 +1,19 @@
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.SceneManagement;
 
 namespace Scorpia.Engine;
 
 public abstract class Component
 {
-    protected Component(Node parent)
-    {
-        Parent = parent;
-    }
-    
-    protected Node Parent { get; }
-    
+    protected IServiceProvider ServiceProvider { get; private set; }
+    protected AssetManager AssetManager => ServiceProvider.GetRequiredService<AssetManager>();
+    protected SceneManager SceneManager => ServiceProvider.GetRequiredService<SceneManager>();
+    protected UserDataManager UserDataManager => ServiceProvider.GetRequiredService<UserDataManager>();
+    protected Node Parent { get; private set; }
+
     public virtual void OnCleanUp()
     {
     }
@@ -25,5 +28,11 @@ public abstract class Component
     
     public virtual void OnRender(RenderContext context)
     {
+    }
+
+    internal void Init(Node parent, IServiceProvider serviceProvider)
+    {
+        ServiceProvider = serviceProvider;
+        Parent = parent;
     }
 }
