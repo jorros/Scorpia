@@ -7,7 +7,12 @@ namespace Scorpia.Engine.InputManagement;
 public static class Input
 {
     public static event EventHandler<KeyboardEventArgs> OnKeyboard;
+    public static event EventHandler<MouseMoveEventArgs> OnMouseMove;
+    public static event EventHandler<MouseButtonEventArgs> OnMouseButton; 
+    public static event EventHandler<MouseWheelEventArgs> OnMouseWheel; 
 
+    public static OffsetVector MousePosition { get; private set; }
+    
     internal static void RaiseEvent(SDL_KeyboardEvent key)
     {
         OnKeyboard?.Invoke(null, new KeyboardEventArgs
@@ -15,6 +20,42 @@ public static class Input
             Type = key.type == SDL_EventType.SDL_KEYUP ? KeyboardEventType.KeyUp : KeyboardEventType.KeyDown,
             Repeated = key.repeat != 0,
             Key = key.keysym.scancode.ToKey()
+        });
+    }
+    
+
+    internal static void CaptureMouseMotion(SDL_MouseMotionEvent motion)
+    {
+        MousePosition = new OffsetVector(motion.x, motion.y);
+        OnMouseMove?.Invoke(null, new MouseMoveEventArgs
+        {
+            X = motion.x,
+            Y = motion.y,
+            DeltaX = motion.xrel,
+            DeltaY = motion.yrel
+        });
+    }
+
+    internal static void CaptureMouseWheel(SDL_MouseWheelEvent wheel)
+    {
+        OnMouseWheel?.Invoke(null, new MouseWheelEventArgs
+        {
+            X = wheel.x,
+            Y = wheel.y,
+            PreciseX = wheel.preciseX,
+            PreciseY = wheel.preciseY
+        });
+    }
+
+    internal static void CaptureMouseButton(SDL_MouseButtonEvent button)
+    {
+        OnMouseButton?.Invoke(null, new MouseButtonEventArgs
+        {
+            Clicks = button.clicks,
+            Type = button.type == SDL_EventType.SDL_MOUSEBUTTONUP ? MouseEventType.ButtonUp : MouseEventType.ButtonDown,
+            X = button.x,
+            Y = button.y,
+            Button = (MouseButton)button.button
         });
     }
 
@@ -25,5 +66,12 @@ public static class Input
         Marshal.Copy(ptr, keys, 0, num);
 
         return keys[(int) key] == 1;
+    }
+
+    public static bool IsButtonDown(MouseButton button)
+    {
+        var state = SDL_GetMouseState(IntPtr.Zero, IntPtr.Zero);
+
+        return SDL_BUTTON(state) == (uint) button;
     }
 }

@@ -7,6 +7,7 @@ using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.SceneManagement;
+using SDL2;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine;
@@ -64,17 +65,17 @@ public abstract class Engine
     private void StartUpdate(SceneManager sceneManager, CancellationToken token)
     {
         var stopwatch = new Stopwatch();
-        
+
         Task.Run(async () =>
         {
             while (!token.IsCancellationRequested)
             {
                 stopwatch.Start();
-                
+
                 sceneManager.Update();
 
-                await Task.Delay((int)Math.Floor(Math.Max(1000 / 30.0 - stopwatch.ElapsedMilliseconds, 0)), token);
-                
+                await Task.Delay((int) Math.Floor(Math.Max(1000 / 30.0 - stopwatch.ElapsedMilliseconds, 0)), token);
+
                 stopwatch.Stop();
                 stopwatch.Reset();
             }
@@ -89,7 +90,7 @@ public abstract class Engine
         while (!cancellationTokenSource.IsCancellationRequested)
         {
             stopwatch.Start();
-            
+
             while (SDL_PollEvent(out var e) == 1)
             {
                 switch (e.type)
@@ -102,6 +103,19 @@ public abstract class Engine
                     case SDL_EventType.SDL_KEYDOWN:
                         Input.RaiseEvent(e.key);
                         break;
+
+                    case SDL_EventType.SDL_MOUSEMOTION:
+                        Input.CaptureMouseMotion(e.motion);
+                        break;
+
+                    case SDL_EventType.SDL_MOUSEWHEEL:
+                        Input.CaptureMouseWheel(e.wheel);
+                        break;
+
+                    case SDL_EventType.SDL_MOUSEBUTTONUP:
+                    case SDL_EventType.SDL_MOUSEBUTTONDOWN:
+                        Input.CaptureMouseButton(e.button);
+                        break;
                 }
             }
 
@@ -110,9 +124,9 @@ public abstract class Engine
             sceneManager.Render(stopwatch.Elapsed);
 
             graphicsManager.Flush();
-            
+
             stopwatch.Stop();
-            Thread.Sleep((int)Math.Floor(Math.Max(4.0 - stopwatch.ElapsedMilliseconds, 0)));
+            Thread.Sleep((int) Math.Floor(Math.Max(4.0 - stopwatch.ElapsedMilliseconds, 0)));
             stopwatch.Reset();
         }
     }

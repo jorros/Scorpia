@@ -36,5 +36,10 @@ public class TestNode : Node
         {
             _render.Position += new OffsetVector(-1, 0);
         }
+
+        if (Input.IsButtonDown(MouseButton.BUTTON_LEFT))
+        {
+            Console.WriteLine("Button pressed");
+        }
     }
 }
