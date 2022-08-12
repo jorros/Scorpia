@@ -5,7 +5,7 @@ using static SDL2.SDL_image;
 
 namespace Scorpia.Engine.Graphics;
 
-internal class GraphicsManager
+public class GraphicsManager
 {
     private readonly UserDataManager _userDataManager;
 
@@ -13,7 +13,6 @@ internal class GraphicsManager
     {
         _userDataManager = userDataManager;
     }
-    
     internal IntPtr Window { get; private set; }
     internal IntPtr Renderer { get; private set; }
 
@@ -28,7 +27,7 @@ internal class GraphicsManager
         var windowHeight = _userDataManager.Get("windowHeight", 768);
 
         Window = SDL_CreateWindow("Scorpia", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight,
-            SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL_WindowFlags.SDL_WINDOW_METAL | SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI);
+            SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL_WindowFlags.SDL_WINDOW_METAL);
 
         if (Window == IntPtr.Zero)
         {
@@ -58,11 +57,6 @@ internal class GraphicsManager
         SDL_Quit();
     }
 
-    public RenderContext CreateContext()
-    {
-        return new RenderContext(this);
-    }
-
     internal IntPtr LoadTexture(byte[] data, string format)
     {
         var size = Marshal.SizeOf(data[0]) * data.Length;
@@ -73,6 +67,7 @@ internal class GraphicsManager
         var surface = IMG_LoadTyped_RW(rw, 1, format);
         var texture = SDL_CreateTextureFromSurface(Renderer, surface);
         SDL_FreeSurface(surface);
+        Marshal.FreeHGlobal(pnt);
 
         return texture;
     }

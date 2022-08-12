@@ -13,11 +13,8 @@ public class SceneManager
     public SceneManager(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-    }
 
-    internal void SetGraphicsManager(GraphicsManager graphicsManager)
-    {
-        _renderContext = graphicsManager.CreateContext();
+        _renderContext = serviceProvider.GetRequiredService<RenderContext>();
     }
 
     public void Switch<T>() where T : Scene
@@ -47,8 +44,7 @@ public class SceneManager
     internal void Render(TimeSpan elapsedTime)
     {
         _renderContext.Begin();
-        _renderContext.ElapsedTime = elapsedTime;
-        
+
         _currentScene.Render(_renderContext);
         foreach (var node in _currentScene.Nodes.Values)
         {

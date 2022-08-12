@@ -2,9 +2,9 @@ namespace Scorpia.Engine.InputManagement;
 
 public enum MouseButton
 {
-    BUTTON_LEFT = 1,
-    BUTTON_MIDDLE = 2,
-    BUTTON_RIGHT = 3,
-    BUTTON_X1 = 4,
-    BUTTON_X2 = 5
+    Left = 1,
+    Middle = 2,
+    Right = 3,
+    X1 = 4,
+    X2 = 5
 }

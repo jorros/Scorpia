@@ -9,37 +9,45 @@ public class TestNode : Node
 {
     private AssetBundle _game;
     private RenderComponent _render;
+    
+    private float _direction = 0.01f;
 
     public override void OnInit()
     {
         _game = AssetManager.Load("Game");
 
         _render = new RenderComponent(_game.Get<Sprite>("title_icon_blue"), OffsetVector.Zero);
-        AttachComponent(_render);
+        // AttachComponent(_render);
     }
 
     public override void OnUpdate()
     {
-        if (Input.IsKeyDown(KeyboardKey.KEY_DOWN))
+        if (_render.Scale >= 2.0f)
         {
-            _render.Position += new OffsetVector(0, 1);
+            _direction = -0.01f;
         }
-        if (Input.IsKeyDown(KeyboardKey.KEY_UP))
+        else if (_render.Scale <= 1.0f)
         {
-            _render.Position += new OffsetVector(0, -1);
-        }
-        if (Input.IsKeyDown(KeyboardKey.KEY_RIGHT))
-        {
-            _render.Position += new OffsetVector(1, 0);
-        }
-        if (Input.IsKeyDown(KeyboardKey.KEY_LEFT))
-        {
-            _render.Position += new OffsetVector(-1, 0);
+            _direction = 0.01f;
         }
 
-        if (Input.IsButtonDown(MouseButton.BUTTON_LEFT))
+        _render.Scale += _direction;
+        
+        if (Input.IsKeyDown(KeyboardKey.Down))
         {
-            Console.WriteLine("Button pressed");
+            Viewport.WorldPosition += new OffsetVector(0, 1);
+        }
+        if (Input.IsKeyDown(KeyboardKey.Up))
+        {
+            Viewport.WorldPosition += new OffsetVector(0, -1);
+        }
+        if (Input.IsKeyDown(KeyboardKey.Right))
+        {
+            Viewport.WorldPosition += new OffsetVector(1, 0);
+        }
+        if (Input.IsKeyDown(KeyboardKey.Left))
+        {
+            Viewport.WorldPosition += new OffsetVector(-1, 0);
         }
     }
 }

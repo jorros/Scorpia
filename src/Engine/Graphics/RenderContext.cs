@@ -1,5 +1,4 @@
-using System;
-using System.Runtime.InteropServices;
+using System.Drawing;
 using Scorpia.Engine.Asset;
 using static SDL2.SDL;
 
@@ -8,57 +7,43 @@ namespace Scorpia.Engine.Graphics;
 public class RenderContext
 {
     private readonly GraphicsManager _graphicsManager;
+    public Viewport Viewport { get; private set; }
 
-    internal RenderContext(GraphicsManager graphicsManager)
+    public RenderContext(GraphicsManager graphicsManager)
     {
         _graphicsManager = graphicsManager;
     }
 
-    public TimeSpan ElapsedTime { get; set; }
-
+    internal void Init()
+    {
+        SDL_RenderGetViewport(_graphicsManager.Renderer, out var rect);
+        Viewport = new Viewport(_graphicsManager, rect);
+    }
+    
     internal void Begin(ScaleQuality scaleQuality = ScaleQuality.Nearest)
     {
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, $"{(int) scaleQuality}");
+        
+        Viewport.Begin();
     }
 
     internal void End()
     {
+        Viewport.End();
     }
 
     public void Draw(Sprite sprite, OffsetVector position)
     {
-        Draw(sprite, position, 0, new OffsetVector(0, 0));
+        Viewport.Draw(sprite, position);
     }
 
-    public void Draw(Sprite sprite, OffsetVector position, double angle, OffsetVector center)
+    public void Draw(Sprite sprite, OffsetVector position, OffsetVector scale, OffsetVector? center)
     {
-        var target = new SDL_Rect
-        {
-            x = position.X,
-            y = position.Y,
-            h = sprite.Height,
-            w = sprite.Width
-        };
+        Viewport.Draw(sprite, position, 0, scale, center, Color.White, 255);
+    }
 
-        var src = IntPtr.Zero;
-
-        if (sprite.SrcX is not null && sprite.SrcY is not null)
-        {
-            var srcRect = new SDL_Rect
-            {
-                w = sprite.Width,
-                h = sprite.Height,
-                x = sprite.SrcX.Value,
-                y = sprite.SrcY.Value
-            };
-            
-            src = Marshal.AllocHGlobal(Marshal.SizeOf(srcRect));
-            Marshal.StructureToPtr(srcRect, src, false);
-        }
-
-        var centerSdl = center.ToSdl();
-
-        SDL_RenderCopyEx(_graphicsManager.Renderer, sprite.Texture, src, ref target, angle, ref centerSdl,
-            SDL_RendererFlip.SDL_FLIP_NONE);
+    public void Draw(Sprite sprite, OffsetVector position, double angle, OffsetVector scale, OffsetVector? center, Color color, byte alpha)
+    {
+        Viewport.Draw(sprite, position, angle, scale, center, color, alpha);
     }
 }

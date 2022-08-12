@@ -22,7 +22,6 @@ public static class Input
             Key = key.keysym.scancode.ToKey()
         });
     }
-    
 
     internal static void CaptureMouseMotion(SDL_MouseMotionEvent motion)
     {

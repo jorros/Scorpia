@@ -3,11 +3,13 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Myra;
+using Myra.Graphics2D.UI;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
+using Scorpia.Engine.MyraIntegration;
 using Scorpia.Engine.SceneManagement;
-using SDL2;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine;
@@ -26,6 +28,8 @@ public abstract class Engine
         services.AddSingleton<SceneManager>();
         services.AddSingleton<AssetManager>();
         services.AddSingleton<UserDataManager>();
+        services.AddSingleton<RenderContext>();
+        services.AddSingleton<Desktop>();
 
         Init(services);
 
@@ -35,8 +39,10 @@ public abstract class Engine
         var sceneManager = sp.GetRequiredService<SceneManager>();
         var assetManager = sp.GetRequiredService<AssetManager>();
         var userDataManager = sp.GetRequiredService<UserDataManager>();
+        var renderContext = sp.GetRequiredService<RenderContext>();
 
-        sceneManager.SetGraphicsManager(graphicsManager);
+        Desktop desktop = null;
+
         assetManager.SetGraphicsManager(graphicsManager);
 
         userDataManager.Load();
@@ -44,6 +50,10 @@ public abstract class Engine
         if (!headless)
         {
             graphicsManager.Init();
+            renderContext.Init();
+
+            MyraEnvironment.Platform = new SMPlatform(graphicsManager, renderContext);
+            desktop = sp.GetRequiredService<Desktop>();
         }
 
         Load(sp);
@@ -57,7 +67,7 @@ public abstract class Engine
             return;
         }
 
-        StartRender(graphicsManager, sceneManager, running);
+        StartRender(graphicsManager, sceneManager, desktop, running);
 
         graphicsManager.Quit();
     }
@@ -70,19 +80,26 @@ public abstract class Engine
         {
             while (!token.IsCancellationRequested)
             {
-                stopwatch.Start();
+                try
+                {
+                    stopwatch.Start();
 
-                sceneManager.Update();
+                    sceneManager.Update();
 
-                await Task.Delay((int) Math.Floor(Math.Max(1000 / 30.0 - stopwatch.ElapsedMilliseconds, 0)), token);
+                    await Task.Delay((int) Math.Floor(Math.Max(1000 / 30.0 - stopwatch.ElapsedMilliseconds, 0)), token);
 
-                stopwatch.Stop();
-                stopwatch.Reset();
+                    stopwatch.Stop();
+                    stopwatch.Reset();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
         }, token);
     }
 
-    private void StartRender(GraphicsManager graphicsManager, SceneManager sceneManager,
+    private void StartRender(GraphicsManager graphicsManager, SceneManager sceneManager, Desktop desktop,
         CancellationTokenSource cancellationTokenSource)
     {
         var stopwatch = new Stopwatch();
@@ -122,6 +139,11 @@ public abstract class Engine
             graphicsManager.Clear();
 
             sceneManager.Render(stopwatch.Elapsed);
+
+            if (desktop.Root is not null)
+            {
+                desktop.Render();
+            }
 
             graphicsManager.Flush();
 

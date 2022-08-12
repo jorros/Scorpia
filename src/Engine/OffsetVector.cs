@@ -5,17 +5,19 @@ namespace Scorpia.Engine;
 
 public struct OffsetVector
 {
-    public OffsetVector(int x, int y)
+    public OffsetVector(double x, double y)
     {
         X = x;
         Y = y;
     }
 
-    public int X { get; }
+    public double X { get; }
 
-    public int Y { get; }
+    public double Y { get; }
 
     public static OffsetVector Zero { get; } = new(0, 0);
+
+    public static OffsetVector One { get; } = new(1, 1);
     
     public static OffsetVector operator +(OffsetVector a) => a;
     public static OffsetVector operator -(OffsetVector a) => new(-a.X, -a.Y);
@@ -42,8 +44,8 @@ public struct OffsetVector
     {
         return new SDL_Point
         {
-            x = X,
-            y = Y
+            x = (int)X,
+            y = (int)Y
         };
     }
 }

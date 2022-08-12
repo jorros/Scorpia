@@ -12,6 +12,7 @@ public abstract class Component
     protected AssetManager AssetManager => ServiceProvider.GetRequiredService<AssetManager>();
     protected SceneManager SceneManager => ServiceProvider.GetRequiredService<SceneManager>();
     protected UserDataManager UserDataManager => ServiceProvider.GetRequiredService<UserDataManager>();
+    protected Viewport Viewport => ServiceProvider.GetRequiredService<RenderContext>().Viewport;
     protected Node Parent { get; private set; }
 
     public virtual void OnCleanUp()
