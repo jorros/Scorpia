@@ -16,6 +16,8 @@ internal class SMRenderer : IMyraRenderer
     private readonly GraphicsManager _graphicsManager;
     private readonly RenderContext _renderContext;
 
+    private OffsetVector _previousDrawSize;
+
     public SMRenderer(GraphicsManager graphicsManager, RenderContext renderContext)
     {
         _graphicsManager = graphicsManager;
@@ -25,11 +27,14 @@ internal class SMRenderer : IMyraRenderer
     public void Begin(TextureFiltering textureFiltering)
     {
         _renderContext.Begin(textureFiltering == TextureFiltering.Nearest ? ScaleQuality.Nearest : ScaleQuality.Linear);
+        // _previousDrawSize = _renderContext.GetDrawSize();
+        // _renderContext.SetDrawSize(new OffsetVector(3840, 2160));
     }
 
     public void End()
     {
         _renderContext.End();
+        // _renderContext.SetDrawSize(_previousDrawSize);
     }
 
     public void Draw(object texture, Vector2 pos, Rectangle? src, Color color, float rotation, Vector2 scale, float depth)
@@ -48,7 +53,7 @@ internal class SMRenderer : IMyraRenderer
 
         if (src is null)
         {
-            SDL_QueryTexture((IntPtr) texture, out _, out _, out w, out h);
+            SDL_QueryTexture((IntPtr) texture, out var format, out _, out w, out h);
         }
         else
         {
@@ -65,7 +70,7 @@ internal class SMRenderer : IMyraRenderer
         };
         var dstRect = Marshal.AllocHGlobal(Marshal.SizeOf(sDstRect));
         Marshal.StructureToPtr(sDstRect, dstRect, false);
-
+        
         SDL_SetTextureColorMod((IntPtr) texture, color.R, color.G, color.B);
         SDL_RenderCopyEx(_graphicsManager.Renderer, (IntPtr) texture, srcRect, dstRect, rotation, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
@@ -76,30 +81,7 @@ internal class SMRenderer : IMyraRenderer
 
     public Rectangle Scissor
     {
-        get
-        {
-            SDL_RenderGetClipRect(_graphicsManager.Renderer, out var rect);
-
-            return new Rectangle
-            {
-                X = rect.x,
-                Y = rect.y,
-                Height = rect.h,
-                Width = rect.w
-            };
-        }
-
-        set
-        {
-            var rect = new SDL_Rect
-            {
-                x = value.X,
-                y = value.Y,
-                h = value.Height,
-                w = value.Width
-            };
-
-            SDL_RenderSetClipRect(_graphicsManager.Renderer, ref rect);
-        }
+        get => _renderContext.Viewport.GetClipping();
+        set => _renderContext.Viewport.SetClipping(value);
     }
 }

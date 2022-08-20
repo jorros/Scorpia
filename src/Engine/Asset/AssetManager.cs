@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using Myra;
 using Myra.Assets;
 using Myra.Graphics2D.UI;
 using Myra.Graphics2D.UI.Styles;
@@ -28,18 +29,23 @@ public class AssetManager
     private readonly IReadOnlyList<string> _validExtensions = new[]
     {
         ".png",
-        ".xmmp",
         ".xmms"
     };
 
-    public AssetBundle Load(string name)
+    public AssetBundle Load(string name, bool defaultMyraAssetManager = false)
     {
         var bundle = new Dictionary<string, IAsset>();
 
         using var stream = File.Open(Path.Combine("Content", $"{name}.pack"), FileMode.Open);
         using var archive = ArchiveFactory.Open(stream);
-        
-        var assetManager = new Myra.Assets.AssetManager(new ArchiveAssetResolver(archive));
+
+        var assetResolver = new ArchiveAssetResolver(archive);
+        var assetManager = new Myra.Assets.AssetManager(assetResolver);
+
+        if (defaultMyraAssetManager)
+        {
+            MyraEnvironment.DefaultAssetManager.AssetResolver = assetResolver;
+        }
 
         foreach (var entry in archive.Entries.Where(entry =>
                      !entry.IsDirectory && _validExtensions.Any(x => x == Path.GetExtension(entry.Key))))
@@ -60,7 +66,6 @@ public class AssetManager
             var assets = ext switch
             {
                 ".png" => LoadSprite(data, key, metaData),
-                ".xmmp" => LoadMML(data, key, assetManager),
                 ".xmms" => LoadStylesheet(key, assetManager),
                 _ => null
             };
@@ -102,14 +107,6 @@ public class AssetManager
 
         archive.AddAllFromDirectory(src);
         archive.SaveTo(output, new TarWriterOptions(CompressionType.Deflate, true));
-    }
-
-    private static IReadOnlyList<(string key, IAsset asset)> LoadMML(byte[] data, string key, IAssetManager assetManager)
-    {
-        var xml = Encoding.UTF8.GetString(data);
-        var project = new MyraMarkup(Project.LoadFromXml(xml, assetManager));
-
-        return new[] {(key, (IAsset) project)};
     }
     
     private static IReadOnlyList<(string key, IAsset asset)> LoadStylesheet(string key, IAssetManager assetManager)

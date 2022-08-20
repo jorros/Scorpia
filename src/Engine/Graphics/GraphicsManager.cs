@@ -16,19 +16,26 @@ public class GraphicsManager
     internal IntPtr Window { get; private set; }
     internal IntPtr Renderer { get; private set; }
 
-    internal void Init()
+    internal void Init(IntPtr? handle = null)
     {
         if (SDL_Init(SDL_INIT_VIDEO) < 0)
         {
             throw new EngineException($"Could not initialise SDL: {SDL_GetError()}");
         }
 
-        var windowWidth = _userDataManager.Get("windowWidth", 1024);
-        var windowHeight = _userDataManager.Get("windowHeight", 768);
+        if (handle is not null)
+        {
+            Window = SDL_CreateWindowFrom(handle.Value);
+        }
+        else
+        {
+            var windowWidth = _userDataManager.Get("windowWidth", 1024);
+            var windowHeight = _userDataManager.Get("windowHeight", 768);
 
-        Window = SDL_CreateWindow("Scorpia", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight,
-            SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL_WindowFlags.SDL_WINDOW_METAL);
-
+            Window = SDL_CreateWindow("Scorpia", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight,
+                SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL_WindowFlags.SDL_WINDOW_METAL | SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI);
+        }
+        
         if (Window == IntPtr.Zero)
         {
             throw new EngineException($"Could not create window: {SDL_GetError()}");
@@ -79,7 +86,7 @@ public class GraphicsManager
 
     internal void Clear()
     {
-        if (SDL_SetRenderDrawColor(Renderer, 135, 206, 235, 255) < 0)
+        if (SDL_SetRenderDrawColor(Renderer, 0, 0, 235, 255) < 0)
         {
             Console.WriteLine($"There was an issue with setting the render draw color. {SDL_GetError()}");
         }

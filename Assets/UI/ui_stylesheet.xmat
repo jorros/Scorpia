@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas Image="ui_stylesheet_atlas.png">
+  <NinePatchRegion Id="input" Left="0" Top="0" Width="552" Height="92" NinePatchLeft="15" NinePatchTop="15" NinePatchRight="15" NinePatchBottom="15" />
+  <TextureRegion Id="menu_background" Left="0" Top="92" Width="3840" Height="2160" />
+  <NinePatchRegion Id="button_regular" Left="0" Top="2252" Width="346" Height="130" NinePatchLeft="108" NinePatchTop="43" NinePatchRight="115" NinePatchBottom="43" />
+  <TextureRegion Id="flag_button_selected" Left="3840" Top="0" Width="200" Height="199" />
+  <TextureRegion Id="flag_button" Left="3840" Top="199" Width="200" Height="199" />
+  <NinePatchRegion Id="button_green" Left="346" Top="2252" Width="346" Height="130" NinePatchLeft="108" NinePatchTop="43" NinePatchRight="115" NinePatchBottom="43" />
+  <NinePatchRegion Id="button_red" Left="692" Top="2252" Width="346" Height="130" NinePatchLeft="108" NinePatchTop="43" NinePatchRight="115" NinePatchBottom="43" />
+  <TextureRegion Id="separator" Left="1038" Top="2252" Width="2207" Height="26" />
+  <NinePatchRegion Id="container" Left="1038" Top="2278" Width="2334" Height="1514" NinePatchLeft="59" NinePatchTop="59" NinePatchRight="59" NinePatchBottom="58" />
+  <NinePatchRegion Id="button_bar" Left="0" Top="3792" Width="1427" Height="118" NinePatchLeft="278" NinePatchTop="0" NinePatchRight="283" NinePatchBottom="0" />
+</TextureAtlas>

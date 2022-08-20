@@ -14,16 +14,16 @@ internal class SMPlatform : IMyraPlatform
 {
     private readonly GraphicsManager _graphicsManager;
     private readonly RenderContext _renderContext;
-    
+
     private static readonly Dictionary<Keys, KeyboardKey> _keysMap = new();
 
     public SMPlatform(GraphicsManager graphicsManager, RenderContext renderContext)
     {
         _graphicsManager = graphicsManager;
         _renderContext = renderContext;
-        
+
         var keysValues = Enum.GetValues(typeof(Keys));
-        foreach(Keys keys in keysValues)
+        foreach (Keys keys in keysValues)
         {
             var name = Enum.GetName(typeof(Keys), keys);
 
@@ -33,16 +33,16 @@ internal class SMPlatform : IMyraPlatform
                 _keysMap[keys] = key;
             }
         }
-        
+
         _keysMap[Keys.Back] = KeyboardKey.Backspace;
     }
 
     public object CreateTexture(int width, int height)
     {
-        var texture = SDL_CreateTexture(_graphicsManager.Renderer, SDL_PIXELFORMAT_BGRA8888,
+        var texture = SDL_CreateTexture(_graphicsManager.Renderer, SDL_PIXELFORMAT_ARGB8888,
             (int) SDL_TextureAccess.SDL_TEXTUREACCESS_STATIC, width,
             height);
-        
+
         SDL_SetTextureBlendMode(texture, SDL_BlendMode.SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawBlendMode(texture, SDL_BlendMode.SDL_BLENDMODE_BLEND);
 
@@ -58,19 +58,19 @@ internal class SMPlatform : IMyraPlatform
 
     public void SetTextureData(object texture, Rectangle bounds, byte[] data)
     {
-        for (int i = 0; i < data.Length; i += 4)
-        {
-            byte r = data[i];
-            byte g = data[i + 1];
-            byte b = data[i + 2];
-            byte a = data[i + 3];
+        // for (var i = 0; i < data.Length; i += 4)
+        // {
+        //     var r = data[i];
+        //     var g = data[i + 1];
+        //     var b = data[i + 2];
+        //     var a = data[i + 3];
+        //
+        //     data[i] = b;
+        //     data[i + 1] = g;
+        //     data[i + 2] = r;
+        //     data[i + 3] = a;
+        // }
 
-            data[i] = b;
-            data[i + 1] = g;
-            data[i + 2] = r;
-            data[i + 3] = a;
-        }
-        
         var rect = new SDL_Rect
         {
             h = bounds.Height,
@@ -100,9 +100,9 @@ internal class SMPlatform : IMyraPlatform
         return new MouseInfo
         {
             Position = new Point(x, y),
-            IsLeftButtonDown = button == (uint)MouseButton.Left,
-            IsMiddleButtonDown = button == (uint)MouseButton.Middle,
-            IsRightButtonDown = button == (uint)MouseButton.Right,
+            IsLeftButtonDown = button == (uint) MouseButton.Left,
+            IsMiddleButtonDown = button == (uint) MouseButton.Middle,
+            IsRightButtonDown = button == (uint) MouseButton.Right,
             Wheel = 0
         };
     }
@@ -115,11 +115,12 @@ internal class SMPlatform : IMyraPlatform
 
         for (var i = 0; i < keys.Length; ++i)
         {
-            var ks = (Keys)i;
+            var ks = (Keys) i;
             if (_keysMap.TryGetValue(ks, out var key))
             {
-                keys[i] = keyArr[(int)key] == 1;
-            } else
+                keys[i] = keyArr[(int) key] == 1;
+            }
+            else
             {
                 keys[i] = false;
             }
@@ -136,7 +137,8 @@ internal class SMPlatform : IMyraPlatform
         get
         {
             SDL_GetRendererOutputSize(_graphicsManager.Renderer, out var w, out var h);
-            
+
+
             return new Point(w, h);
         }
     }

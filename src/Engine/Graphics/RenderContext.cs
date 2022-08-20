@@ -32,6 +32,18 @@ public class RenderContext
         Viewport.End();
     }
 
+    public void SetDrawSize(OffsetVector size)
+    {
+        SDL_RenderSetLogicalSize(_graphicsManager.Renderer, (int)size.X, (int)size.Y);
+    }
+
+    public OffsetVector GetDrawSize()
+    {
+        SDL_RenderGetLogicalSize(_graphicsManager.Renderer, out var w, out var h);
+
+        return new OffsetVector(w, h);
+    }
+
     public void Draw(Sprite sprite, OffsetVector position)
     {
         Viewport.Draw(sprite, position);

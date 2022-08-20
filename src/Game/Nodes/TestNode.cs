@@ -22,16 +22,16 @@ public class TestNode : Node
 
     public override void OnUpdate()
     {
-        if (_render.Scale >= 2.0f)
-        {
-            _direction = -0.01f;
-        }
-        else if (_render.Scale <= 1.0f)
-        {
-            _direction = 0.01f;
-        }
-
-        _render.Scale += _direction;
+        // if (_render.Scale >= 2.0f)
+        // {
+        //     _direction = -0.01f;
+        // }
+        // else if (_render.Scale <= 1.0f)
+        // {
+        //     _direction = 0.01f;
+        // }
+        //
+        // _render.Scale += _direction;
         
         if (Input.IsKeyDown(KeyboardKey.Down))
         {

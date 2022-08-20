@@ -20,7 +20,7 @@ public abstract class Engine
 
     protected abstract void Load(IServiceProvider serviceProvider);
 
-    public void Run(bool headless = false)
+    public void Run(bool headless = false, IntPtr? viewHandler = null)
     {
         var services = new ServiceCollection();
 
@@ -49,7 +49,7 @@ public abstract class Engine
 
         if (!headless)
         {
-            graphicsManager.Init();
+            graphicsManager.Init(viewHandler);
             renderContext.Init();
 
             MyraEnvironment.Platform = new SMPlatform(graphicsManager, renderContext);

@@ -4,11 +4,11 @@ namespace Scorpia.Engine.InputManagement;
 
 public class KeyboardEventArgs : EventArgs
 {
-    public KeyboardEventType Type { get; init; }
+    public KeyboardEventType Type { get; set; }
     
-    public bool Repeated { get; init; }
+    public bool Repeated { get; set; }
     
-    public KeyboardKey Key { get; init; }
+    public KeyboardKey Key { get; set; }
 }
 
 public enum KeyboardEventType

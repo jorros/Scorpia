@@ -9,8 +9,8 @@ namespace Scorpia.Engine.Graphics;
 public class Viewport
 {
     private readonly GraphicsManager _graphicsManager;
-    internal SDL_Rect _rect;
-    internal SDL_Rect _previousRect;
+    private SDL_Rect _rect;
+    private SDL_Rect _previousRect;
 
     public OffsetVector WorldPosition { get; set; }
 
@@ -31,7 +31,47 @@ public class Viewport
     {
         SDL_RenderSetViewport(_graphicsManager.Renderer, ref _previousRect);
     }
-    
+
+    public void SetClipping(Rectangle? rectangle)
+    {
+        if (rectangle is null)
+        {
+            SDL_RenderSetClipRect(_graphicsManager.Renderer, IntPtr.Zero);
+
+            return;
+        }
+
+        var rect = new SDL_Rect
+        {
+            x = rectangle.Value.Left,
+            y = rectangle.Value.Top,
+            h = rectangle.Value.Height,
+            w = rectangle.Value.Width
+        };
+
+        if (_rect.x == rect.x && _rect.y == rect.y && _rect.w == rect.w && _rect.h == rect.h)
+        {
+            SDL_RenderSetClipRect(_graphicsManager.Renderer, IntPtr.Zero);
+
+            return;
+        }
+
+        SDL_RenderSetClipRect(_graphicsManager.Renderer, ref rect);
+    }
+
+    public Rectangle GetClipping()
+    {
+        SDL_RenderGetClipRect(_graphicsManager.Renderer, out var rect);
+
+        return new Rectangle
+        {
+            X = rect.x,
+            Y = rect.y,
+            Height = rect.h,
+            Width = rect.w
+        };
+    }
+
     public void Draw(Sprite sprite, OffsetVector position)
     {
         Draw(sprite, position, 0, OffsetVector.One, null, Color.White, 255);
@@ -42,34 +82,20 @@ public class Viewport
         Draw(sprite, position, 0, scale, center, Color.White, 255);
     }
 
-    public void DrawTest(IntPtr texture)
-    {
-        SDL_QueryTexture(texture, out var format, out var access, out var w, out var h);
-
-        var dest = new SDL_Rect
-        {
-            x = 0,
-            y = 0,
-            w = w,
-            h = h
-        };
-        
-        SDL_RenderCopy(_graphicsManager.Renderer, texture, IntPtr.Zero, ref dest);
-    }
-
-    public void Draw(Sprite sprite, OffsetVector position, double angle, OffsetVector scale, OffsetVector? center, Color color, byte alpha)
+    public void Draw(Sprite sprite, OffsetVector position, double angle, OffsetVector scale, OffsetVector? center,
+        Color color, byte alpha)
     {
         var scaledW = sprite.Width * scale.X;
         var scaledH = sprite.Height * scale.Y;
 
         center ??= new OffsetVector(scaledW / 2, scaledH / 2);
-        
+
         var target = new SDL_Rect
         {
-            x = (int)(position.X - center.Value.X) - (int)WorldPosition.X,
-            y = (int)(position.Y - center.Value.Y) - (int)WorldPosition.Y,
-            h = (int)scaledH,
-            w = (int)scaledW
+            x = (int) (position.X - center.Value.X) - (int) WorldPosition.X,
+            y = (int) (position.Y - center.Value.Y) - (int) WorldPosition.Y,
+            h = (int) scaledH,
+            w = (int) scaledW
         };
 
         var src = IntPtr.Zero;

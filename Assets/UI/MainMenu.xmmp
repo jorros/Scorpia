@@ -1,0 +1,5 @@
+<Project StylesheetPath="ui_stylesheet.xmms">
+  <Window Width="2048" Height="1328">
+    <Label Text="testest" Font="MyriadProRegular.ttf:36" />
+  </Window>
+</Project>
