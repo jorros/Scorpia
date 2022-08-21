@@ -30,6 +30,7 @@ public abstract class Engine
         services.AddSingleton<RenderContext>();
 
         services.AddSingleton<IAssetLoader, SpriteLoader>();
+        services.AddSingleton<IAssetLoader, FontLoader>();
 
         services.AddSingleton<LibgdxSpriteSheetParser>();
 

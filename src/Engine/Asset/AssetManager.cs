@@ -30,9 +30,9 @@ public class AssetManager
         var allowedExtensions = GetAllowedExtensions();
 
         foreach (var entry in archive.Entries.Where(entry =>
-                     !entry.IsDirectory && allowedExtensions.Contains(Path.GetExtension(entry.Key))))
+                     !entry.IsDirectory && allowedExtensions.Contains(Path.GetExtension(entry.Key).ToLowerInvariant())))
         {
-            var ext = Path.GetExtension(entry.Key);
+            var ext = Path.GetExtension(entry.Key).ToLowerInvariant();
             var loader = _assetLoaders.First(x => x.Extensions.Contains(ext));
 
             var assets = loader.Load(entry, archive);

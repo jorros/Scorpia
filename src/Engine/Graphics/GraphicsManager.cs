@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using static SDL2.SDL;
 using static SDL2.SDL_image;
+using static SDL2.SDL_ttf;
 
 namespace Scorpia.Engine.Graphics;
 
@@ -53,12 +54,19 @@ public class GraphicsManager
         
         if (IMG_Init(IMG_InitFlags.IMG_INIT_PNG) == 0)
         {
-            throw new EngineException($"There was an issue initialising SDL2_Image: {IMG_GetError()}");
+            throw new EngineException($"There was an issue initialising SDL_Image: {IMG_GetError()}");
+        }
+
+        if (TTF_Init() == -1)
+        {
+            throw new EngineException($"There was an issue initialising SDL_TTF: {TTF_GetError()}");
         }
     }
 
     internal void Quit()
     {
+        TTF_Quit();
+        IMG_Quit();
         SDL_DestroyRenderer(Renderer);
         SDL_DestroyWindow(Window);
         SDL_Quit();

@@ -1,4 +1,5 @@
 using System.Drawing;
+using Scorpia.Engine;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
@@ -11,10 +12,13 @@ namespace Scorpia.Game.Scenes;
 public class MainMenuScene : Scene
 {
     private readonly AssetBundle _assets;
+    private readonly Font _font;
 
     public MainMenuScene(IServiceProvider serviceProvider, AssetManager assetManager) : base(serviceProvider)
     {
         _assets = assetManager.Load("UI");
+        
+        _font = _assets.Get<Font>("MYRIADPRO-REGULAR");
 
         CreateNode<TestNode>();
     }
@@ -22,6 +26,8 @@ public class MainMenuScene : Scene
     protected override void OnRender(RenderContext context)
     {
         context.Draw(_assets.Get<Sprite>("button_regular"), new Rectangle(300, 200, 400, 150));
-        // _menu._position.Text = $"{Input.MousePosition.X}:{Input.MousePosition.Y}";
+        context.DrawText(_font, new OffsetVector(500, 500), "Test 123", 30, Color.Beige);
+        
+        context.DrawText(_font, new OffsetVector(700, 500), $"{Input.MousePosition.X}:{Input.MousePosition.Y}", 30, Color.Beige);
     }
 }

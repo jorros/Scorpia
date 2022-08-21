@@ -53,4 +53,9 @@ public class RenderContext
     {
         Viewport.Draw(sprite, target, 0, Color.White, 255);
     }
+    
+    public void DrawText(Font font, OffsetVector position, string text, int size, Color color)
+    {
+        Viewport.DrawText(font, position, text, size, color);
+    }
 }

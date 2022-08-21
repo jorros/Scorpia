@@ -30,6 +30,10 @@ public class AssetBundle : IDisposable
                     _graphicsManager.RemoveTexture(sprite.Texture);
                     break;
                 
+                case Font font:
+                    font.Dispose();
+                    break;
+                
                 default:
                     Console.WriteLine("Unknown asset in bundle. Could not remove from memory.");
                     break;

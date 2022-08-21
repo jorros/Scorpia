@@ -15,4 +15,15 @@ public static class SdlExtensions
             y = rectangle.Top
         };
     }
+
+    public static SDL_Color ToSdl(this Color color)
+    {
+        return new SDL_Color
+        {
+            r = color.R,
+            g = color.G,
+            b = color.B,
+            a = color.A
+        };
+    }
 }

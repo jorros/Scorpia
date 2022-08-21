@@ -76,16 +76,16 @@ public class Viewport
         var dest = new Rectangle((int)position.X, (int)position.Y, (int)sprite.Size.X, (int)sprite.Size.Y);
         Draw(sprite, dest, 0, Color.White, 255);
     }
-
-    public void Draw(Sprite sprite, OffsetVector position, OffsetVector scale)
-    {
-        
-    }
-
+    
     public void Draw(Sprite sprite, Rectangle dest, double angle, Color color, byte alpha)
     {
         var _dest = dest with {X = dest.X - (int)WorldPosition.X, Y = dest.Y - (int)WorldPosition.Y};
 
         sprite.Render(_graphicsManager, _dest, angle, color, alpha);
+    }
+
+    public void DrawText(Font font, OffsetVector position, string text, int size, Color color)
+    {
+        font.Render(_graphicsManager, position, text, size, color);
     }
 }
