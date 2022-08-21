@@ -3,12 +3,11 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Myra;
-using Myra.Graphics2D.UI;
 using Scorpia.Engine.Asset;
+using Scorpia.Engine.Asset.AssetLoaders;
+using Scorpia.Engine.Asset.SpriteSheetParsers;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
-using Scorpia.Engine.MyraIntegration;
 using Scorpia.Engine.SceneManagement;
 using static SDL2.SDL;
 
@@ -29,7 +28,10 @@ public abstract class Engine
         services.AddSingleton<AssetManager>();
         services.AddSingleton<UserDataManager>();
         services.AddSingleton<RenderContext>();
-        services.AddSingleton<Desktop>();
+
+        services.AddSingleton<IAssetLoader, SpriteLoader>();
+
+        services.AddSingleton<LibgdxSpriteSheetParser>();
 
         Init(services);
 
@@ -41,9 +43,9 @@ public abstract class Engine
         var userDataManager = sp.GetRequiredService<UserDataManager>();
         var renderContext = sp.GetRequiredService<RenderContext>();
 
-        Desktop desktop = null;
+        var assetLoaders = sp.GetServices<IAssetLoader>();
 
-        assetManager.SetGraphicsManager(graphicsManager);
+        assetManager.SetGraphicsManager(graphicsManager, assetLoaders);
 
         userDataManager.Load();
 
@@ -51,9 +53,6 @@ public abstract class Engine
         {
             graphicsManager.Init(viewHandler);
             renderContext.Init();
-
-            MyraEnvironment.Platform = new SMPlatform(graphicsManager, renderContext);
-            desktop = sp.GetRequiredService<Desktop>();
         }
 
         Load(sp);
@@ -67,7 +66,7 @@ public abstract class Engine
             return;
         }
 
-        StartRender(graphicsManager, sceneManager, desktop, running);
+        StartRender(graphicsManager, sceneManager, running);
 
         graphicsManager.Quit();
     }
@@ -99,8 +98,7 @@ public abstract class Engine
         }, token);
     }
 
-    private void StartRender(GraphicsManager graphicsManager, SceneManager sceneManager, Desktop desktop,
-        CancellationTokenSource cancellationTokenSource)
+    private void StartRender(GraphicsManager graphicsManager, SceneManager sceneManager, CancellationTokenSource cancellationTokenSource)
     {
         var stopwatch = new Stopwatch();
 
@@ -139,11 +137,6 @@ public abstract class Engine
             graphicsManager.Clear();
 
             sceneManager.Render(stopwatch.Elapsed);
-
-            if (desktop.Root is not null)
-            {
-                desktop.Render();
-            }
 
             graphicsManager.Flush();
 

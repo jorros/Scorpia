@@ -49,13 +49,8 @@ public class RenderContext
         Viewport.Draw(sprite, position);
     }
 
-    public void Draw(Sprite sprite, OffsetVector position, OffsetVector scale, OffsetVector? center)
+    public void Draw(Sprite sprite, Rectangle target)
     {
-        Viewport.Draw(sprite, position, 0, scale, center, Color.White, 255);
-    }
-
-    public void Draw(Sprite sprite, OffsetVector position, double angle, OffsetVector scale, OffsetVector? center, Color color, byte alpha)
-    {
-        Viewport.Draw(sprite, position, angle, scale, center, color, alpha);
+        Viewport.Draw(sprite, target, 0, Color.White, 255);
     }
 }

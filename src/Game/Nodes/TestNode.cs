@@ -16,7 +16,8 @@ public class TestNode : Node
     {
         _game = AssetManager.Load("Game");
 
-        _render = new RenderComponent(_game.Get<Sprite>("title_icon_blue"), OffsetVector.Zero);
+        _render = new RenderComponent(_game.Get<TextureSprite>("title_icon_blue"), OffsetVector.Zero);
+        _render.Position = new OffsetVector(200, 200);
         // AttachComponent(_render);
     }
 

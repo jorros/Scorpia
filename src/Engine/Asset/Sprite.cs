@@ -1,29 +1,21 @@
 using System;
+using System.Drawing;
+using Scorpia.Engine.Graphics;
 
 namespace Scorpia.Engine.Asset;
 
-public class Sprite : IAsset
+public abstract class Sprite : IAsset
 {
+    public OffsetVector Size { get; }
+    public OffsetVector Center { get; set; }
+    
     internal IntPtr Texture { get; }
-    
-    public int Width { get; }
-    
-    public int Height { get; }
-    
-    internal int? SrcX { get; set; }
-    
-    internal int? SrcY { get; set; }
 
-    internal Sprite(IntPtr texture, int width, int height)
+    protected Sprite(IntPtr texture, OffsetVector size)
     {
         Texture = texture;
-        Width = width;
-        Height = height;
+        Size = size;
     }
-
-    internal Sprite(IntPtr texture, int srcX, int srcY, int width, int height) : this(texture, width, height)
-    {
-        SrcX = srcX;
-        SrcY = srcY;
-    }
+    
+    internal abstract void Render(GraphicsManager context, Rectangle dest, double angle, Color color, byte alpha);
 }

@@ -26,7 +26,7 @@ public class AssetBundle : IDisposable
         {
             switch (asset)
             {
-                case Sprite sprite:
+                case TextureSprite sprite:
                     _graphicsManager.RemoveTexture(sprite.Texture);
                     break;
                 

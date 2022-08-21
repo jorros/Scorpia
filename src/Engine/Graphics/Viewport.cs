@@ -1,6 +1,5 @@
 using System;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using Scorpia.Engine.Asset;
 using static SDL2.SDL;
 
@@ -74,57 +73,19 @@ public class Viewport
 
     public void Draw(Sprite sprite, OffsetVector position)
     {
-        Draw(sprite, position, 0, OffsetVector.One, null, Color.White, 255);
+        var dest = new Rectangle((int)position.X, (int)position.Y, (int)sprite.Size.X, (int)sprite.Size.Y);
+        Draw(sprite, dest, 0, Color.White, 255);
     }
 
-    public void Draw(Sprite sprite, OffsetVector position, OffsetVector scale, OffsetVector? center)
+    public void Draw(Sprite sprite, OffsetVector position, OffsetVector scale)
     {
-        Draw(sprite, position, 0, scale, center, Color.White, 255);
+        
     }
 
-    public void Draw(Sprite sprite, OffsetVector position, double angle, OffsetVector scale, OffsetVector? center,
-        Color color, byte alpha)
+    public void Draw(Sprite sprite, Rectangle dest, double angle, Color color, byte alpha)
     {
-        var scaledW = sprite.Width * scale.X;
-        var scaledH = sprite.Height * scale.Y;
+        var _dest = dest with {X = dest.X - (int)WorldPosition.X, Y = dest.Y - (int)WorldPosition.Y};
 
-        center ??= new OffsetVector(scaledW / 2, scaledH / 2);
-
-        var target = new SDL_Rect
-        {
-            x = (int) (position.X - center.Value.X) - (int) WorldPosition.X,
-            y = (int) (position.Y - center.Value.Y) - (int) WorldPosition.Y,
-            h = (int) scaledH,
-            w = (int) scaledW
-        };
-
-        var src = IntPtr.Zero;
-
-        if (sprite.SrcX is not null && sprite.SrcY is not null)
-        {
-            var srcRect = new SDL_Rect
-            {
-                w = sprite.Width,
-                h = sprite.Height,
-                x = sprite.SrcX.Value,
-                y = sprite.SrcY.Value
-            };
-
-            src = Marshal.AllocHGlobal(Marshal.SizeOf(srcRect));
-            Marshal.StructureToPtr(srcRect, src, false);
-        }
-
-        var centerSdl = center.Value.ToSdl();
-
-        SDL_SetTextureColorMod(sprite.Texture, color.R, color.G, color.B);
-        SDL_SetTextureAlphaMod(sprite.Texture, alpha);
-
-        SDL_RenderCopyEx(_graphicsManager.Renderer, sprite.Texture, src, ref target, angle, ref centerSdl,
-            SDL_RendererFlip.SDL_FLIP_NONE);
-
-        if (src != IntPtr.Zero)
-        {
-            Marshal.FreeHGlobal(src);
-        }
+        sprite.Render(_graphicsManager, _dest, angle, color, alpha);
     }
 }

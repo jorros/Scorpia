@@ -1,16 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
-using Myra;
-using Myra.Assets;
-using Myra.Graphics2D.UI;
-using Myra.Graphics2D.UI.Styles;
+using Scorpia.Engine.Asset.AssetLoaders;
 using Scorpia.Engine.Graphics;
-using Scorpia.Engine.MyraIntegration;
-using static SDL2.SDL;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Writers.Tar;
@@ -20,56 +12,31 @@ namespace Scorpia.Engine.Asset;
 public class AssetManager
 {
     private GraphicsManager _graphicsManager;
+    private IEnumerable<IAssetLoader> _assetLoaders;
 
-    internal void SetGraphicsManager(GraphicsManager graphicsManager)
+    internal void SetGraphicsManager(GraphicsManager graphicsManager, IEnumerable<IAssetLoader> assetLoaders)
     {
         _graphicsManager = graphicsManager;
+        _assetLoaders = assetLoaders;
     }
 
-    private readonly IReadOnlyList<string> _validExtensions = new[]
-    {
-        ".png",
-        ".xmms"
-    };
-
-    public AssetBundle Load(string name, bool defaultMyraAssetManager = false)
+    public AssetBundle Load(string name)
     {
         var bundle = new Dictionary<string, IAsset>();
 
         using var stream = File.Open(Path.Combine("Content", $"{name}.pack"), FileMode.Open);
         using var archive = ArchiveFactory.Open(stream);
 
-        var assetResolver = new ArchiveAssetResolver(archive);
-        var assetManager = new Myra.Assets.AssetManager(assetResolver);
-
-        if (defaultMyraAssetManager)
-        {
-            MyraEnvironment.DefaultAssetManager.AssetResolver = assetResolver;
-        }
+        var allowedExtensions = GetAllowedExtensions();
 
         foreach (var entry in archive.Entries.Where(entry =>
-                     !entry.IsDirectory && _validExtensions.Any(x => x == Path.GetExtension(entry.Key))))
+                     !entry.IsDirectory && allowedExtensions.Contains(Path.GetExtension(entry.Key))))
         {
-            var data = GetData(entry);
-
             var ext = Path.GetExtension(entry.Key);
-            var key = GetKey(entry.Key);
+            var loader = _assetLoaders.First(x => x.Extensions.Contains(ext));
 
-            var metaEntry = archive.Entries.FirstOrDefault(x =>
-                x.Key.Equals($"{key}.json", StringComparison.InvariantCultureIgnoreCase));
-            byte[] metaData = null;
-            if (metaEntry is not null)
-            {
-                metaData = GetData(metaEntry);
-            }
-
-            var assets = ext switch
-            {
-                ".png" => LoadSprite(data, key, metaData),
-                ".xmms" => LoadStylesheet(key, assetManager),
-                _ => null
-            };
-
+            var assets = loader.Load(entry, archive);
+            
             if (assets is null || !assets.Any())
             {
                 continue;
@@ -84,21 +51,9 @@ public class AssetManager
         return new AssetBundle(bundle, _graphicsManager);
     }
 
-    private static string GetKey(string file)
+    private IEnumerable<string> GetAllowedExtensions()
     {
-        var ext = Path.GetExtension(file);
-        
-        return file.Remove(file.Length - ext.Length);
-    }
-
-    private static byte[] GetData(IArchiveEntry entry)
-    {
-        using var entryStream = entry.OpenEntryStream();
-        using var memory = new MemoryStream();
-        entryStream.CopyTo(memory);
-        var data = memory.ToArray();
-
-        return data;
+        return _assetLoaders.SelectMany(x => x.Extensions);
     }
 
     public static void Pack(string src, string output)
@@ -107,54 +62,5 @@ public class AssetManager
 
         archive.AddAllFromDirectory(src);
         archive.SaveTo(output, new TarWriterOptions(CompressionType.Deflate, true));
-    }
-    
-    private static IReadOnlyList<(string key, IAsset asset)> LoadStylesheet(string key, IAssetManager assetManager)
-    {
-        var stylesheet = assetManager.Load<Stylesheet>($"{key}.xmms");
-        
-        var markup = new MyraMarkup(stylesheet);
-
-        return new[] {(key, (IAsset) markup)};
-    }
-
-    private IReadOnlyList<(string key, IAsset asset)> LoadSprite(byte[] data, string key, byte[] meta)
-    {
-        var texture = _graphicsManager.LoadTexture(data, "png");
-
-        SDL_QueryTexture(texture, out _, out _, out var width, out var height);
-
-        var sprites = new List<(string key, IAsset asset)>();
-
-        if (meta is null)
-        {
-            sprites.Add((key, new Sprite(texture, width, height)));
-
-            return sprites;
-        }
-
-        var descriptor = JsonSerializer.Deserialize<SpritesheetDescriptor>(meta, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
-
-        if (descriptor == null)
-        {
-            sprites.Add((key, new Sprite(texture, width, height)));
-
-            return sprites;
-        }
-
-        foreach (var frame in descriptor.Frames)
-        {
-            var sprite = new Sprite(texture, frame.Frame.X, frame.Frame.Y, frame.Frame.W, frame.Frame.H);
-
-            var path = Path.GetDirectoryName(key);
-            var frameKey = Path.Combine(path!, GetKey(frame.Filename));
-            
-            sprites.Add((frameKey, sprite));
-        }
-
-        return sprites;
     }
 }

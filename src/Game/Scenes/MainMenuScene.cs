@@ -1,11 +1,8 @@
-using Myra.Graphics2D.UI;
-using Myra.Graphics2D.UI.Styles;
-using Scorpia.Engine;
+using System.Drawing;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.SceneManagement;
-using Scorpia.Game.Menu;
 using Scorpia.Game.Nodes;
 
 namespace Scorpia.Game.Scenes;
@@ -14,23 +11,17 @@ namespace Scorpia.Game.Scenes;
 public class MainMenuScene : Scene
 {
     private readonly AssetBundle _assets;
-    private readonly MainMenu _menu;
 
-    public MainMenuScene(IServiceProvider serviceProvider, AssetManager assetManager, Desktop desktop) : base(serviceProvider)
+    public MainMenuScene(IServiceProvider serviceProvider, AssetManager assetManager) : base(serviceProvider)
     {
-        _assets = assetManager.Load("UI", true);
+        _assets = assetManager.Load("UI");
 
         CreateNode<TestNode>();
-
-        var stylesheet = _assets.Get<MyraMarkup>("ui_stylesheet");
-        Stylesheet.Current = stylesheet.Stylesheet;
-        
-        _menu = new MainMenu();
-        desktop.Root = _menu;
     }
 
     protected override void OnRender(RenderContext context)
     {
+        context.Draw(_assets.Get<Sprite>("button_regular"), new Rectangle(300, 200, 400, 150));
         // _menu._position.Text = $"{Input.MousePosition.X}:{Input.MousePosition.Y}";
     }
 }
