@@ -13,11 +13,13 @@ public class AssetManager
 {
     private GraphicsManager _graphicsManager;
     private IEnumerable<IAssetLoader> _assetLoaders;
+    private Dictionary<string, AssetBundle> _assetBundles;
 
     internal void SetGraphicsManager(GraphicsManager graphicsManager, IEnumerable<IAssetLoader> assetLoaders)
     {
         _graphicsManager = graphicsManager;
         _assetLoaders = assetLoaders;
+        _assetBundles = new Dictionary<string, AssetBundle>();
     }
 
     public AssetBundle Load(string name)
@@ -48,12 +50,29 @@ public class AssetManager
             }
         }
 
-        return new AssetBundle(bundle, _graphicsManager);
+        var assetBundle = new AssetBundle(bundle, _graphicsManager);
+        _assetBundles[name] = assetBundle;
+
+        return assetBundle;
     }
 
     private IEnumerable<string> GetAllowedExtensions()
     {
         return _assetLoaders.SelectMany(x => x.Extensions);
+    }
+    
+    public T Get<T>(string name) where T : class, IAsset
+    {
+        var split = name.Split(':');
+
+        if (!_assetBundles.ContainsKey(split[0]))
+        {
+            throw new EngineException($"Tried to access not loaded asset bundle {name}.");
+        }
+
+        var assetBundle = _assetBundles[split[0]];
+
+        return assetBundle.Get<T>(split[1]);
     }
 
     public static void Pack(string src, string output)

@@ -11,23 +11,24 @@ namespace Scorpia.Game.Scenes;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class MainMenuScene : Scene
 {
-    private readonly AssetBundle _assets;
+    private readonly AssetManager _assetManager;
     private readonly Font _font;
 
     public MainMenuScene(IServiceProvider serviceProvider, AssetManager assetManager) : base(serviceProvider)
     {
-        _assets = assetManager.Load("UI");
+        _assetManager = assetManager;
+        assetManager.Load("UI");
         
-        _font = _assets.Get<Font>("MYRIADPRO-REGULAR");
+        _font = assetManager.Get<Font>("UI:MYRIADPRO-REGULAR");
 
         CreateNode<TestNode>();
     }
 
     protected override void OnRender(RenderContext context)
     {
-        context.Draw(_assets.Get<Sprite>("button_regular"), new Rectangle(300, 200, 400, 150));
-        context.DrawText(_font, new OffsetVector(500, 500), "Test 123", 30, Color.Beige);
+        context.Draw(_assetManager.Get<Sprite>("UI:button_regular"), new Rectangle(300, 200, 400, 150));
+        context.DrawText(_font, new OffsetVector(500, 500), "<text style='italic,bold'>Test</text><text color='#000000'>123</text>", 30, Color.Beige);
         
-        context.DrawText(_font, new OffsetVector(700, 500), $"{Input.MousePosition.X}:{Input.MousePosition.Y}", 30, Color.Beige);
+        context.DrawText(_font, new OffsetVector(700, 500), $"<outline color='#ff0000' size='1'>{Input.MousePosition.X}:{Input.MousePosition.Y}</outline>", 30, Color.Beige);
     }
 }
