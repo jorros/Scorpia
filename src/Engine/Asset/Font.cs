@@ -42,7 +42,8 @@ public class Font : IAsset, IDisposable
         return font;
     }
 
-    internal void Render(GraphicsManager context, OffsetVector position, string text, int size, Color color)
+    internal void Render(GraphicsManager context, OffsetVector position, string text, int size, Color color,
+        TextAlign align = TextAlign.Left)
     {
         var options = new CachedTextOptions(size, 0, Color.Empty, FontStyle.Normal);
         var startBlock = options.ToTextBlock() with {Color = color};
@@ -50,12 +51,14 @@ public class Font : IAsset, IDisposable
         var markup = FontMarkup.Read(text, startBlock);
         var lastX = (int) position.X;
 
+        var toBeRendered = new List<(IntPtr texture, SDL_Rect target, IntPtr surface)>();
+
         foreach (var block in markup.TextBlocks)
         {
             var cachedOptions = CachedTextOptions.FromTextBlock(block);
 
             RenderTexture(cachedOptions.Outline > 0);
-            
+
             if (cachedOptions.Outline > 0)
             {
                 cachedOptions = cachedOptions with {Outline = 0};
@@ -66,7 +69,7 @@ public class Font : IAsset, IDisposable
             {
                 var font = LoadFont(cachedOptions);
 
-                var (texture, surface) = GenerateTexture(context, font, block, position, isOutline);
+                var (texture, surface) = GenerateTexture(context, font, block, position with { X = lastX }, isOutline);
 
                 SDL_QueryTexture(texture, out _, out _, out var w, out var h);
 
@@ -78,17 +81,30 @@ public class Font : IAsset, IDisposable
                     h = h
                 };
 
-                SDL_RenderCopy(context.Renderer, texture, IntPtr.Zero, ref target);
+                toBeRendered.Add((texture, target, surface));
 
                 if (!isOutline)
                 {
                     lastX += w;
                 }
+            }
+        }
 
-                if (surface != IntPtr.Zero)
-                {
-                    SDL_FreeSurface(surface);
-                }
+        var xModifier = align switch
+        {
+            TextAlign.Center => (lastX - (int) position.X) / 2,
+            TextAlign.Right => lastX - (int) position.X,
+            _ => 0
+        };
+
+        foreach (var render in toBeRendered)
+        {
+            var target = render.target with {x = render.target.x - xModifier};
+            SDL_RenderCopy(context.Renderer, render.texture, IntPtr.Zero, ref target);
+            
+            if (render.surface != IntPtr.Zero)
+            {
+                SDL_FreeSurface(render.surface);
             }
         }
     }
@@ -147,6 +163,11 @@ public class Font : IAsset, IDisposable
 
     public void Dispose()
     {
+        foreach (var texture in _textureCache.Values)
+        {
+            SDL_DestroyTexture(texture.texture);
+        }
+        
         foreach (var font in _cache.Values)
         {
             TTF_CloseFont(font);

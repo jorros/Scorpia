@@ -28,6 +28,8 @@ public class MainMenuScene : Scene
     {
         context.Draw(_assetManager.Get<Sprite>("UI:button_regular"), new Rectangle(300, 200, 400, 150));
         context.DrawText(_font, new OffsetVector(500, 500), "<text style='italic,bold'>Test</text><text color='#000000'>123</text>", 30, Color.Beige);
+        context.DrawText(_font, new OffsetVector(500, 600), "<text style='italic,bold'>Right aligned</text><text color='#000000'>123</text>test", 30, Color.Beige, TextAlign.Right);
+
         
         context.DrawText(_font, new OffsetVector(700, 500), $"<outline color='#ff0000' size='1'>{Input.MousePosition.X}:{Input.MousePosition.Y}</outline>", 30, Color.Beige);
     }

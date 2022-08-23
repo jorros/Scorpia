@@ -11,9 +11,9 @@ public struct OffsetVector
         Y = y;
     }
 
-    public double X { get; }
+    public double X { get; init; }
 
-    public double Y { get; }
+    public double Y { get; init; }
 
     public static OffsetVector Zero { get; } = new(0, 0);
 

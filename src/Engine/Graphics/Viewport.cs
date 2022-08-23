@@ -84,8 +84,8 @@ public class Viewport
         sprite.Render(_graphicsManager, _dest, angle, color, alpha);
     }
 
-    public void DrawText(Font font, OffsetVector position, string text, int size, Color color)
+    public void DrawText(Font font, OffsetVector position, string text, int size, Color color, TextAlign align = TextAlign.Left)
     {
-        font.Render(_graphicsManager, position, text, size, color);
+        font.Render(_graphicsManager, position, text, size, color, align);
     }
 }
