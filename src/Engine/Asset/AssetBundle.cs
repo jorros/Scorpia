@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
-using Scorpia.Engine.Graphics;
 
 namespace Scorpia.Engine.Asset;
 
 public class AssetBundle : IDisposable
 {
     private readonly Dictionary<string, IAsset> _assets;
-    private readonly GraphicsManager _graphicsManager;
 
-    internal AssetBundle(Dictionary<string, IAsset> assets, GraphicsManager graphicsManager)
+    internal AssetBundle(Dictionary<string, IAsset> assets)
     {
         _assets = assets;
-        _graphicsManager = graphicsManager;
     }
 
     public T Get<T>(string name) where T : class, IAsset
@@ -27,7 +24,7 @@ public class AssetBundle : IDisposable
             switch (asset)
             {
                 case TextureSprite sprite:
-                    _graphicsManager.RemoveTexture(sprite.Texture);
+                    sprite.Dispose();
                     break;
                 
                 case Font font:

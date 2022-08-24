@@ -11,13 +11,11 @@ namespace Scorpia.Engine.Asset;
 
 public class AssetManager
 {
-    private GraphicsManager _graphicsManager;
     private IEnumerable<IAssetLoader> _assetLoaders;
     private Dictionary<string, AssetBundle> _assetBundles;
 
     internal void SetGraphicsManager(GraphicsManager graphicsManager, IEnumerable<IAssetLoader> assetLoaders)
     {
-        _graphicsManager = graphicsManager;
         _assetLoaders = assetLoaders;
         _assetBundles = new Dictionary<string, AssetBundle>();
     }
@@ -50,7 +48,7 @@ public class AssetManager
             }
         }
 
-        var assetBundle = new AssetBundle(bundle, _graphicsManager);
+        var assetBundle = new AssetBundle(bundle);
         _assetBundles[name] = assetBundle;
 
         return assetBundle;

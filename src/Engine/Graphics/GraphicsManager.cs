@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 using static SDL2.SDL;
 using static SDL2.SDL_image;
 using static SDL2.SDL_ttf;
@@ -70,26 +69,6 @@ public class GraphicsManager
         SDL_DestroyRenderer(Renderer);
         SDL_DestroyWindow(Window);
         SDL_Quit();
-    }
-
-    internal IntPtr LoadTexture(byte[] data, string format)
-    {
-        var size = Marshal.SizeOf(data[0]) * data.Length;
-        var pnt = Marshal.AllocHGlobal(size);
-        Marshal.Copy(data, 0, pnt, size);
-        
-        var rw = SDL_RWFromMem(pnt, size);
-        var surface = IMG_LoadTyped_RW(rw, 1, format);
-        var texture = SDL_CreateTextureFromSurface(Renderer, surface);
-        SDL_FreeSurface(surface);
-        Marshal.FreeHGlobal(pnt);
-
-        return texture;
-    }
-
-    internal void RemoveTexture(IntPtr texture)
-    {
-        SDL_DestroyTexture(texture);
     }
 
     internal void Clear()

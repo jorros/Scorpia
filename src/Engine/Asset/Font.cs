@@ -49,7 +49,7 @@ public class Font : IAsset, IDisposable
         var startBlock = options.ToTextBlock() with {Color = color};
 
         var markup = FontMarkup.Read(text, startBlock);
-        var lastX = (int) position.X;
+        var lastX = position.X;
 
         var toBeRendered = new List<(IntPtr texture, SDL_Rect target, IntPtr surface)>();
 
@@ -76,7 +76,7 @@ public class Font : IAsset, IDisposable
                 var target = new SDL_Rect
                 {
                     x = lastX,
-                    y = (int) position.Y,
+                    y = position.Y,
                     w = w,
                     h = h
                 };
@@ -92,8 +92,8 @@ public class Font : IAsset, IDisposable
 
         var xModifier = align switch
         {
-            TextAlign.Center => (lastX - (int) position.X) / 2,
-            TextAlign.Right => lastX - (int) position.X,
+            TextAlign.Center => (lastX - position.X) / 2,
+            TextAlign.Right => lastX - position.X,
             _ => 0
         };
 
@@ -173,7 +173,7 @@ public class Font : IAsset, IDisposable
             TTF_CloseFont(font);
         }
 
-        SDL_FreeRW(_sdlRw);
+        SDL_RWclose(_sdlRw);
 
         _cache.Clear();
     }

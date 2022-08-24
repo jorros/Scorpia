@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Scorpia.Engine.Asset.SpriteSheetParsers;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.Helper;
 using SharpCompress.Archives;
 using static SDL2.SDL;
+using static SDL2.SDL_image;
 
 namespace Scorpia.Engine.Asset.AssetLoaders;
 
@@ -30,7 +31,7 @@ internal class SpriteLoader : IAssetLoader
         var key = entry.GetAssetKey();
 
         var data = GetData(entry);
-        var texture = _graphicsManager.LoadTexture(data, "png");
+        var texture = LoadTexture(data, "png");
 
         SDL_QueryTexture(texture, out _, out _, out var width, out var height);
 
@@ -74,6 +75,25 @@ internal class SpriteLoader : IAssetLoader
         }
 
         return sprites;
+    }
+    
+    private IntPtr LoadTexture(byte[] data, string format)
+    {
+        unsafe
+        {
+            fixed (byte* p = data)
+            {
+                var ptr = (IntPtr)p;
+                var size = Marshal.SizeOf(typeof(byte)) * data.Length;
+                
+                var rw = SDL_RWFromMem(ptr, size);
+                var surface = IMG_LoadTyped_RW(rw, 1, format);
+                var texture = SDL_CreateTextureFromSurface(_graphicsManager.Renderer, surface);
+                SDL_FreeSurface(surface);
+                
+                return texture;
+            }
+        }
     }
 
     private static byte[] GetData(IArchiveEntry entry)

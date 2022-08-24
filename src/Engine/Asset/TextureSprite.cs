@@ -12,7 +12,7 @@ public class TextureSprite : Sprite
 
     internal TextureSprite(IntPtr texture, int width, int height) : base(texture, new OffsetVector(width, height))
     {
-        Center = new OffsetVector(width / 2f, height / 2f);
+        Center = new OffsetVector(width / 2, height / 2);
     }
 
     internal TextureSprite(IntPtr texture, SpritesheetFrame frame) : this(texture, frame.OriginalSize.X,
@@ -25,10 +25,10 @@ public class TextureSprite : Sprite
     {
         var target = new SDL_Rect
         {
-            x = (int) (dest.X - Center.X),
-            y = (int) (dest.Y - Center.Y),
-            h = (int) Size.Y,
-            w = (int) Size.X
+            x = dest.X - Center.X,
+            y = dest.Y - Center.Y,
+            h = Size.Y,
+            w = Size.X
         };
 
         var src = IntPtr.Zero;
