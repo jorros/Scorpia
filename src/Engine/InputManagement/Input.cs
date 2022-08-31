@@ -12,6 +12,11 @@ public static class Input
     public static event EventHandler<MouseWheelEventArgs> OnMouseWheel; 
 
     public static OffsetVector MousePosition { get; private set; }
+
+    private static int CalculateWithDpi(int val, bool highDpi)
+    {
+        return highDpi ? val * 2 : val;
+    }
     
     internal static void RaiseEvent(SDL_KeyboardEvent key)
     {
@@ -23,13 +28,13 @@ public static class Input
         });
     }
 
-    internal static void CaptureMouseMotion(SDL_MouseMotionEvent motion)
+    internal static void CaptureMouseMotion(SDL_MouseMotionEvent motion, bool highDpi)
     {
         MousePosition = new OffsetVector(motion.x, motion.y);
         OnMouseMove?.Invoke(null, new MouseMoveEventArgs
         {
-            X = motion.x,
-            Y = motion.y,
+            X = CalculateWithDpi(motion.x, highDpi),
+            Y = CalculateWithDpi(motion.y, highDpi),
             DeltaX = motion.xrel,
             DeltaY = motion.yrel
         });
@@ -46,14 +51,14 @@ public static class Input
         });
     }
 
-    internal static void CaptureMouseButton(SDL_MouseButtonEvent button)
+    internal static void CaptureMouseButton(SDL_MouseButtonEvent button, bool highDpi)
     {
         OnMouseButton?.Invoke(null, new MouseButtonEventArgs
         {
             Clicks = button.clicks,
             Type = button.type == SDL_EventType.SDL_MOUSEBUTTONUP ? MouseEventType.ButtonUp : MouseEventType.ButtonDown,
-            X = button.x,
-            Y = button.y,
+            X = CalculateWithDpi(button.x, highDpi),
+            Y = CalculateWithDpi(button.y, highDpi),
             Button = (MouseButton)button.button
         });
     }

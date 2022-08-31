@@ -1,0 +1,23 @@
+container@2x.png
+size: 3761, 1514
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+button_bar
+  rotate: false
+  xy: 0, 0
+  size: 1427, 118
+  split: 280, 262, 0, 0
+  pad: 357, 357, 30, 29
+  orig: 1427, 118
+  offset: 0, 0
+  index: -1
+container
+  rotate: false
+  xy: 1427, 0
+  size: 2334, 1514
+  split: 62, 62, 62, 62
+  pad: 584, 583, 379, 378
+  orig: 2334, 1514
+  offset: 0, 0
+  index: -1

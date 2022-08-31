@@ -1,5 +1,6 @@
 using System.Drawing;
 using Scorpia.Engine.Asset;
+using Scorpia.Engine.Asset.Font;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine.Graphics;
@@ -32,14 +33,9 @@ public class RenderContext
         Viewport.End();
     }
 
-    public void SetDrawSize(OffsetVector size)
-    {
-        SDL_RenderSetLogicalSize(_graphicsManager.Renderer, (int)size.X, (int)size.Y);
-    }
-
     public OffsetVector GetDrawSize()
     {
-        SDL_RenderGetLogicalSize(_graphicsManager.Renderer, out var w, out var h);
+        SDL_GetRendererOutputSize(_graphicsManager.Renderer, out var w, out var h);
 
         return new OffsetVector(w, h);
     }
@@ -54,8 +50,8 @@ public class RenderContext
         Viewport.Draw(sprite, target, 0, Color.White, 255);
     }
     
-    public void DrawText(Font font, OffsetVector position, string text, int size, Color color, TextAlign align = TextAlign.Left)
+    public void DrawText(Font font, OffsetVector position, string text, FontSettings settings)
     {
-        Viewport.DrawText(font, position, text, size, color, align);
+        Viewport.DrawText(font, position, text, settings);
     }
 }

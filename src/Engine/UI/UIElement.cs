@@ -1,31 +1,42 @@
 using System;
 using System.Collections.Generic;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Engine.UI;
 
 public abstract class UIElement
 {
-    public UIElement(RenderContext renderContext)
-    {
-        RenderContext = renderContext;
-    }
-
-    protected List<UIElement> Elements { get; } = new();
-    protected RenderContext RenderContext { get; }
-
     public int Width { get; protected set; }
     public int Height { get; protected set; }
-    public OffsetVector Position { get; set; }
-
-    public T Attach<T>() where T : UIElement
+    public OffsetVector Position { get; set; } = OffsetVector.Zero;
+    public UIElement Parent { get; internal set; }
+    public UIAnchor Anchor { get; set; } = UIAnchor.TopLeft;
+    
+    protected OffsetVector GetPosition()
     {
-        var element = Activator.CreateInstance(typeof(T), RenderContext) as T;
-
-        Elements.Add(element);
-
-        return element;
+        if (Parent is null)
+        {
+            return Position;
+        }
+        
+        var parentsPos = Parent.GetPosition();
+        var relativePos = parentsPos + Position;
+        
+        return Anchor switch
+        {
+            UIAnchor.TopLeft => relativePos,
+            UIAnchor.Top => new OffsetVector(relativePos.X + Parent.Width / 2 - Width / 2, relativePos.Y),
+            UIAnchor.TopRight => new OffsetVector(parentsPos.X + Parent.Width - Width - Position.X, relativePos.Y),
+            UIAnchor.Left => new OffsetVector(relativePos.X, relativePos.Y + Parent.Height / 2 - Height / 2),
+            UIAnchor.Center => new OffsetVector(relativePos.X + Parent.Width / 2 - Width / 2, relativePos.Y + Parent.Height / 2 - Height / 2),
+            UIAnchor.Right => new OffsetVector(parentsPos.X + Parent.Width - Width - Position.X, relativePos.Y + Parent.Height / 2 - Height / 2),
+            UIAnchor.BottomLeft => new OffsetVector(relativePos.X, parentsPos.Y + Parent.Height - Height - Position.Y),
+            UIAnchor.Bottom => new OffsetVector(relativePos.X + Parent.Width / 2 - Width / 2, parentsPos.Y + Parent.Height - Height - Position.Y),
+            UIAnchor.BottomRight => new OffsetVector(parentsPos.X + Parent.Width - Width - Position.X, parentsPos.Y + Parent.Height - Height - Position.Y),
+            _ => relativePos
+        };
     }
 
-    public abstract void Render(OffsetVector position);
+    public abstract void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld);
 }

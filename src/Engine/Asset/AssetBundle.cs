@@ -27,7 +27,7 @@ public class AssetBundle : IDisposable
                     sprite.Dispose();
                     break;
                 
-                case Font font:
+                case Font.Font font:
                     font.Dispose();
                     break;
                 

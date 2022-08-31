@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Scorpia.Engine.Asset.AssetLoaders;
-using Scorpia.Engine.Graphics;
+using Scorpia.Engine.Helper;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Writers.Tar;
@@ -13,11 +14,15 @@ public class AssetManager
 {
     private IEnumerable<IAssetLoader> _assetLoaders;
     private Dictionary<string, AssetBundle> _assetBundles;
+    private bool _highRes;
 
-    internal void SetGraphicsManager(GraphicsManager graphicsManager, IEnumerable<IAssetLoader> assetLoaders)
+    public bool HighRes => _highRes;
+
+    internal void Init(IEnumerable<IAssetLoader> assetLoaders, bool highRes)
     {
         _assetLoaders = assetLoaders;
         _assetBundles = new Dictionary<string, AssetBundle>();
+        _highRes = highRes;
     }
 
     public AssetBundle Load(string name)
@@ -33,10 +38,19 @@ public class AssetManager
                      !entry.IsDirectory && allowedExtensions.Contains(Path.GetExtension(entry.Key).ToLowerInvariant())))
         {
             var ext = Path.GetExtension(entry.Key).ToLowerInvariant();
+
+            switch (_highRes)
+            {
+                case true when archive.Entries.Any(p =>
+                    p.Key.Equals($"{entry.GetAssetKey()}@2x{ext}", StringComparison.InvariantCultureIgnoreCase)) && !IsHighRes(entry):
+                case false when IsHighRes(entry):
+                    continue;
+            }
+
             var loader = _assetLoaders.First(x => x.Extensions.Contains(ext));
 
             var assets = loader.Load(entry, archive);
-            
+
             if (assets is null || !assets.Any())
             {
                 continue;
@@ -54,11 +68,16 @@ public class AssetManager
         return assetBundle;
     }
 
+    private static bool IsHighRes(IArchiveEntry entry)
+    {
+        return entry.Key.Contains("@2x.");
+    }
+
     private IEnumerable<string> GetAllowedExtensions()
     {
         return _assetLoaders.SelectMany(x => x.Extensions);
     }
-    
+
     public T Get<T>(string name) where T : class, IAsset
     {
         var split = name.Split(':');

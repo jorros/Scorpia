@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using Scorpia.Engine.Asset;
+using Scorpia.Engine.Asset.Font;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine.Graphics;
@@ -73,19 +74,27 @@ public class Viewport
 
     public void Draw(Sprite sprite, OffsetVector position)
     {
-        var dest = new Rectangle((int)position.X, (int)position.Y, (int)sprite.Size.X, (int)sprite.Size.Y);
+        var dest = new Rectangle(position.X, position.Y, sprite.Size.X, sprite.Size.Y);
         Draw(sprite, dest, 0, Color.White, 255);
     }
-    
-    public void Draw(Sprite sprite, Rectangle dest, double angle, Color color, byte alpha)
-    {
-        var _dest = dest with {X = dest.X - (int)WorldPosition.X, Y = dest.Y - (int)WorldPosition.Y};
 
-        sprite.Render(_graphicsManager, _dest, angle, color, alpha);
+    public void Draw(Sprite sprite, Rectangle dest, double angle, Color color, byte alpha, bool inWorld = true)
+    {
+        if (inWorld)
+        {
+            dest = dest with {X = dest.X - WorldPosition.X, Y = dest.Y - WorldPosition.Y};
+        }
+
+        sprite.Render(_graphicsManager, dest, angle, color, alpha);
     }
 
-    public void DrawText(Font font, OffsetVector position, string text, int size, Color color, TextAlign align = TextAlign.Left)
+    public void DrawText(Font font, OffsetVector position, string text, FontSettings settings, bool inWorld = true)
     {
-        font.Render(_graphicsManager, position, text, size, color, align);
+        if (inWorld)
+        {
+            position -= WorldPosition;
+        }
+        
+        font.Render(position, text, settings);
     }
 }

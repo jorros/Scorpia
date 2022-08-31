@@ -25,10 +25,10 @@ public class TextureSprite : Sprite
     {
         var target = new SDL_Rect
         {
-            x = dest.X - Center.X,
-            y = dest.Y - Center.Y,
-            h = Size.Y,
-            w = Size.X
+            x = dest.X,
+            y = dest.Y,
+            h = dest.Height,
+            w = dest.Width
         };
 
         var src = IntPtr.Zero;

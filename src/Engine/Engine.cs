@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Asset.AssetLoaders;
+using Scorpia.Engine.Asset.Markup;
 using Scorpia.Engine.Asset.SpriteSheetParsers;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
@@ -28,6 +29,7 @@ public abstract class Engine
         services.AddSingleton<AssetManager>();
         services.AddSingleton<UserDataManager>();
         services.AddSingleton<RenderContext>();
+        services.AddSingleton<FontMarkupReader>();
 
         services.AddSingleton<IAssetLoader, SpriteLoader>();
         services.AddSingleton<IAssetLoader, FontLoader>();
@@ -44,10 +46,6 @@ public abstract class Engine
         var userDataManager = sp.GetRequiredService<UserDataManager>();
         var renderContext = sp.GetRequiredService<RenderContext>();
 
-        var assetLoaders = sp.GetServices<IAssetLoader>();
-
-        assetManager.SetGraphicsManager(graphicsManager, assetLoaders);
-
         userDataManager.Load();
 
         if (!headless)
@@ -55,6 +53,11 @@ public abstract class Engine
             graphicsManager.Init(viewHandler);
             renderContext.Init();
         }
+
+        var highRes = graphicsManager.IsHighRes();
+        
+        var assetLoaders = sp.GetServices<IAssetLoader>();
+        assetManager.Init(assetLoaders, highRes);
 
         Load(sp);
 
@@ -103,6 +106,8 @@ public abstract class Engine
     {
         var stopwatch = new Stopwatch();
 
+        var highDpi = graphicsManager.IsHighDpiMode();
+
         while (!cancellationTokenSource.IsCancellationRequested)
         {
             stopwatch.Start();
@@ -121,7 +126,7 @@ public abstract class Engine
                         break;
 
                     case SDL_EventType.SDL_MOUSEMOTION:
-                        Input.CaptureMouseMotion(e.motion);
+                        Input.CaptureMouseMotion(e.motion, highDpi);
                         break;
 
                     case SDL_EventType.SDL_MOUSEWHEEL:
@@ -130,7 +135,7 @@ public abstract class Engine
 
                     case SDL_EventType.SDL_MOUSEBUTTONUP:
                     case SDL_EventType.SDL_MOUSEBUTTONDOWN:
-                        Input.CaptureMouseButton(e.button);
+                        Input.CaptureMouseButton(e.button, highDpi);
                         break;
                 }
             }

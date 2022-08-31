@@ -1,14 +1,25 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using Scorpia.Engine.Asset.Markup;
+using Scorpia.Engine.Graphics;
 using Scorpia.Engine.Helper;
 using SharpCompress.Archives;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine.Asset.AssetLoaders;
 
-public class FontLoader : IAssetLoader
+internal class FontLoader : IAssetLoader
 {
+    private readonly FontMarkupReader _fontMarkupReader;
+    private readonly GraphicsManager _graphicsManager;
+
+    public FontLoader(FontMarkupReader fontMarkupReader, GraphicsManager graphicsManager)
+    {
+        _fontMarkupReader = fontMarkupReader;
+        _graphicsManager = graphicsManager;
+    }
+    
     public IEnumerable<string> Extensions => new[] {".otf", ".ttf"};
     public IReadOnlyList<(string key, IAsset asset)> Load(IArchiveEntry entry, IArchive archive)
     {
@@ -25,7 +36,7 @@ public class FontLoader : IAssetLoader
 
         var fonts = new (string key, IAsset asset)[]
         {
-            (entry.GetAssetKey(), new Font(rw))
+            (entry.GetAssetKey(), new Font.Font(rw, _fontMarkupReader, _graphicsManager))
         };
 
         return fonts;

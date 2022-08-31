@@ -38,6 +38,8 @@ internal class SpriteLoader : IAssetLoader
         var metaEntry = archive.Entries.FirstOrDefault(x =>
             x.Key.Equals($"{key}.txt", StringComparison.InvariantCultureIgnoreCase));
 
+        key = key.EndsWith("@2x") ? key.Remove(key.Length - 3, 3) : key;
+
         if (metaEntry is null)
         {
             sprites.Add((key, new TextureSprite(texture, width, height)));

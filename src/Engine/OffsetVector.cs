@@ -39,6 +39,24 @@ public struct OffsetVector
         }
         return new OffsetVector(a.X / b.X, a.Y / b.Y);
     }
+    
+    public static OffsetVector operator +(OffsetVector a, int b)
+        => new(a.X + b, a.Y + b);
+
+    public static OffsetVector operator -(OffsetVector a, int b)
+        => a + (-b);
+
+    public static OffsetVector operator *(OffsetVector a, int b)
+        => new OffsetVector(a.X * b, a.Y * b);
+
+    public static OffsetVector operator /(OffsetVector a, int b)
+    {
+        if (b == 0)
+        {
+            throw new DivideByZeroException();
+        }
+        return new OffsetVector(a.X / b, a.Y / b);
+    }
 
     internal SDL_Point ToSdl()
     {

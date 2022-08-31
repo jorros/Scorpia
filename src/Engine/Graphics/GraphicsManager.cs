@@ -29,7 +29,7 @@ public class GraphicsManager
         }
         else
         {
-            var windowWidth = _userDataManager.Get("windowWidth", 1024);
+            var windowWidth = _userDataManager.Get("windowWidth", 1366);
             var windowHeight = _userDataManager.Get("windowHeight", 768);
 
             Window = SDL_CreateWindow("Scorpia", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight,
@@ -60,6 +60,26 @@ public class GraphicsManager
         {
             throw new EngineException($"There was an issue initialising SDL_TTF: {TTF_GetError()}");
         }
+    }
+
+    internal bool IsHighDpiMode()
+    {
+        SDL_GetRendererOutputSize(Renderer, out var rw, out var rh);
+        SDL_GetWindowSize(Window, out var ww, out var wh);
+
+        if (rw != ww)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    internal bool IsHighRes()
+    {
+        SDL_GetRendererOutputSize(Renderer, out var rw, out var rh);
+
+        return rw * rw > 3686400;
     }
 
     internal void Quit()
