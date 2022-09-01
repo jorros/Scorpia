@@ -16,6 +16,7 @@ public class MainMenuScene : Scene
     private readonly AssetManager _assetManager;
 
     private readonly BasicLayout _layout;
+    private readonly Label _fpsLabel;
 
     public MainMenuScene(IServiceProvider serviceProvider, AssetManager assetManager) : base(serviceProvider)
     {
@@ -29,12 +30,21 @@ public class MainMenuScene : Scene
         var defaultLabel = stylesheet.CreateLabelStyle(null, "UI:MYRIADPRO-REGULAR");
         defaultLabel.Size = 36;
         
+        var inputLabel = stylesheet.CreateLabelStyle("InputLabel", "UI:MYRIADPRO-REGULAR");
+        inputLabel.Size = 28;
+        inputLabel.Color = Color.FromArgb(202, 178, 148);
+        
         var buttonLabel = stylesheet.CreateLabelStyle("Button", "UI:MYRIADPRO-BOLD");
         buttonLabel.Color = ColorHelper.HtmlToColor("#cab294");
         buttonLabel.Outline = 1;
         buttonLabel.OutlineColor = Color.Black;
         buttonLabel.Size = 40;
-        
+
+        var textInput = stylesheet.CreateTextInputStyle(null, "UI:input", "InputLabel");
+        textInput.Width = 550;
+        textInput.Height = 90;
+        textInput.Padding = new OffsetVector(30, 30);
+
         var regularActionButton =
             stylesheet.CreateButtonStyle("action_regular", "UI:button_regular", "Button");
         regularActionButton.MinHeight = 130;
@@ -72,12 +82,28 @@ public class MainMenuScene : Scene
             Position = new OffsetVector(20, 20)
         };
         _layout.Attach(versionLabel);
+        
+        _fpsLabel = new Label
+        {
+            Text = "0",
+            Anchor = UIAnchor.TopLeft,
+            Color = Color.White,
+            Size = 36,
+            Position = new OffsetVector(20, 20)
+        };
+        _layout.Attach(_fpsLabel);
 
         var window = new Window
         {
             Anchor = UIAnchor.Center
         };
         _layout.Attach(window);
+
+        var input = new TextInput
+        {
+            Position = new OffsetVector(20, 20)
+        };
+        window.Attach(input);
 
         var quitButton = new Button
         {
@@ -106,6 +132,7 @@ public class MainMenuScene : Scene
 
     protected override void OnRender(RenderContext context)
     {
+        _fpsLabel.Text = context.FPS.ToString();
         _layout.Render(context, false);
     }
 }

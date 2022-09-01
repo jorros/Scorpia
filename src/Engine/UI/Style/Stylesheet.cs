@@ -12,11 +12,13 @@ public class Stylesheet
     private readonly Dictionary<string, ButtonStyle> _buttons = new();
     private readonly Dictionary<string, LabelStyle> _labels = new();
     private readonly Dictionary<string, WindowStyle> _windows = new();
+    private readonly Dictionary<string, TextInputStyle> _inputs = new();
 
     private Font? _defaultFont;
     private ButtonStyle? _defaultButton;
     private LabelStyle? _defaultLabel;
     private WindowStyle? _defaultWindow;
+    private TextInputStyle? _defaultInput;
     private readonly AssetManager _assetManager;
 
     public Stylesheet(AssetManager assetManager)
@@ -51,6 +53,24 @@ public class Stylesheet
         }
 
         _labels[name] = style;
+        return style;
+    }
+    
+    public TextInputStyle CreateTextInputStyle(string? name, string spriteAsset, string? labelStyle)
+    {
+        var style = new TextInputStyle
+        {
+            Background = _assetManager.Get<Sprite>(spriteAsset),
+            Text = GetLabel(labelStyle)
+        };
+
+        if (name is null)
+        {
+            _defaultInput = style;
+            return style;
+        }
+
+        _inputs[name] = style;
         return style;
     }
 
@@ -122,6 +142,21 @@ public class Stylesheet
         }
 
         return _defaultButton;
+    }
+    
+    public TextInputStyle GetTextInput(string? name = null)
+    {
+        if (name is not null && _inputs.ContainsKey(name))
+        {
+            return _inputs[name];
+        }
+
+        if (_defaultInput is null)
+        {
+            throw new EngineException("No default input style set in stylesheet.");
+        }
+
+        return _defaultInput;
     }
     
     public WindowStyle GetWindow(string? name = null)

@@ -1,5 +1,7 @@
 using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
+using Scorpia.Engine.Helper;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine.InputManagement;
@@ -7,6 +9,7 @@ namespace Scorpia.Engine.InputManagement;
 public static class Input
 {
     public static event EventHandler<KeyboardEventArgs> OnKeyboard;
+    public static event EventHandler<TextInputEventArgs> OnTextInput;
     public static event EventHandler<MouseMoveEventArgs> OnMouseMove;
     public static event EventHandler<MouseButtonEventArgs> OnMouseButton; 
     public static event EventHandler<MouseWheelEventArgs> OnMouseWheel; 
@@ -25,6 +28,14 @@ public static class Input
             Type = key.type == SDL_EventType.SDL_KEYUP ? KeyboardEventType.KeyUp : KeyboardEventType.KeyDown,
             Repeated = key.repeat != 0,
             Key = key.keysym.scancode.ToKey()
+        });
+    }
+    
+    internal static void RaiseTextInput(char input)
+    {
+        OnTextInput?.Invoke(null, new TextInputEventArgs
+        {
+            Character = input
         });
     }
 

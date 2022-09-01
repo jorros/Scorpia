@@ -52,6 +52,11 @@ public class Font : IAsset, IDisposable
 
     internal void Render(OffsetVector position, string text, FontSettings settings)
     {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+        
         var startBlock = settings.ToTextBlock();
 
         var blocks = _fontMarkupReader.Read(text, startBlock);
@@ -79,8 +84,19 @@ public class Font : IAsset, IDisposable
         }
     }
 
+    public int GetHeight(FontSettings settings)
+    {
+        var font = LoadFont(settings.ToCached());
+        return TTF_FontHeight(font);
+    }
+
     public OffsetVector CalculateSize(string text, FontSettings settings)
     {
+        if (string.IsNullOrEmpty(text))
+        {
+            return OffsetVector.Zero;
+        }
+        
         var startBlock = settings.ToTextBlock();
         var blocks = _fontMarkupReader.Read(text, startBlock);
 

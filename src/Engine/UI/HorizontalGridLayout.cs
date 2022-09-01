@@ -30,7 +30,7 @@ public class HorizontalGridLayout : UIElement
     
     public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
-        var height = stylesheet.Scale(Height);
+        var scaledHeight = stylesheet.Scale(Height);
 
         Width = Padding.X + Padding.Width + Elements.Sum(element => element.Width);
         Width = Width > MinWidth ? Width : MinWidth;
@@ -38,7 +38,7 @@ public class HorizontalGridLayout : UIElement
         if (Background is not null)
         {
             var scaledPos = stylesheet.Scale(GetPosition()) + stylesheet.Scale(Margin);
-            var rect = new Rectangle(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), height);
+            var rect = new Rectangle(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), scaledHeight);
             renderContext.Viewport.Draw(Background, rect, 0, Color.White, 255, inWorld);
         }
         

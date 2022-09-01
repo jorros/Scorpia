@@ -97,4 +97,10 @@ public class Viewport
         
         font.Render(position, text, settings);
     }
+
+    public void DrawLine(OffsetVector from, OffsetVector to, Color color)
+    {
+        SDL_SetRenderDrawColor(_graphicsManager.Renderer, color.R, color.G, color.B, color.A);
+        SDL_RenderDrawLine(_graphicsManager.Renderer, from.X, from.Y, to.X, to.Y);
+    }
 }

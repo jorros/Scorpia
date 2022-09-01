@@ -15,6 +15,8 @@ public class GraphicsManager
     }
     internal IntPtr Window { get; private set; }
     internal IntPtr Renderer { get; private set; }
+    
+    internal int FPS { get; set; }
 
     internal void Init(IntPtr? handle = null)
     {

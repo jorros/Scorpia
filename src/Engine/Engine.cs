@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +12,7 @@ using Scorpia.Engine.Asset.SpriteSheetParsers;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.SceneManagement;
+using SDL2;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine;
@@ -55,7 +58,7 @@ public abstract class Engine
         }
 
         var highRes = graphicsManager.IsHighRes();
-        
+
         var assetLoaders = sp.GetServices<IAssetLoader>();
         assetManager.Init(assetLoaders, highRes);
 
@@ -102,7 +105,8 @@ public abstract class Engine
         }, token);
     }
 
-    private void StartRender(GraphicsManager graphicsManager, SceneManager sceneManager, CancellationTokenSource cancellationTokenSource)
+    private void StartRender(GraphicsManager graphicsManager, SceneManager sceneManager,
+        CancellationTokenSource cancellationTokenSource)
     {
         var stopwatch = new Stopwatch();
 
@@ -111,6 +115,7 @@ public abstract class Engine
         while (!cancellationTokenSource.IsCancellationRequested)
         {
             stopwatch.Start();
+            var start = SDL_GetPerformanceCounter();
 
             while (SDL_PollEvent(out var e) == 1)
             {
@@ -137,6 +142,16 @@ public abstract class Engine
                     case SDL_EventType.SDL_MOUSEBUTTONDOWN:
                         Input.CaptureMouseButton(e.button, highDpi);
                         break;
+
+                    case SDL_EventType.SDL_TEXTINPUT:
+                        var ch = new byte[Marshal.SizeOf<char>()];
+                        unsafe
+                        {
+                            Marshal.Copy((IntPtr)e.text.text, ch, 0, Marshal.SizeOf<char>());
+                        }
+                        Input.RaiseTextInput(Encoding.UTF8.GetChars(ch)[0]);
+
+                        break;
                 }
             }
 
@@ -145,8 +160,12 @@ public abstract class Engine
             sceneManager.Render(stopwatch.Elapsed);
 
             graphicsManager.Flush();
+            
+            var end = SDL_GetPerformanceCounter();
+            var elapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
 
             stopwatch.Stop();
+            graphicsManager.FPS = (int)(1.0f / elapsed);
             Thread.Sleep((int) Math.Floor(Math.Max(4.0 - stopwatch.ElapsedMilliseconds, 0)));
             stopwatch.Reset();
         }
