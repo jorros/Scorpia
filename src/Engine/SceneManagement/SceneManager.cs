@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.Graphics;
 
@@ -9,6 +10,7 @@ public class SceneManager
     private readonly IServiceProvider _serviceProvider;
     private Scene _currentScene;
     private RenderContext _renderContext;
+    private CancellationTokenSource _cancellationTokenSource;
 
     public SceneManager(IServiceProvider serviceProvider)
     {
@@ -31,6 +33,16 @@ public class SceneManager
         var scene = _serviceProvider.GetService<T>();
 
         _currentScene = scene ?? throw new EngineException($"PreLoading: Could not find scene {nameof(T)}");
+    }
+
+    public void Quit()
+    {
+        _cancellationTokenSource?.Cancel();
+    }
+
+    internal void SetCancellationToken(CancellationTokenSource source)
+    {
+        _cancellationTokenSource = source;
     }
 
     internal void Update()

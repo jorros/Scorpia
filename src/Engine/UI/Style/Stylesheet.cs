@@ -13,12 +13,16 @@ public class Stylesheet
     private readonly Dictionary<string, LabelStyle> _labels = new();
     private readonly Dictionary<string, WindowStyle> _windows = new();
     private readonly Dictionary<string, TextInputStyle> _inputs = new();
+    private readonly Dictionary<string, RadioButtonStyle> _radios = new();
+    private readonly Dictionary<string, HorizontalDividerStyle> _horizontalDividers = new();
 
     private Font? _defaultFont;
     private ButtonStyle? _defaultButton;
     private LabelStyle? _defaultLabel;
     private WindowStyle? _defaultWindow;
     private TextInputStyle? _defaultInput;
+    private RadioButtonStyle? _defaultRadio;
+    private HorizontalDividerStyle? _defaultHorizontalDivider;
     private readonly AssetManager _assetManager;
 
     public Stylesheet(AssetManager assetManager)
@@ -38,7 +42,42 @@ public class Stylesheet
     {
         return new OffsetVector(Scale(val.X), Scale(val.Y));
     }
+    
+    #region HorizontalDivider
+    public HorizontalDividerStyle CreateHorizontalDividerStyle(string? name, string backgroundSprite)
+    {
+        var style = new HorizontalDividerStyle
+        {
+            Background = _assetManager.Get<Sprite>(backgroundSprite)
+        };
 
+        if (name is null)
+        {
+            _defaultHorizontalDivider = style;
+            return style;
+        }
+
+        _horizontalDividers[name] = style;
+        return style;
+    }
+    
+    public HorizontalDividerStyle GetHorizontalDivider(string? name = null)
+    {
+        if (name is not null && _labels.ContainsKey(name))
+        {
+            return _horizontalDividers[name];
+        }
+        
+        if (_defaultHorizontalDivider is null)
+        {
+            throw new EngineException("No default horizontal divider style set in stylesheet.");
+        }
+
+        return _defaultHorizontalDivider;
+    }
+    #endregion
+
+    #region Label
     public LabelStyle CreateLabelStyle(string? name, string fontAsset)
     {
         var style = new LabelStyle
@@ -56,6 +95,23 @@ public class Stylesheet
         return style;
     }
     
+    public LabelStyle GetLabel(string? name = null)
+    {
+        if (name is not null && _labels.ContainsKey(name))
+        {
+            return _labels[name];
+        }
+        
+        if (_defaultLabel is null)
+        {
+            throw new EngineException("No default label style set in stylesheet.");
+        }
+
+        return _defaultLabel;
+    }
+    #endregion
+    
+    #region TextInput
     public TextInputStyle CreateTextInputStyle(string? name, string spriteAsset, string? labelStyle)
     {
         var style = new TextInputStyle
@@ -73,7 +129,59 @@ public class Stylesheet
         _inputs[name] = style;
         return style;
     }
+    
+    public TextInputStyle GetTextInput(string? name = null)
+    {
+        if (name is not null && _inputs.ContainsKey(name))
+        {
+            return _inputs[name];
+        }
 
+        if (_defaultInput is null)
+        {
+            throw new EngineException("No default input style set in stylesheet.");
+        }
+
+        return _defaultInput;
+    }
+    #endregion
+    
+    #region RadioButton
+    public RadioButtonStyle CreateRadioButtonStyle(string? name, string checkedSpriteAsset, string uncheckedSpriteAsset)
+    {
+        var style = new RadioButtonStyle
+        {
+            CheckedButton = _assetManager.Get<Sprite>(checkedSpriteAsset),
+            UncheckedButton = _assetManager.Get<Sprite>(uncheckedSpriteAsset)
+        };
+
+        if (name is null)
+        {
+            _defaultRadio = style;
+            return style;
+        }
+
+        _radios[name] = style;
+        return style;
+    }
+    
+    public RadioButtonStyle GetRadioButton(string? name = null)
+    {
+        if (name is not null && _radios.ContainsKey(name))
+        {
+            return _radios[name];
+        }
+
+        if (_defaultRadio is null)
+        {
+            throw new EngineException("No default radio button style set in stylesheet.");
+        }
+
+        return _defaultRadio;
+    }
+    #endregion
+
+    #region Button
     public ButtonStyle CreateButtonStyle(string? name, string spriteAsset, string? labelStyle)
     {
         var style = new ButtonStyle
@@ -100,6 +208,23 @@ public class Stylesheet
         return style;
     }
     
+    public ButtonStyle GetButton(string? name = null)
+    {
+        if (name is not null && _buttons.ContainsKey(name))
+        {
+            return _buttons[name];
+        }
+
+        if (_defaultButton is null)
+        {
+            throw new EngineException("No default button style set in stylesheet.");
+        }
+
+        return _defaultButton;
+    }
+    #endregion
+    
+    #region Window
     public WindowStyle CreateWindowStyle(string? name, string backgroundAsset, string actionBarAsset)
     {
         var style = new WindowStyle
@@ -117,47 +242,6 @@ public class Stylesheet
         _windows[name] = style;
         return style;
     }
-
-    public void SetFont(string? name, string assetName)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            _defaultFont = _assetManager.Get<Font>(assetName);
-            return;
-        }
-
-        _fonts[name] = _assetManager.Get<Font>(assetName);
-    }
-
-    public ButtonStyle GetButton(string? name = null)
-    {
-        if (name is not null && _buttons.ContainsKey(name))
-        {
-            return _buttons[name];
-        }
-
-        if (_defaultButton is null)
-        {
-            throw new EngineException("No default button style set in stylesheet.");
-        }
-
-        return _defaultButton;
-    }
-    
-    public TextInputStyle GetTextInput(string? name = null)
-    {
-        if (name is not null && _inputs.ContainsKey(name))
-        {
-            return _inputs[name];
-        }
-
-        if (_defaultInput is null)
-        {
-            throw new EngineException("No default input style set in stylesheet.");
-        }
-
-        return _defaultInput;
-    }
     
     public WindowStyle GetWindow(string? name = null)
     {
@@ -173,20 +257,18 @@ public class Stylesheet
 
         return _defaultWindow;
     }
+    #endregion
 
-    public LabelStyle GetLabel(string? name = null)
+    #region Font
+    public void SetFont(string? name, string assetName)
     {
-        if (name is not null && _labels.ContainsKey(name))
+        if (string.IsNullOrWhiteSpace(name))
         {
-            return _labels[name];
-        }
-        
-        if (_defaultLabel is null)
-        {
-            throw new EngineException("No default label style set in stylesheet.");
+            _defaultFont = _assetManager.Get<Font>(assetName);
+            return;
         }
 
-        return _defaultLabel;
+        _fonts[name] = _assetManager.Get<Font>(assetName);
     }
 
     public Font GetFont(string? name = null)
@@ -203,4 +285,5 @@ public class Stylesheet
 
         return _defaultFont;
     }
+    #endregion
 }

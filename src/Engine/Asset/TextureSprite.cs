@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.Helper;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine.Asset;
@@ -43,12 +44,23 @@ public class TextureSprite : Sprite
                 y = _frame.Position.Y
             };
 
+            var offX = _frame.Rotated ? _frame.Offset.Y : _frame.Offset.X;
+            var offY = _frame.Rotated ? _frame.Offset.X : _frame.Offset.Y;
+
+            var w = _frame.Rotated ? _frame.Size.Y : _frame.Size.X;
+            var h = _frame.Rotated ? _frame.Size.X : _frame.Size.Y;
+
+            Center = new OffsetVector(w / 2 + offX, h / 2 + offY);
+
+            var otherOffX = Size.X - offX - w;
+            var otherOffY = Size.Y - offY - h;
+
             target = new SDL_Rect
             {
-                x = target.x + (_frame.Rotated ? _frame.Offset.Y : _frame.Offset.X),
-                y = target.y + (_frame.Rotated ? _frame.Offset.X : _frame.Offset.Y),
-                w = _frame.Rotated ? _frame.Size.Y : _frame.Size.X,
-                h = _frame.Rotated ? _frame.Size.X : _frame.Size.Y
+                x = target.x + offX,
+                y = target.y + otherOffY,
+                w = (int)(dest.Width / (double)Size.X * w),
+                h = (int)(dest.Height / (double)Size.Y * h)
             };
 
             if (_frame.Rotated)
@@ -56,16 +68,24 @@ public class TextureSprite : Sprite
                 angle += 90;
             }
 
+            // Center = new OffsetVector(w / 2, h / 2);
+
             src = Marshal.AllocHGlobal(Marshal.SizeOf(srcRect));
             Marshal.StructureToPtr(srcRect, src, false);
         }
 
-        var centerSdl = Center.ToSdl();
+        // var debugRect = dest.ToSdl();
+        // SDL_SetRenderDrawColor(context.Renderer, 255, 0, 0, 255);
+        // SDL_RenderDrawRect(context.Renderer, ref debugRect);
+        //
+        // SDL_RenderDrawRect(context.Renderer, ref target);
+
+        // var centerSdl = Center.ToSdl();
 
         SDL_SetTextureColorMod(Texture, color.R, color.G, color.B);
         SDL_SetTextureAlphaMod(Texture, alpha);
 
-        SDL_RenderCopyEx(context.Renderer, Texture, src, ref target, angle, ref centerSdl,
+        SDL_RenderCopyEx(context.Renderer, Texture, src, ref target, angle, IntPtr.Zero, 
             SDL_RendererFlip.SDL_FLIP_NONE);
 
         if (src != IntPtr.Zero)

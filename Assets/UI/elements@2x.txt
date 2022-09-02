@@ -1,11 +1,11 @@
 elements@2x.png
-size: 1598, 132
+size: 2209, 229
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 button_green
   rotate: false
-  xy: 555, 1
+  xy: 405, 29
   size: 346, 130
   split: 86, 86, 46, 46
   pad: 87, 86, 33, 32
@@ -14,7 +14,7 @@ button_green
   index: -1
 button_red
   rotate: false
-  xy: 903, 1
+  xy: 753, 29
   size: 346, 130
   split: 86, 86, 46, 46
   pad: 87, 86, 33, 32
@@ -23,19 +23,44 @@ button_red
   index: -1
 button_regular
   rotate: false
-  xy: 1251, 1
+  xy: 1101, 29
   size: 346, 130
   split: 86, 86, 46, 46
   pad: 87, 86, 33, 32
   orig: 346, 130
   offset: 0, 0
   index: -1
-input
+horizontal_divider
   rotate: false
   xy: 1, 1
+  size: 2207, 26
+  orig: 2207, 26
+  offset: 0, 0
+  index: -1
+input
+  rotate: false
+  xy: 1449, 29
   size: 552, 92
   split: 15, 15, 15, 15
   pad: 138, 138, 23, 23
   orig: 552, 92
+  offset: 0, 0
+  index: -1
+radio_button_content
+  rotate: false
+  xy: 1, 29
+  size: 200, 199
+  split: 63, 50, 50, 57
+  pad: 50, 50, 50, 50
+  orig: 200, 199
+  offset: 0, 0
+  index: -1
+radio_button_content_selected
+  rotate: false
+  xy: 203, 29
+  size: 200, 199
+  split: 63, 50, 50, 57
+  pad: 50, 50, 50, 50
+  orig: 200, 199
   offset: 0, 0
   index: -1

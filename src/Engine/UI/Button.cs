@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 using Scorpia.Engine.Asset;
-using Scorpia.Engine.Asset.Font;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.UI.Style;
@@ -34,15 +33,22 @@ public class Button : UIElement
                 return;
             }
 
-            if (IsInButton(new OffsetVector(args.X, args.Y)))
+            if (_bounds.Value.Contains(new Point(args.X, args.Y)))
             {
-                if (args.Type == MouseEventType.ButtonDown)
+                switch (args.Type)
                 {
-                    _isPressed = true;
+                    case MouseEventType.ButtonDown:
+                        _isPressed = true;
+                        break;
+                    case MouseEventType.ButtonUp:
+                        OnClick?.Invoke(this, args);
+                        break;
                 }
 
-                OnClick?.Invoke(this, args);
+                return;
             }
+
+            _isPressed = false;
         };
     }
 
@@ -91,10 +97,10 @@ public class Button : UIElement
         renderContext.Viewport.Draw(style.Button, _bounds.Value, 0, tint, 255, inWorld);
 
         var textPosition = new OffsetVector(Width / 2, Height / 2) + position + style.TextPosition;
-        renderContext.Viewport.DrawText(style.LabelStyle.Font, 
-            stylesheet.Scale(textPosition), 
+        renderContext.Viewport.DrawText(style.LabelStyle.Font,
+            stylesheet.Scale(textPosition),
             Text,
-            fontSettings, 
+            fontSettings,
             inWorld);
     }
 }

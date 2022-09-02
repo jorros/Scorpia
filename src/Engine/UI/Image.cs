@@ -8,6 +8,28 @@ namespace Scorpia.Engine.UI;
 public class Image : UIElement
 {
     private Sprite _sprite;
+    private int? _width;
+    private int? _height;
+
+    public new int Width
+    {
+        get => base.Width;
+        set
+        {
+            _width = value;
+            base.Width = value;
+        }
+    }
+
+    public new int Height
+    {
+        get => base.Height;
+        set
+        {
+            _height = value;
+            base.Height = value;
+        }
+    }
 
     public Sprite Sprite
     {
@@ -15,15 +37,22 @@ public class Image : UIElement
         set
         {
             _sprite = value;
-            Width = value.Size.X;
-            Height = value.Size.Y;
+            if (_width is null)
+            {
+                base.Width = value.Size.X;
+            }
+
+            if (_height is null)
+            {
+                base.Height = value.Size.Y;
+            }
         }
     }
 
     public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
         var position = stylesheet.Scale(GetPosition());
-        var bounds = new Rectangle(position.X, position.Y, stylesheet.Scale(Width), stylesheet.Scale(Height));
+        var bounds = new Rectangle(position.X, position.Y, stylesheet.Scale(base.Width), stylesheet.Scale(base.Height));
 
         renderContext.Viewport.Draw(Sprite, bounds, 0, Color.White, 255, inWorld);
     }

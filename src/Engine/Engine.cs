@@ -48,6 +48,9 @@ public abstract class Engine
         var assetManager = sp.GetRequiredService<AssetManager>();
         var userDataManager = sp.GetRequiredService<UserDataManager>();
         var renderContext = sp.GetRequiredService<RenderContext>();
+        
+        var running = new CancellationTokenSource();
+        sceneManager.SetCancellationToken(running);
 
         userDataManager.Load();
 
@@ -63,8 +66,6 @@ public abstract class Engine
         assetManager.Init(assetLoaders, highRes);
 
         Load(sp);
-
-        var running = new CancellationTokenSource();
 
         StartUpdate(sceneManager, running.Token);
 

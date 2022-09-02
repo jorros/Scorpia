@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine;
@@ -65,5 +66,10 @@ public struct OffsetVector
             x = X,
             y = Y
         };
+    }
+
+    internal Point ToPoint()
+    {
+        return new Point(X, Y);
     }
 }

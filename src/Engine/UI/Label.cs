@@ -11,7 +11,7 @@ public class Label : UIElement
     public string Type { get; set; }
     public string Font { get; set; }
     public string Text { get; set; } = string.Empty;
-    public int? Size { get; set; } = 12;
+    public int? Size { get; set; }
     public Color? Color { get; set; }
     public TextAlign? TextAlign { get; set; }
     public FontStyle? Style { get; set; }
