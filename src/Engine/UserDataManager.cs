@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using static SDL2.SDL;
 
 namespace Scorpia.Engine;
 
@@ -12,17 +13,14 @@ public class UserDataManager
 
     private const string Filename = "user.properties";
 
-    public UserDataManager()
+    public UserDataManager(EngineSettings settings)
     {
         _data = new Dictionary<string, string>();
-        _appdata = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData,
-                Environment.SpecialFolderOption.DoNotVerify), "Scorpia");
+        _appdata = SDL_GetPrefPath("jorros", settings.Name);
     }
 
     internal void Load()
     {
-        Directory.CreateDirectory(_appdata);
         var propFile = Path.Combine(_appdata, Filename);
 
         if (!File.Exists(propFile))

@@ -11,6 +11,7 @@ using Scorpia.Engine.Asset.Markup;
 using Scorpia.Engine.Asset.SpriteSheetParsers;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
+using Scorpia.Engine.Network;
 using Scorpia.Engine.SceneManagement;
 using SDL2;
 using static SDL2.SDL;
@@ -23,53 +24,68 @@ public abstract class Engine
 
     protected abstract void Load(IServiceProvider serviceProvider);
 
-    public void Run(bool headless = false, IntPtr? viewHandler = null)
+    public void Run(EngineSettings settings, IntPtr? viewHandler = null)
     {
         var services = new ServiceCollection();
 
-        services.AddSingleton<GraphicsManager>();
+        services.AddSingleton((sp) => settings);
         services.AddSingleton<SceneManager>();
-        services.AddSingleton<AssetManager>();
         services.AddSingleton<UserDataManager>();
-        services.AddSingleton<RenderContext>();
-        services.AddSingleton<FontMarkupReader>();
 
-        services.AddSingleton<IAssetLoader, SpriteLoader>();
-        services.AddSingleton<IAssetLoader, FontLoader>();
+        if (!settings.Headless)
+        {
+            services.AddSingleton<GraphicsManager>();
+            services.AddSingleton<AssetManager>();
+            services.AddSingleton<RenderContext>();
+            services.AddSingleton<FontMarkupReader>();
+            
+            services.AddSingleton<IAssetLoader, SpriteLoader>();
+            services.AddSingleton<IAssetLoader, FontLoader>();
 
-        services.AddSingleton<LibgdxSpriteSheetParser>();
+            services.AddSingleton<LibgdxSpriteSheetParser>();
+        }
 
+        if (settings.NetworkEnabled)
+        {
+            services.AddSingleton<NetworkManager>();
+        }
         Init(services);
 
         var sp = services.BuildServiceProvider();
 
-        var graphicsManager = sp.GetRequiredService<GraphicsManager>();
+        if (settings.NetworkEnabled)
+        {
+            var networkManager = sp.GetRequiredService<NetworkManager>();
+            networkManager.Start();
+        }
+
+        var graphicsManager = sp.GetService<GraphicsManager>();
         var sceneManager = sp.GetRequiredService<SceneManager>();
-        var assetManager = sp.GetRequiredService<AssetManager>();
+        var assetManager = sp.GetService<AssetManager>();
         var userDataManager = sp.GetRequiredService<UserDataManager>();
-        var renderContext = sp.GetRequiredService<RenderContext>();
-        
+        var renderContext = sp.GetService<RenderContext>();
+
         var running = new CancellationTokenSource();
         sceneManager.SetCancellationToken(running);
 
         userDataManager.Load();
 
-        if (!headless)
+        if (!settings.Headless)
         {
             graphicsManager.Init(viewHandler);
             renderContext.Init();
+            
+            var highRes = graphicsManager.IsHighRes();
+
+            var assetLoaders = sp.GetServices<IAssetLoader>();
+            assetManager.Init(assetLoaders, highRes);
         }
-
-        var highRes = graphicsManager.IsHighRes();
-
-        var assetLoaders = sp.GetServices<IAssetLoader>();
-        assetManager.Init(assetLoaders, highRes);
-
+        
         Load(sp);
 
         StartUpdate(sceneManager, running.Token);
 
-        if (headless)
+        if (settings.Headless)
         {
             return;
         }

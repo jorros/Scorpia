@@ -1,26 +1,25 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 
 namespace Scorpia.Engine.SceneManagement;
 
 public abstract class Scene : IDisposable
 {
-    private readonly IServiceProvider _serviceProvider;
+    protected IServiceProvider ServiceProvider { get; private set; }
 
-    public Scene(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
+    protected SceneManager SceneManager { get; private set; }
+    
     public Dictionary<ulong, Node> Nodes { get; } = new();
 
     private ulong _nodeIdCounter;
 
-    public Node CreateNode<T>() where T : Node
+    protected Node CreateNode<T>() where T : Node
     {
         var node = Activator.CreateInstance<T>();
-        node.Create(_nodeIdCounter, _serviceProvider, this);
+        node.Create(_nodeIdCounter, ServiceProvider, this);
 
         Nodes.Add(_nodeIdCounter, node);
 
@@ -29,7 +28,7 @@ public abstract class Scene : IDisposable
         return node;
     }
 
-    public void Render(RenderContext context)
+    internal void Render(RenderContext context)
     {
         OnRender(context);
         
@@ -43,11 +42,43 @@ public abstract class Scene : IDisposable
         }
     }
 
-    protected virtual void OnRender(RenderContext context)
+    internal void Update()
     {
+        OnUpdate();
+        
+        foreach (var node in Nodes.Values)
+        {
+            foreach (var component in node.Components)
+            {
+                component.OnUpdate();
+            }
+            node.OnUpdate();
+        }
     }
 
-    public virtual void Dispose()
+    internal void Load(IServiceProvider serviceProvider)
     {
+        ServiceProvider = serviceProvider;
+        SceneManager = serviceProvider.GetRequiredService<SceneManager>();
+        
+        OnLoad(serviceProvider.GetService<AssetManager>());
+    }
+    
+    protected abstract void OnLoad(AssetManager? assetManager);
+    protected abstract void OnUpdate();
+    protected abstract void OnRender(RenderContext context);
+    protected virtual void OnLeave()
+    {}
+
+    public void Dispose()
+    {
+        foreach (var node in Nodes.Values)
+        {
+            node.OnCleanUp();
+        }
+        
+        Nodes.Clear();
+
+        OnLeave();
     }
 }

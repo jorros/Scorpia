@@ -8,10 +8,12 @@ namespace Scorpia.Engine.Graphics;
 public class GraphicsManager
 {
     private readonly UserDataManager _userDataManager;
+    private readonly EngineSettings _settings;
 
-    public GraphicsManager(UserDataManager userDataManager)
+    public GraphicsManager(UserDataManager userDataManager, EngineSettings settings)
     {
         _userDataManager = userDataManager;
+        _settings = settings;
     }
     internal IntPtr Window { get; private set; }
     internal IntPtr Renderer { get; private set; }
@@ -34,7 +36,7 @@ public class GraphicsManager
             var windowWidth = _userDataManager.Get("windowWidth", 1366);
             var windowHeight = _userDataManager.Get("windowHeight", 768);
 
-            Window = SDL_CreateWindow("Scorpia", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight,
+            Window = SDL_CreateWindow(_settings.DisplayName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight,
                 SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL_WindowFlags.SDL_WINDOW_METAL | SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI);
         }
         

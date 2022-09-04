@@ -4,12 +4,17 @@ using Scorpia.Game;
 
 var settings = new EngineSettings
 {
-    Headless = false,
-    Name = "Scorpia",
+    Headless = true,
+    Name = "ScorpiaServer",
     DisplayName = "Scorpia",
     NetworkEnabled = true,
-    NetworkMode = NetworkMode.Client
+    NetworkMode = NetworkMode.Server
 };
 
 var game = new Game();
 game.Run(settings);
+
+while (true)
+{
+    
+}

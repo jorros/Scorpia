@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
@@ -8,24 +9,34 @@ namespace Scorpia.Game.Scenes;
 // ReSharper disable once ClassNeverInstantiated.Global
 public partial class MainMenuScene : Scene
 {
-    private readonly SceneManager _sceneManager;
-
-    public MainMenuScene(IServiceProvider serviceProvider, AssetManager assetManager, SceneManager sceneManager) : base(serviceProvider)
-    {
-        _sceneManager = sceneManager;
-        SetupUI(assetManager);
-        
-        _quitButton.OnClick += QuitButtonOnOnClick;
-    }
-
     private void QuitButtonOnOnClick(object sender, MouseButtonEventArgs e)
     {
-        _sceneManager.Quit();
+        SceneManager.Quit();
+    }
+
+    protected override void OnLoad(AssetManager? assetManager)
+    {
+        if (assetManager is not null)
+        {
+            assetManager.Load("UI");
+            ScorpiaStyle.Setup(assetManager);
+            SetupUI(assetManager);
+
+            _quitButton.OnClick += QuitButtonOnOnClick;
+        }
+    }
+
+    protected override void OnUpdate()
+    {
+        var renderContext = ServiceProvider.GetService<RenderContext>();
+        if (renderContext is not null)
+        {
+            _fpsLabel.Text = renderContext.FPS.ToString();
+        }
     }
 
     protected override void OnRender(RenderContext context)
     {
-        _fpsLabel.Text = context.FPS.ToString();
         _layout.Render(context, false);
     }
 }

@@ -16,23 +16,30 @@ public class SceneManager
     {
         _serviceProvider = serviceProvider;
 
-        _renderContext = serviceProvider.GetRequiredService<RenderContext>();
+        _renderContext = serviceProvider.GetService<RenderContext>();
     }
 
-    public void Switch<T>() where T : Scene
+    public Scene Load<T>() where T : Scene
     {
+        var scene = Activator.CreateInstance(typeof(T), true) as Scene;
+        
+        scene?.Load(_serviceProvider);
+
+        return scene;
+    }
+
+    public void Switch(Scene scene)
+    {
+        if (scene is null)
+        {
+            throw new EngineException($"Switching scene failed. {nameof(scene)} is null.");
+        }
         if (_currentScene is not null)
         {
-            foreach (var node in _currentScene.Nodes.Values)
-            {
-                node.OnCleanUp();
-            }
-            _currentScene.Nodes.Clear();
+            _currentScene.Dispose();
         }
-        
-        var scene = _serviceProvider.GetService<T>();
 
-        _currentScene = scene ?? throw new EngineException($"PreLoading: Could not find scene {nameof(T)}");
+        _currentScene = scene;
     }
 
     public void Quit()
@@ -47,21 +54,13 @@ public class SceneManager
 
     internal void Update()
     {
-        foreach (var node in _currentScene.Nodes.Values)
-        {
-            node.OnUpdate();
-        }
+        _currentScene.Update();
     }
 
     internal void Render(TimeSpan elapsedTime)
     {
         _renderContext.Begin();
-
         _currentScene.Render(_renderContext);
-        foreach (var node in _currentScene.Nodes.Values)
-        {
-            node.OnRender(_renderContext);
-        }
         _renderContext.End();
     }
 }
