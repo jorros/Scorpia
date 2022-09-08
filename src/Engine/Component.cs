@@ -9,8 +9,8 @@ namespace Scorpia.Engine;
 public abstract class Component
 {
     protected IServiceProvider ServiceProvider { get; private set; }
-    protected AssetManager AssetManager => ServiceProvider.GetRequiredService<AssetManager>();
-    protected SceneManager SceneManager => ServiceProvider.GetRequiredService<SceneManager>();
+    protected AssetManager AssetManager => ServiceProvider.GetService<AssetManager>();
+    protected DefaultSceneManager SceneManager => ServiceProvider.GetRequiredService<DefaultSceneManager>();
     protected UserDataManager UserDataManager => ServiceProvider.GetRequiredService<UserDataManager>();
     protected Viewport Viewport => ServiceProvider.GetRequiredService<RenderContext>().Viewport;
     protected Node Parent { get; private set; }
@@ -24,6 +24,10 @@ public abstract class Component
     }
     
     public virtual void OnUpdate()
+    {
+    }
+
+    public virtual void OnTick()
     {
     }
     

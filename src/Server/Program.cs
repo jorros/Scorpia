@@ -1,6 +1,8 @@
 ﻿using Scorpia.Engine;
 using Scorpia.Engine.Network;
 using Scorpia.Game;
+using Server.Actions;
+using Sharprompt;
 
 var settings = new EngineSettings
 {
@@ -12,9 +14,18 @@ var settings = new EngineSettings
 };
 
 var game = new Game();
-game.Run(settings);
 
-while (true)
+var actions = new IAction[]
 {
-    
-}
+    new TestAction()
+};
+
+settings.HeadlessLoopAction = () =>
+{
+    var input = Prompt.Select("Select action", new[] {"Test"});
+
+    var action = actions.FirstOrDefault(x => string.Equals(x.Name, input, StringComparison.InvariantCultureIgnoreCase));
+    action?.Execute(game.ServiceProvider);
+};
+
+game.Run(settings);

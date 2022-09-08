@@ -7,13 +7,14 @@ namespace Scorpia.Game.Scenes;
 
 public partial class MainMenuScene
 {
-    private BasicLayout _layout;
-    private Label _fpsLabel;
-    private TextInput _nameInput;
-    private RadioGroup _colourGroup;
-    private Button _quitButton;
-    private Button _joinButton;
-    private Button _settingsButton;
+    private BasicLayout? _layout;
+    private Label? _fpsLabel;
+    private TextInput? _nameInput;
+    private RadioGroup? _colourGroup;
+    private Button? _quitButton;
+    private Button? _joinButton;
+    private Button? _settingsButton;
+    private Label? _serverStatus;
 
     private void SetupUI(AssetManager assetManager)
     {
@@ -62,14 +63,14 @@ public partial class MainMenuScene
         };
         window.Attach(_nameInput);
 
-        var serverStatus = new Label
+        _serverStatus = new Label
         {
             Position = new OffsetVector(0, 20),
             Type = "Header",
             Text = "Server <text size='70'>UNKNOWN</text>",
             Anchor = UIAnchor.TopRight
         };
-        window.Attach(serverStatus);
+        window.Attach(_serverStatus);
         
         var colourLabel = new Label
         {

@@ -1,35 +1,61 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Asset.AssetLoaders;
 using Scorpia.Engine.Asset.Markup;
 using Scorpia.Engine.Asset.SpriteSheetParsers;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.Helper;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.Network;
+using Scorpia.Engine.Network.Packets;
 using Scorpia.Engine.SceneManagement;
-using SDL2;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine;
 
 public abstract class Engine
 {
-    protected abstract void Init(IServiceCollection services);
+    private ServiceProvider _serviceProvider;
+    private EngineSettings _settings;
+    protected abstract void Init(IServiceCollection services, List<Type> networkedNodes);
 
     protected abstract void Load(IServiceProvider serviceProvider);
+
+    public IServiceProvider ServiceProvider => _serviceProvider;
+
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "Requires referenced packets anyways")]
+    protected void AddNetworkPacketsFrom(Assembly assembly)
+    {
+        foreach (var type in assembly.GetTypes().Where(t => t.IsAssignableTo(typeof(INetworkPacket)) && !t.IsInterface))
+        {
+            _settings.NetworkPackets.Add(type.FullName.GetDeterministicHashCode16(), type);
+        }
+    }
 
     public void Run(EngineSettings settings, IntPtr? viewHandler = null)
     {
         var services = new ServiceCollection();
 
-        services.AddSingleton((sp) => settings);
-        services.AddSingleton<SceneManager>();
+        services.AddLogging(builder =>
+        {
+            builder.AddConsole(opt => opt.LogToStandardErrorThreshold = LogLevel.Error);
+            builder.SetMinimumLevel(LogLevel.Debug);
+        });
+
+        _settings = settings;
+        services.AddSingleton(_ => settings);
+        
         services.AddSingleton<UserDataManager>();
 
         if (!settings.Headless)
@@ -38,7 +64,7 @@ public abstract class Engine
             services.AddSingleton<AssetManager>();
             services.AddSingleton<RenderContext>();
             services.AddSingleton<FontMarkupReader>();
-            
+
             services.AddSingleton<IAssetLoader, SpriteLoader>();
             services.AddSingleton<IAssetLoader, FontLoader>();
 
@@ -48,22 +74,33 @@ public abstract class Engine
         if (settings.NetworkEnabled)
         {
             services.AddSingleton<NetworkManager>();
-        }
-        Init(services);
+            services.AddSingleton<PacketManager>();
 
-        var sp = services.BuildServiceProvider();
+            services.AddSingleton<SceneManager, NetworkedSceneManager>();
+            
+            AddNetworkPacketsFrom(typeof(Engine).Assembly);
+        }
+        else
+        {
+            services.AddSingleton<SceneManager, DefaultSceneManager>();
+        }
+
+        Init(services, settings.NetworkedNodes);
+
+        _serviceProvider = services.BuildServiceProvider();
 
         if (settings.NetworkEnabled)
         {
-            var networkManager = sp.GetRequiredService<NetworkManager>();
+            var networkManager = _serviceProvider.GetRequiredService<NetworkManager>();
             networkManager.Start();
         }
 
-        var graphicsManager = sp.GetService<GraphicsManager>();
-        var sceneManager = sp.GetRequiredService<SceneManager>();
-        var assetManager = sp.GetService<AssetManager>();
-        var userDataManager = sp.GetRequiredService<UserDataManager>();
-        var renderContext = sp.GetService<RenderContext>();
+        var graphicsManager = _serviceProvider.GetService<GraphicsManager>();
+        var sceneManager = _serviceProvider.GetRequiredService<SceneManager>();
+        var assetManager = _serviceProvider.GetService<AssetManager>();
+        var userDataManager = _serviceProvider.GetRequiredService<UserDataManager>();
+        var renderContext = _serviceProvider.GetService<RenderContext>();
+        var logger = _serviceProvider.GetRequiredService<ILogger<Engine>>();
 
         var running = new CancellationTokenSource();
         sceneManager.SetCancellationToken(running);
@@ -72,32 +109,70 @@ public abstract class Engine
 
         if (!settings.Headless)
         {
-            graphicsManager.Init(viewHandler);
-            renderContext.Init();
-            
-            var highRes = graphicsManager.IsHighRes();
+            graphicsManager?.Init(viewHandler);
+            renderContext?.Init();
 
-            var assetLoaders = sp.GetServices<IAssetLoader>();
-            assetManager.Init(assetLoaders, highRes);
+            var highRes = graphicsManager?.IsHighRes();
+
+            var assetLoaders = _serviceProvider.GetServices<IAssetLoader>();
+            assetManager?.Init(assetLoaders, highRes ?? false);
         }
-        
-        Load(sp);
 
-        StartUpdate(sceneManager, running.Token);
+        Load(_serviceProvider);
+
+        StartUpdate(logger, running.Token);
+        StartTick(settings, logger, running.Token);
 
         if (settings.Headless)
         {
+            while (!running.IsCancellationRequested)
+            {
+                settings.HeadlessLoopAction?.Invoke();
+                Thread.Sleep(100);
+            }
+            
+            var networkManager = _serviceProvider.GetRequiredService<NetworkManager>();
+            networkManager.Stop();
+            
             return;
         }
 
         StartRender(graphicsManager, sceneManager, running);
 
-        graphicsManager.Quit();
+        graphicsManager?.Quit();
     }
 
-    private void StartUpdate(SceneManager sceneManager, CancellationToken token)
+    private void StartTick(EngineSettings settings, ILogger logger, CancellationToken token)
+    {
+        var cap = 1000 / (double) settings.TicksPerSecond;
+        var sceneManager = _serviceProvider.GetRequiredService<SceneManager>();
+        
+        Task.Run(async () =>
+        {
+            while (!token.IsCancellationRequested)
+            {
+                var start = SDL_GetPerformanceCounter();
+
+                try
+                {
+                    sceneManager.Tick();
+                }
+                catch (Exception e)
+                {
+                    logger.LogError("Failed to process tick: {Error}", e.Message);
+                }
+
+                var end = SDL_GetPerformanceCounter();
+                var elapsedMs = (end - start) / (float) SDL_GetPerformanceFrequency() * 1000.0f;
+                await Task.Delay(Math.Max((int) (cap - elapsedMs), 0), token);
+            }
+        }, token);
+    }
+
+    private void StartUpdate(ILogger logger, CancellationToken token)
     {
         var stopwatch = new Stopwatch();
+        var sceneManager = _serviceProvider.GetRequiredService<SceneManager>();
 
         Task.Run(async () =>
         {
@@ -116,7 +191,7 @@ public abstract class Engine
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    logger.LogError("Failed to process update: {Error}", e.Message);
                 }
             }
         }, token);
@@ -164,8 +239,9 @@ public abstract class Engine
                         var ch = new byte[Marshal.SizeOf<char>()];
                         unsafe
                         {
-                            Marshal.Copy((IntPtr)e.text.text, ch, 0, Marshal.SizeOf<char>());
+                            Marshal.Copy((IntPtr) e.text.text, ch, 0, Marshal.SizeOf<char>());
                         }
+
                         Input.RaiseTextInput(Encoding.UTF8.GetChars(ch)[0]);
 
                         break;
@@ -177,12 +253,12 @@ public abstract class Engine
             sceneManager.Render(stopwatch.Elapsed);
 
             graphicsManager.Flush();
-            
+
             var end = SDL_GetPerformanceCounter();
-            var elapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
+            var elapsed = (end - start) / (float) SDL_GetPerformanceFrequency();
 
             stopwatch.Stop();
-            graphicsManager.FPS = (int)(1.0f / elapsed);
+            graphicsManager.FPS = (int) (1.0f / elapsed);
             Thread.Sleep((int) Math.Floor(Math.Max(4.0 - stopwatch.ElapsedMilliseconds, 0)));
             stopwatch.Reset();
         }

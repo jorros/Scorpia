@@ -2,13 +2,14 @@ using Scorpia.Engine;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Components;
 using Scorpia.Engine.InputManagement;
+using Scorpia.Engine.SceneManagement;
 
 namespace Scorpia.Game.Nodes;
 
-public class TestNode : Node
+public class TestNode : NetworkedNode
 {
-    private AssetBundle _game;
-    private RenderComponent _render;
+    private AssetBundle? _game;
+    private RenderComponent? _render;
     
     private float _direction = 0.01f;
 

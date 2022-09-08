@@ -8,7 +8,7 @@ namespace Scorpia.Game;
 
 public static class ScorpiaStyle
 {
-    public static Stylesheet Stylesheet { get; private set; }
+    public static Stylesheet? Stylesheet { get; private set; }
     
     public static void Setup(AssetManager assetManager)
     {

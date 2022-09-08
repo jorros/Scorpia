@@ -1,4 +1,6 @@
 using System;
+using Microsoft.Extensions.Logging;
+using Scorpia.Engine.Helper;
 using static SDL2.SDL;
 using static SDL2.SDL_image;
 using static SDL2.SDL_ttf;
@@ -9,79 +11,87 @@ public class GraphicsManager
 {
     private readonly UserDataManager _userDataManager;
     private readonly EngineSettings _settings;
+    private readonly ILogger<GraphicsManager> _logger;
 
-    public GraphicsManager(UserDataManager userDataManager, EngineSettings settings)
+    public GraphicsManager(UserDataManager userDataManager, EngineSettings settings, ILogger<GraphicsManager> logger)
     {
         _userDataManager = userDataManager;
         _settings = settings;
+        _logger = logger;
     }
+
     internal IntPtr Window { get; private set; }
     internal IntPtr Renderer { get; private set; }
-    
+
     internal int FPS { get; set; }
 
     internal void Init(IntPtr? handle = null)
     {
+        _logger.LogDebug("Starting");
         if (SDL_Init(SDL_INIT_VIDEO) < 0)
         {
+            _logger.LogCritical("Could not initialise SDL: {Error}", SDL_GetError());
             throw new EngineException($"Could not initialise SDL: {SDL_GetError()}");
         }
 
         if (handle is not null)
         {
+            _logger.LogDebug("Use existing window");
             Window = SDL_CreateWindowFrom(handle.Value);
         }
         else
         {
+            _logger.LogDebug("Create new window");
             var windowWidth = _userDataManager.Get("windowWidth", 1366);
             var windowHeight = _userDataManager.Get("windowHeight", 768);
 
-            Window = SDL_CreateWindow(_settings.DisplayName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight,
-                SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL_WindowFlags.SDL_WINDOW_METAL | SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI);
+            Window = SDL_CreateWindow(_settings.DisplayName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                windowWidth, windowHeight,
+                SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL_WindowFlags.SDL_WINDOW_METAL |
+                SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI);
         }
-        
+
         if (Window == IntPtr.Zero)
         {
+            _logger.LogCritical("Could not create window: {Error}", SDL_GetError());
             throw new EngineException($"Could not create window: {SDL_GetError()}");
         }
-        
-        Renderer = SDL_CreateRenderer(Window, 
-            -1, 
-            SDL_RendererFlags.SDL_RENDERER_ACCELERATED | 
+
+        Renderer = SDL_CreateRenderer(Window,
+            -1,
+            SDL_RendererFlags.SDL_RENDERER_ACCELERATED |
             SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
 
         if (Renderer == IntPtr.Zero)
         {
+            _logger.LogCritical("There was an issue creating the renderer: {Error}", SDL_GetError());
             throw new EngineException($"There was an issue creating the renderer: {SDL_GetError()}");
         }
-        
+
         if (IMG_Init(IMG_InitFlags.IMG_INIT_PNG) == 0)
         {
+            _logger.LogCritical("There was an issue initialising SDL_Image: {Error}", IMG_GetError());
             throw new EngineException($"There was an issue initialising SDL_Image: {IMG_GetError()}");
         }
 
         if (TTF_Init() == -1)
         {
+            _logger.LogCritical("There was an issue initialising SDL_TTF: {Error}", TTF_GetError());
             throw new EngineException($"There was an issue initialising SDL_TTF: {TTF_GetError()}");
         }
     }
 
     internal bool IsHighDpiMode()
     {
-        SDL_GetRendererOutputSize(Renderer, out var rw, out var rh);
+        ErrorHandling.Handle(_logger, SDL_GetRendererOutputSize(Renderer, out var rw, out var rh));
         SDL_GetWindowSize(Window, out var ww, out var wh);
 
-        if (rw != ww)
-        {
-            return true;
-        }
-
-        return false;
+        return rw != ww;
     }
 
     internal bool IsHighRes()
     {
-        SDL_GetRendererOutputSize(Renderer, out var rw, out var rh);
+        ErrorHandling.Handle(_logger, SDL_GetRendererOutputSize(Renderer, out var rw, out var rh));
 
         return rw * rw > 3686400;
     }
@@ -97,15 +107,8 @@ public class GraphicsManager
 
     internal void Clear()
     {
-        if (SDL_SetRenderDrawColor(Renderer, 0, 0, 235, 255) < 0)
-        {
-            Console.WriteLine($"There was an issue with setting the render draw color. {SDL_GetError()}");
-        }
-        
-        if (SDL_RenderClear(Renderer) < 0)
-        {
-            Console.WriteLine($"There was an issue with clearing the render surface. {SDL_GetError()}");
-        }
+        ErrorHandling.Handle(_logger, SDL_SetRenderDrawColor(Renderer, 0, 0, 235, 255));
+        ErrorHandling.Handle(_logger, SDL_RenderClear(Renderer));
     }
 
     internal void Flush()
