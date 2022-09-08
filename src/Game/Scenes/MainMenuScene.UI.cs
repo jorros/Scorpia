@@ -67,7 +67,7 @@ public partial class MainMenuScene
         {
             Position = new OffsetVector(0, 20),
             Type = "Header",
-            Text = "Server <text size='70'>UNKNOWN</text>",
+            Text = "Server <text color='red' size='70'>OFFLINE</text>",
             Anchor = UIAnchor.TopRight
         };
         window.Attach(_serverStatus);

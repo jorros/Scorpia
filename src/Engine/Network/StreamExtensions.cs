@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -160,4 +161,11 @@ public static class StreamExtensions
     //     {
     //     }
     // }
+    
+    public static MemoryStream ReadIntoBuffer(this NetworkStream stream)
+    {
+        Span<byte> buffer = stackalloc byte[256];
+        var length = stream.Read(buffer);
+        return new MemoryStream(buffer.ToArray(), 0, length);
+    }
 }

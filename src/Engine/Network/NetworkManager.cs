@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.HighPerformance;
 using Microsoft.Extensions.Logging;
@@ -17,6 +18,7 @@ public class NetworkManager
     private readonly EngineSettings _settings;
     private readonly ILogger<NetworkManager> _logger;
     private readonly PacketManager _packetManager;
+    private readonly IServiceProvider _serviceProvider;
     private readonly Dictionary<ushort, TcpClient> _connectedClients = new();
     private TcpClient _client;
     private TcpListener _listener;
@@ -25,12 +27,18 @@ public class NetworkManager
 
     public event EventHandler<PacketReceivedEventArgs> OnPacketReceive;
     public event EventHandler<UserConnectedEventArgs> OnUserConnect;
+    public event EventHandler<UserDisconnectedEventArgs> OnUserDisconnect;
+    public event EventHandler<AuthenticationFailedEventArgs> OnAuthenticationFail;
 
-    public NetworkManager(EngineSettings settings, ILogger<NetworkManager> logger, PacketManager packetManager)
+    public bool IsConnected { get; private set; }
+
+    public NetworkManager(EngineSettings settings, ILogger<NetworkManager> logger, PacketManager packetManager,
+        IServiceProvider serviceProvider)
     {
         _settings = settings;
         _logger = logger;
         _packetManager = packetManager;
+        _serviceProvider = serviceProvider;
     }
 
     internal void Start()
@@ -78,6 +86,50 @@ public class NetworkManager
             {
                 var client = _listener.AcceptTcpClient();
                 _logger.LogDebug("Incoming connection");
+
+                if (_settings.Authentication is not null)
+                {
+                    _logger.LogDebug("Receive authentication");
+                    
+                    var stream = client.GetStream();
+
+                    try
+                    {
+                        stream.ReadTimeout = 2000;
+
+                        var buffer = stream.ReadIntoBuffer();
+
+                        stream.ReadTimeout = Timeout.Infinite;
+
+                        var authString = buffer.ReadString();
+
+                        var response = _settings.Authentication(authString, _serviceProvider);
+
+                        response.Write(stream, _packetManager);
+
+                        if (!response.Succeeded)
+                        {
+                            _logger.LogDebug("Failed authentication: {Reason}", response.Reason);
+                            client.Close();
+                            continue;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogDebug("Failed authentication: {Reason}", e.Message);
+                        
+                        var responsePacket = new LoginResponsePacket
+                        {
+                            Reason = "NO_AUTH",
+                            Succeeded = false
+                        };
+                        responsePacket.Write(stream, _packetManager);
+
+                        client.Close();
+                        continue;
+                    }
+                }
+
                 var clientId = _clientCounter;
                 _clientCounter++;
 
@@ -107,7 +159,7 @@ public class NetworkManager
         using var buffer = new MemoryStream();
         short bufferSize = 0;
         Span<byte> networkBuffer = stackalloc byte[255];
-        
+
         while (client.Connected)
         {
             if (!stream.DataAvailable)
@@ -130,7 +182,7 @@ public class NetworkManager
                 _logger.LogDebug("[{ClientId}] Receiving data from remote endpoint", clientId);
 
                 var packet = _packetManager.Read(buffer);
-                
+
                 buffer.SetLength(0);
 
                 OnPacketReceive?.Invoke(this, new PacketReceivedEventArgs
@@ -159,7 +211,8 @@ public class NetworkManager
 
         if (client == 0)
         {
-            foreach (var clientStream in _connectedClients.Keys.Select(clientId => _connectedClients[clientId].GetStream()))
+            foreach (var clientStream in _connectedClients.Keys.Select(clientId =>
+                         _connectedClients[clientId].GetStream()))
             {
                 WriteToStream(clientStream);
             }
@@ -178,7 +231,7 @@ public class NetworkManager
         }
     }
 
-    public void Connect(string hostname, int port)
+    public void Connect(string hostname, int port, string loginRequest = null)
     {
         if (_client is null)
         {
@@ -190,35 +243,97 @@ public class NetworkManager
         {
             _client.Connect(hostname, port);
 
-            if (_client.Connected)
+            if (!_client.Connected)
             {
-                Task.Run(() => ReceiveData(_client, 0));
+                return;
             }
+
+            if (loginRequest is not null)
+            {
+                var stream = _client.GetStream();
+                
+                stream.Write(loginRequest);
+
+                var buffer = stream.ReadIntoBuffer();
+
+                var response = new LoginResponsePacket();
+                response.Read(buffer, _packetManager);
+
+                if (!response.Succeeded)
+                {
+                    _client.Close();
+                    _client = new TcpClient();
+                    
+                    OnAuthenticationFail?.Invoke(this, new AuthenticationFailedEventArgs
+                    {
+                        Reason = response.Reason
+                    });
+                    return;
+                }
+            }
+
+            OnUserConnect?.Invoke(this, new UserConnectedEventArgs());
+            Task.Run(() => ReceiveData(_client, 0));
         }
         catch (SocketException e)
         {
-            _logger.LogError("Failed to connect to server: {Error}", e.Message);
+            _logger.LogWarning("Failed to connect to server: {Error}", e.Message);
         }
     }
 
-    public bool IsConnected()
+    internal void UpdateStatus()
     {
-        if (_client is null)
+        if (IsClient)
         {
-            return false;
+            if (_client.Client.LocalEndPoint is not IPEndPoint localEndpoint ||
+                _client.Client.RemoteEndPoint is not IPEndPoint remoteEndpoint)
+            {
+                return;
+            }
+
+            var state = TcpStatus.GetState(remoteEndpoint.Port, localEndpoint.Port);
+
+            switch (state)
+            {
+                case ConnectionStatus.Disconnecting or ConnectionStatus.NotReady when IsConnected:
+                    IsConnected = false;
+                    _client.Close();
+                    _client = new TcpClient();
+                    OnUserDisconnect?.Invoke(this, new UserDisconnectedEventArgs
+                    {
+                        ClientId = 0
+                    });
+                    break;
+                case ConnectionStatus.Connected:
+                    IsConnected = true;
+                    break;
+            }
+
+            return;
         }
 
-        return GetStatus() == ConnectionStatus.Connected;
-    }
-
-    public ConnectionStatus GetStatus()
-    {
-        if (_client.Client.LocalEndPoint is IPEndPoint localEndpoint)
+        foreach (var client in _connectedClients)
         {
-            return TcpStatus.GetState(1992, localEndpoint.Port);
-        }
+            if (client.Value.Client.LocalEndPoint is not IPEndPoint localEndpoint ||
+                client.Value.Client.RemoteEndPoint is not IPEndPoint remoteEndpoint)
+            {
+                return;
+            }
 
-        return ConnectionStatus.NotInitialized;
+            var state = TcpStatus.GetState(remoteEndpoint.Port, localEndpoint.Port);
+
+            if (state != ConnectionStatus.Disconnecting)
+            {
+                continue;
+            }
+
+            client.Value.Close();
+            _connectedClients.Remove(client.Key);
+            OnUserDisconnect?.Invoke(this, new UserDisconnectedEventArgs
+            {
+                ClientId = client.Key
+            });
+        }
     }
 
     public bool IsClient => _client is not null;

@@ -12,6 +12,14 @@ public partial class MainMenuScene
         Console.WriteLine(param.Param);
         Invoke(nameof(Abc), senderId);
     }
+    
+    private void ServerOnUserDisconnect(object? sender, UserDisconnectedEventArgs e)
+    {
+    }
+    
+    private void ServerOnUserConnect(object? sender, UserConnectedEventArgs e)
+    {
+    }
 }
 
 public struct TestParam : INetworkPacket

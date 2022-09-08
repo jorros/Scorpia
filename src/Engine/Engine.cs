@@ -43,6 +43,11 @@ public abstract class Engine
         }
     }
 
+    protected void SetAuthentication(Func<string, IServiceProvider, LoginResponsePacket> auth)
+    {
+        _settings.Authentication = auth;
+    }
+
     public void Run(EngineSettings settings, IntPtr? viewHandler = null)
     {
         var services = new ServiceCollection();
@@ -146,12 +151,15 @@ public abstract class Engine
     {
         var cap = 1000 / (double) settings.TicksPerSecond;
         var sceneManager = _serviceProvider.GetRequiredService<SceneManager>();
+        var networkManager = _serviceProvider.GetService<NetworkManager>();
         
         Task.Run(async () =>
         {
             while (!token.IsCancellationRequested)
             {
                 var start = SDL_GetPerformanceCounter();
+
+                networkManager?.UpdateStatus();
 
                 try
                 {

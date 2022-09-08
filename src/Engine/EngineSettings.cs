@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Scorpia.Engine.Network;
+using Scorpia.Engine.Network.Packets;
 
 namespace Scorpia.Engine;
 
@@ -9,6 +10,8 @@ public record EngineSettings
     public bool NetworkEnabled { get; set; }
     
     public NetworkMode NetworkMode { get; set; }
+    
+    public Func<string, IServiceProvider, LoginResponsePacket> Authentication { get; set; }
 
     public int Port { get; set; } = 1992;
     

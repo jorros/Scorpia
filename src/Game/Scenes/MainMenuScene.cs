@@ -21,6 +21,34 @@ public partial class MainMenuScene : NetworkedScene
             _quitButton!.OnClick += QuitButtonOnOnClick;
             _joinButton!.OnClick += JoinButtonOnOnClick;
         }
+
+        if (NetworkManager.IsClient)
+        {
+            NetworkManager.OnUserDisconnect += OnUserDisconnect;
+            NetworkManager.OnUserConnect += OnUserConnect;
+        }
+        else
+        {
+            NetworkManager.OnUserDisconnect += ServerOnUserDisconnect;
+            NetworkManager.OnUserConnect += ServerOnUserConnect;
+        }
+
+        NetworkManager.OnAuthenticationFail += OnAuthenticationFail;
+    }
+
+    private void OnUserConnect(object? sender, UserConnectedEventArgs e)
+    {
+        _serverStatus!.Text = "Server <text color='green' size='70'>ONLINE</text>";
+    }
+
+    private void OnUserDisconnect(object? sender, UserDisconnectedEventArgs e)
+    {
+        _serverStatus!.Text = "Server <text color='red' size='70'>OFFLINE</text>";
+    }
+
+    private void OnAuthenticationFail(object? sender, AuthenticationFailedEventArgs e)
+    {
+        _serverStatus!.Text = $"Server <text color='orange' size='70'>IN PROGRESS</text>";
     }
 
     private void JoinButtonOnOnClick(object sender, MouseButtonEventArgs e)
@@ -36,7 +64,7 @@ public partial class MainMenuScene : NetworkedScene
     {
         Console.Write(senderId);
     }
-    
+
     private void QuitButtonOnOnClick(object sender, MouseButtonEventArgs e)
     {
         SceneManager.Quit();
@@ -48,21 +76,16 @@ public partial class MainMenuScene : NetworkedScene
         {
             return;
         }
-        
+
         var renderContext = ServiceProvider.GetService<RenderContext>();
         if (renderContext is not null)
         {
             _fpsLabel!.Text = renderContext.FPS.ToString();
         }
-        
-        if (!NetworkManager.IsConnected())
+
+        if (!NetworkManager.IsConnected)
         {
-            NetworkManager.Connect("127.0.0.1", 1992);
-            _serverStatus!.Text = "Server <text color='red' size='70'>OFFLINE</text>";
-        }
-        else
-        {
-            _serverStatus!.Text = "Server <text color='green' size='70'>ONLINE</text>";
+            NetworkManager.Connect("127.0.0.1", 1992, "1234");
         }
     }
 
