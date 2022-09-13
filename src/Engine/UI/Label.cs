@@ -38,6 +38,11 @@ public class Label : UIElement
         Width = size.X;
         Height = size.Y;
         
+        if (!Show)
+        {
+            return;
+        }
+        
         renderContext.Viewport.DrawText(font, stylesheet.Scale(GetPosition()), Text, fontSettings, inWorld);
     }
 }

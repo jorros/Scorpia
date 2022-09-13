@@ -9,8 +9,8 @@ namespace Scorpia.Engine.UI;
 public class RadioButton : UIElement
 {
     public string Type { get; set; }
-    
-    public string Value { get; set; }
+
+    public object Value { get; set; }
 
     public Content Content
     {
@@ -21,6 +21,7 @@ public class RadioButton : UIElement
             {
                 value.Value.Parent = this;
             }
+
             _content = value;
         }
     }
@@ -38,6 +39,11 @@ public class RadioButton : UIElement
 
     private void InputOnOnMouseButton(object sender, MouseButtonEventArgs e)
     {
+        if (!Show || !Enabled)
+        {
+            return;
+        }
+
         if (e.Type == MouseEventType.ButtonUp)
         {
             _isPressed = false;
@@ -84,17 +90,27 @@ public class RadioButton : UIElement
         var position = GetPosition();
         _bounds = new Rectangle(stylesheet.Scale(position.X), stylesheet.Scale(position.Y), stylesheet.Scale(Width),
             stylesheet.Scale(Height));
-        
+
+        if (!Show)
+        {
+            return;
+        }
+
         var tint = Color.White;
 
-        if (style.HoveredTint is not null && _bounds.Value.Contains(Input.MousePosition.ToPoint()))
+        if (style.HoveredTint is not null && Enabled && _bounds.Value.Contains(Input.MousePosition.ToPoint()))
         {
             tint = style.HoveredTint.Value;
         }
 
-        if (style.PressedTint is not null && _isPressed)
+        if (style.PressedTint is not null && Enabled && _isPressed)
         {
             tint = style.PressedTint.Value;
+        }
+
+        if (!Enabled)
+        {
+            tint = Color.DarkGray;
         }
 
         var sprite = style.UncheckedButton;
@@ -102,7 +118,7 @@ public class RadioButton : UIElement
         {
             sprite = style.CheckedButton;
         }
-        
+
         renderContext.Viewport.Draw(sprite, _bounds.Value, 0, tint, 255, inWorld);
 
         if (Content is not null)

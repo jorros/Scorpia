@@ -93,6 +93,11 @@ public class Window : UIElement
 
             _tempActionList = null;
         }
+        
+        if (!Show)
+        {
+            return;
+        }
 
         var position = stylesheet.Scale(pos);
         var rect = new Rectangle(position.X, position.Y, stylesheet.Scale(Width), stylesheet.Scale(Height - style.ActionBarHeight));

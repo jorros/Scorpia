@@ -9,7 +9,7 @@ public struct RemoteCallPacket : INetworkPacket
     public string Scene { get; set; }
     public ulong NodeId { get; set; }
     public int Method { get; set; }
-    public INetworkPacket Arguments { get; set; }
+    public object Arguments { get; set; }
     
     public void Write(Stream stream, PacketManager packetManager)
     {

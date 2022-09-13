@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 using Scorpia.Engine.Network.Packets;
 
 namespace Scorpia.Engine.Network;
@@ -162,10 +163,10 @@ public static class StreamExtensions
     //     }
     // }
     
-    public static MemoryStream ReadIntoBuffer(this NetworkStream stream)
+    public static async Task<MemoryStream> ReadIntoBuffer(this NetworkStream stream)
     {
-        Span<byte> buffer = stackalloc byte[256];
-        var length = stream.Read(buffer);
-        return new MemoryStream(buffer.ToArray(), 0, length);
+        var buffer = new byte[256];
+        var length = await stream.ReadAsync(buffer);
+        return new MemoryStream(buffer, 0, length);
     }
 }

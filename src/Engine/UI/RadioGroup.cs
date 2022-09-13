@@ -34,9 +34,14 @@ public class RadioGroup : UIElement
         return _radioButtons.FirstOrDefault(x => x.IsSelected);
     }
 
-    public string GetValue()
+    public RadioButton GetButton(object value)
     {
-        return GetSelected().Value;
+        return _radioButtons.FirstOrDefault(x => x.Value == value);
+    }
+
+    public object? GetValue()
+    {
+        return GetSelected()?.Value;
     }
     
     public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)

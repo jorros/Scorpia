@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Scorpia.Engine.Network;
 using Scorpia.Engine.Network.Packets;
@@ -19,66 +18,17 @@ public class NetworkedSceneManager : DefaultSceneManager
         _serviceProvider = serviceProvider;
         _networkManager = networkManager;
         _logger = logger;
-        _networkManager.OnPacketReceive += NetworkManagerOnOnPacketReceive;
+        _networkManager.OnPacketReceive += OnPacketReceive;
     }
 
-    private void NetworkManagerOnOnPacketReceive(object sender, PacketReceivedEventArgs e)
+    private void OnPacketReceive(object sender, DataReceivedEventArgs e)
     {
-        switch (e.Packet)
+        switch (e.Data)
         {
             case SwitchScenePacket switchScenePacket:
                 SwitchInternally(switchScenePacket.Name);
                 break;
-            case CreateNodePacket createNodePacket:
-            {
-                var scene = GetScene(createNodePacket.Scene);
-                scene.SpawnNode(createNodePacket.Node, createNodePacket.NetworkId);
-                break;
-            }
-            case RemoteCallPacket remoteCallPacket:
-            {
-                if (remoteCallPacket.NodeId == 0)
-                {
-                    var scene = GetScene(remoteCallPacket.Scene);
-                    var method = _networkManager.IsClient
-                        ? scene.ClientRpcs[remoteCallPacket.Method]
-                        : scene.ServerRpcs[remoteCallPacket.Method];
-
-                    var onlySenderId = method.GetParameters().FirstOrDefault()?.ParameterType == typeof(ushort);
-
-                    var args = method.GetParameters().Length switch
-                    {
-                        0 => null,
-                        1 => onlySenderId ? new object[] {e.SenderId} : new object[] {remoteCallPacket.Arguments},
-                        2 => new object[] {remoteCallPacket.Arguments, e.SenderId}
-                    };
-
-                    // var args = method.GetParameters().Length == 1 ? new object[] {remoteCallPacket.Arguments} : null;
-                    method.Invoke(scene, args);
-                }
-
-                break;
-            }
         }
-    }
-
-    internal void InvokeRpc<T>(NetworkedScene scene, NetworkedNode node, int method, T args, ushort clientId = 0)
-        where T : INetworkPacket
-    {
-        ulong nodeId = 0;
-
-        if (node is not null)
-        {
-            nodeId = scene.Nodes.First(x => x.Value == node).Key;
-        }
-
-        _networkManager.Send(new RemoteCallPacket
-        {
-            Arguments = args,
-            Method = method,
-            Scene = scene.GetType().Name,
-            NodeId = nodeId
-        }, clientId);
     }
 
     public override void Load<T>()
@@ -97,6 +47,8 @@ public class NetworkedSceneManager : DefaultSceneManager
 
             return;
         }
+        
+        _logger.LogInformation("Force all clients to switch scene to {Scene}", scene);
 
         _networkManager.Send(new SwitchScenePacket
         {
@@ -112,12 +64,9 @@ public class NetworkedSceneManager : DefaultSceneManager
         {
             return;
         }
+        
+        _logger.LogInformation("Server switches scene to {Scene}", scene);
 
         base.Switch(scene);
-    }
-
-    private NetworkedScene GetScene(string name)
-    {
-        return loadedScenes[name] as NetworkedScene;
     }
 }

@@ -58,7 +58,7 @@ public class UserDataManager
     {
         if (!_data.ContainsKey(key))
         {
-            return @default;
+            Set(key, @default);
         }
 
         return (T) Convert.ChangeType(_data[key], typeof(T));

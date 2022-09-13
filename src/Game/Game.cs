@@ -3,7 +3,7 @@ using Scorpia.Engine;
 using Scorpia.Engine.Network.Packets;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Nodes;
-using Scorpia.Game.Packets;
+using Scorpia.Game.Player;
 using Scorpia.Game.Scenes;
 
 namespace Scorpia.Game;
@@ -13,6 +13,9 @@ public class Game : Engine.Engine
     protected override void Init(IServiceCollection services, List<Type> networkedNodes)
     {
         services.AddScene<MainMenuScene>();
+
+        services.AddSingleton<GameState>();
+        services.AddSingleton<PlayerManager>();
         
         networkedNodes.Add(typeof(TestNode));
         AddNetworkPacketsFrom(GetType().Assembly);
@@ -22,7 +25,9 @@ public class Game : Engine.Engine
 
     private static LoginResponsePacket Auth(string authString, IServiceProvider sp)
     {
-        if (authString == "123")
+        var playerManager = sp.GetRequiredService<PlayerManager>();
+
+        if (playerManager.HasAccess(authString))
         {
             return new LoginResponsePacket
             {
@@ -33,7 +38,7 @@ public class Game : Engine.Engine
         return new LoginResponsePacket
         {
             Succeeded = false,
-            Reason = "RUNNING"
+            Reason = "match in progress"
         };
     }
 

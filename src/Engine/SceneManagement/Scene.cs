@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 
@@ -10,8 +11,10 @@ namespace Scorpia.Engine.SceneManagement;
 public abstract class Scene : IDisposable
 {
     protected IServiceProvider ServiceProvider { get; private set; }
-    protected SceneManager SceneManager { get; private set; }
+    public SceneManager SceneManager { get; private set; }
+    public UserDataManager UserDataManager { get; private set; }
     public Dictionary<ulong, Node> Nodes { get; } = new();
+    public ILogger Logger { get; private set; }
 
     private ulong _nodeIdCounter;
 
@@ -91,8 +94,16 @@ public abstract class Scene : IDisposable
     {
         ServiceProvider = serviceProvider;
         SceneManager = serviceProvider.GetRequiredService<SceneManager>();
+        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+        Logger = loggerFactory.CreateLogger(GetType());
+        UserDataManager = serviceProvider.GetRequiredService<UserDataManager>();
 
-        OnLoad(serviceProvider.GetService<AssetManager>());
+        var assetManager = serviceProvider.GetService<AssetManager>();
+
+        if (assetManager is not null)
+        {
+            OnLoad(assetManager);
+        }
     }
 
     protected abstract void OnLoad(AssetManager assetManager);
@@ -117,7 +128,7 @@ public abstract class Scene : IDisposable
     {
         foreach (var node in Nodes.Values)
         {
-            node.OnCleanUp();
+            node.Dispose();
         }
 
         Nodes.Clear();

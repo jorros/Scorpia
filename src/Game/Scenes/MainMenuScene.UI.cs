@@ -2,6 +2,8 @@ using System.Drawing;
 using Scorpia.Engine;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.UI;
+using Scorpia.Game.Lobby;
+using Scorpia.Game.Player;
 
 namespace Scorpia.Game.Scenes;
 
@@ -9,15 +11,22 @@ public partial class MainMenuScene
 {
     private BasicLayout? _layout;
     private Label? _fpsLabel;
-    private TextInput? _nameInput;
-    private RadioGroup? _colourGroup;
+    public TextInput? _nameInput;
+    public RadioGroup? _colourGroup;
     private Button? _quitButton;
     private Button? _joinButton;
     private Button? _settingsButton;
     private Label? _serverStatus;
+    private HorizontalDivider _divider;
+    private Label _colorLabel;
+    private HorizontalGridLayout _playerList;
+
+    private AssetManager _assetManager;
 
     private void SetupUI(AssetManager assetManager)
     {
+        _assetManager = assetManager;
+        
         _layout = new BasicLayout(ScorpiaStyle.Stylesheet)
         {
             Background = assetManager.Get<Sprite>("UI:background")
@@ -72,18 +81,18 @@ public partial class MainMenuScene
         };
         window.Attach(_serverStatus);
         
-        var colourLabel = new Label
+        _colorLabel = new Label
         {
             Position = new OffsetVector(0, 140),
             Type = "Form",
             Text = "Your colour:"
         };
-        window.Attach(colourLabel);
-        
+        window.Attach(_colorLabel);
+
         _colourGroup = new RadioGroup();
         window.Attach(_colourGroup);
-
-        var colours = new[] {"blue", "red", "brown", "green", "grey", "orange", "purple", "yellow"};
+        
+        var colours = Enum.GetValues<PlayerColor>();
 
         for (var i = 0; i < colours.Length; i++)
         {
@@ -95,7 +104,7 @@ public partial class MainMenuScene
                 Position = new OffsetVector(-20 + 240 * i, 180),
                 Content = new Image
                 {
-                    Sprite = assetManager.Get<Sprite>($"UI:player_icon_{colour}"),
+                    Sprite = assetManager.Get<Sprite>($"UI:player_icon_{colour.ToString().ToLower()}"),
                     Width = 150,
                     Height = 150,
                     Anchor = UIAnchor.Center
@@ -104,12 +113,23 @@ public partial class MainMenuScene
             _colourGroup.Attach(radioButton);
         }
 
-        var divider = new HorizontalDivider
+        _divider = new HorizontalDivider
         {
             Position = new OffsetVector(0, 450),
-            Width = 1900
+            Width = 1900,
+            Show = false
         };
-        window.Attach(divider);
+        window.Attach(_divider);
+
+        _playerList = new HorizontalGridLayout
+        {
+            Position = new OffsetVector(0, 500),
+            MinWidth = 1900,
+            SpaceBetween = 80,
+            Margin = new OffsetVector(20, 20)
+        };
+        _playerList.SetHeight(400);
+        window.Attach(_playerList);
 
         _quitButton = new Button
         {

@@ -11,6 +11,6 @@ public class TestAction : IAction
         var sceneManager = serviceProvider.GetRequiredService<SceneManager>();
         var scene = sceneManager.GetCurrentScene() as NetworkedScene;
         
-        scene?.Invoke("Abc");
+        scene?.Invoke("PlayerJoinedClientRpc", 1);
     }
 }

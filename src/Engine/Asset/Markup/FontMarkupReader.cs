@@ -9,7 +9,7 @@ namespace Scorpia.Engine.Asset.Markup;
 
 internal class FontMarkupReader
 {
-    private readonly Cache<string, IReadOnlyList<IBlock>> _cache = new();
+    private readonly Cache<(string, TextBlock), IReadOnlyList<IBlock>> _cache = new();
 
     private static readonly XmlReaderSettings Settings = new()
     {
@@ -69,7 +69,7 @@ internal class FontMarkupReader
             }).ToArray();
         }
 
-        return _cache.Get(content, CalculateTextBlocks);
+        return _cache.Get((content, @default), CalculateTextBlocks);
     }
 
     private static void Process(string type, string attribute, string value, TextBlock textBlock)

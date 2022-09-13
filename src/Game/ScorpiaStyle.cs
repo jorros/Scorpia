@@ -31,6 +31,12 @@ public static class ScorpiaStyle
         formLabel.Outline = 1;
         formLabel.OutlineColor = Color.Black;
         
+        var playerPreview = Stylesheet.CreateLabelStyle("PlayerPreview", "UI:MYRIADPRO-BOLD");
+        playerPreview.Size = 50;
+        playerPreview.Color = Color.FromArgb(154, 132, 108);
+        playerPreview.Outline = 1;
+        playerPreview.OutlineColor = Color.Black;
+        
         var serverStatus = Stylesheet.CreateLabelStyle("Header", "UI:MYRIADPRO-BOLD");
         serverStatus.Size = 54;
         serverStatus.Color = Color.FromArgb(107, 95, 82);

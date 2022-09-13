@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.UI.Style;
@@ -8,7 +10,7 @@ namespace Scorpia.Engine.UI;
 
 public class BasicLayout : UIElement
 {
-    private readonly Stylesheet _stylesheet;
+    private Stylesheet _stylesheet;
     
     protected List<UIElement> Elements { get; } = new();
     
@@ -18,11 +20,24 @@ public class BasicLayout : UIElement
     {
         _stylesheet = stylesheet;
     }
+
+    public BasicLayout()
+    {
+    }
     
     public void Attach(UIElement element)
     {
         element.Parent = this;
         Elements.Add(element);
+    }
+
+    public void Remove(Func<UIElement, bool> predicate)
+    {
+        var element = Elements.FirstOrDefault(predicate);
+        if (element is not null)
+        {
+            Elements.Remove(element);
+        }
     }
 
     public void SetSize(int width, int height)
@@ -40,7 +55,7 @@ public class BasicLayout : UIElement
             Height = renderSize.Y;
         }
 
-        if (Background is not null)
+        if (Background is not null && Show)
         {
             var position = GetPosition();
             var backgroundRect = new Rectangle(position.X + Width / 2, position.Y + Height / 2, Background.Size.X, Background.Size.Y);

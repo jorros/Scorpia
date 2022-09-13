@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -23,6 +24,15 @@ public class HorizontalGridLayout : UIElement
         Elements.Add(element);
     }
     
+    public void Remove(Func<UIElement, bool> predicate)
+    {
+        var element = Elements.FirstOrDefault(predicate);
+        if (element is not null)
+        {
+            Elements.Remove(element);
+        }
+    }
+    
     public void SetHeight(int height)
     {
         Height = height;
@@ -34,8 +44,8 @@ public class HorizontalGridLayout : UIElement
 
         Width = Padding.X + Padding.Width + Elements.Sum(element => element.Width);
         Width = Width > MinWidth ? Width : MinWidth;
-
-        if (Background is not null)
+        
+        if (Background is not null && Show)
         {
             var scaledPos = stylesheet.Scale(GetPosition()) + stylesheet.Scale(Margin);
             var rect = new Rectangle(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), scaledHeight);
@@ -47,6 +57,7 @@ public class HorizontalGridLayout : UIElement
         foreach (var element in Elements)
         {
             element.Position = currentPos;
+
             element.Render(renderContext, stylesheet, inWorld);
 
             currentPos += new OffsetVector(SpaceBetween + element.Width, 0);

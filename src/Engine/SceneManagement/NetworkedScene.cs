@@ -12,13 +12,13 @@ namespace Scorpia.Engine.SceneManagement;
 public abstract class NetworkedScene : Scene
 {
     public NetworkManager NetworkManager { get; private set; }
-    private EngineSettings Settings { get; set; }
+    public EngineSettings Settings { get; set; }
 
-    private readonly Dictionary<uint, Node> _nodes = new();
-    private uint _lastNetworkId;
+    private readonly Dictionary<uint, Node> _networkedNodes = new();
+    private uint _lastNetworkId = 1;
 
-    internal IDictionary<int, MethodBase> ClientRpcs { get; private set; }
-    internal IDictionary<int, MethodBase> ServerRpcs { get; private set; }
+    private IDictionary<int, MethodBase> ClientRpcs { get; set; }
+    private IDictionary<int, MethodBase> ServerRpcs { get; set; }
 
     protected NetworkedNode SpawnNode<T>() where T : NetworkedNode
     {
@@ -37,14 +37,32 @@ public abstract class NetworkedScene : Scene
             NetworkId = _lastNetworkId
         });
 
-        _nodes.Add(_lastNetworkId, node);
+        _networkedNodes.Add(_lastNetworkId, node);
 
         _lastNetworkId++;
 
         return node;
     }
 
-    internal void SpawnNode(string name, uint id)
+    public void SyncNodes()
+    {
+        if (NetworkManager.IsServer)
+        {
+            return;
+        }
+
+        foreach (var node in _networkedNodes.Where(node => node.Value is NetworkedNode))
+        {
+            _networkedNodes.Remove(node.Key);
+        }
+
+        NetworkManager.Send(new SyncSceneRequest
+        {
+            Scene = GetType().Name
+        });
+    }
+
+    private void SpawnNode(string name, uint id)
     {
         foreach (var node in from nodeType in Settings.NetworkedNodes
                  where nodeType.Name == name
@@ -52,9 +70,75 @@ public abstract class NetworkedScene : Scene
         {
             node?.Create(id);
 
-            _nodes.Add(id, node);
+            _networkedNodes.Add(id, node);
             break;
         }
+    }
+
+    private void OnPacketReceive(object sender, DataReceivedEventArgs e)
+    {
+        switch (e.Data)
+        {
+            case CreateNodePacket createNodePacket:
+            {
+                if (createNodePacket.Scene != GetType().Name)
+                {
+                    break;
+                }
+                
+                SpawnNode(createNodePacket.Node, createNodePacket.NetworkId);
+                break;
+            }
+            case RemoteCallPacket remoteCallPacket:
+            {
+                if (remoteCallPacket.NodeId != 0 || remoteCallPacket.Scene != GetType().Name)
+                {
+                    break;
+                }
+                
+                var method = NetworkManager.IsClient
+                    ? ClientRpcs[remoteCallPacket.Method]
+                    : ServerRpcs[remoteCallPacket.Method];
+
+                var onlySenderInfo = method.GetParameters().FirstOrDefault()?.ParameterType == typeof(SenderInfo);
+
+                var args = method.GetParameters().Length switch
+                {
+                    0 => null,
+                    1 => onlySenderInfo
+                        ? new object[] {new SenderInfo(e.SenderId)}
+                        : new[] {remoteCallPacket.Arguments},
+                    2 => new[] {remoteCallPacket.Arguments, new SenderInfo(e.SenderId)}
+                };
+
+                method.Invoke(this, args);
+                break;
+            }
+            case SyncSceneRequest syncSceneRequest:
+            {
+                if (syncSceneRequest.Scene != GetType().Name || NetworkManager.IsClient)
+                {
+                    break;
+                }
+
+                foreach (var node in _networkedNodes)
+                {
+                    NetworkManager.Send(new CreateNodePacket
+                    {
+                        NetworkId = node.Key,
+                        Node = node.Value.GetType().Name,
+                        Scene = GetType().Name
+                    });
+                }
+
+                break;
+            }
+        }
+    }
+    
+    private void OnUserConnect(object sender, UserConnectedEventArgs e)
+    {
+        SyncNodes();
     }
 
     internal new void Load(IServiceProvider serviceProvider)
@@ -62,42 +146,46 @@ public abstract class NetworkedScene : Scene
         NetworkManager = serviceProvider.GetRequiredService<NetworkManager>();
         Settings = serviceProvider.GetRequiredService<EngineSettings>();
 
-        ClientRpcs = new Dictionary<int, MethodBase>();
-        foreach (var method in GetType().GetRuntimeMethods().Where(x => Attribute.IsDefined(x, typeof(ClientRpcAttribute))))
-        {
-            if (method.GetParameters().Length > 1)
-            {
-                throw new EngineException($"Malformed RPC method: {method.Name} on {GetType().Name}");
-            }
-            
-            ClientRpcs.Add(method.Name.GetDeterministicHashCode(), method);
-        }
-        
-        ServerRpcs = new Dictionary<int, MethodBase>();
-        foreach (var method in GetType().GetRuntimeMethods().Where(x => Attribute.IsDefined(x, typeof(ServerRpcAttribute))))
-        {
-            if (method.GetParameters().Length > 2)
-            {
-                throw new EngineException($"Malformed RPC method: {method.Name} on {GetType().Name}");
-            }
-            
-            ServerRpcs.Add(method.Name.GetDeterministicHashCode(), method);
-        }
+        ClientRpcs = GetType().GetClientRpcs();
+        ServerRpcs = GetType().GetServerRpcs();
+
+        NetworkManager.OnPacketReceive += OnPacketReceive;
+        NetworkManager.OnUserConnect += OnUserConnect;
 
         base.Load(serviceProvider);
+
+        if (NetworkManager.IsServer)
+        {
+            ServerOnLoad();
+        }
     }
 
-    public void Invoke<T>(string name, T args, ushort clientId = 0) where T : INetworkPacket
+    protected virtual void ServerOnLoad()
     {
-        var networkedMgr = (NetworkedSceneManager) SceneManager;
-        
-        networkedMgr.InvokeRpc(this, null, name.GetDeterministicHashCode(), args, clientId);
+    }
+
+    public void Invoke<T>(string name, T args, ushort clientId = 0)
+    {
+        NetworkManager.Send(new RemoteCallPacket
+        {
+            Arguments = args,
+            Method = name.GetDeterministicHashCode(),
+            Scene = GetType().Name,
+            NodeId = 0
+        }, clientId);
     }
 
     public void Invoke(string name, ushort clientId = 0)
     {
-        var networkedMgr = (NetworkedSceneManager) SceneManager;
+        Invoke<object>(name, null, clientId);
+    }
+    
+    public new void Dispose()
+    {
+        NetworkManager.OnPacketReceive -= OnPacketReceive;
+        NetworkManager.OnUserConnect -= OnUserConnect;
+        _networkedNodes.Clear();
         
-        networkedMgr.InvokeRpc(this, null, name.GetDeterministicHashCode(), (INetworkPacket)null, clientId);
+        base.Dispose();
     }
 }

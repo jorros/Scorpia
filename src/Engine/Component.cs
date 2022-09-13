@@ -6,7 +6,7 @@ using Scorpia.Engine.SceneManagement;
 
 namespace Scorpia.Engine;
 
-public abstract class Component
+public abstract class Component : IDisposable
 {
     protected IServiceProvider ServiceProvider { get; private set; }
     protected AssetManager AssetManager => ServiceProvider.GetService<AssetManager>();
@@ -39,5 +39,10 @@ public abstract class Component
     {
         ServiceProvider = serviceProvider;
         Parent = parent;
+    }
+
+    public void Dispose()
+    {
+        OnCleanUp();
     }
 }

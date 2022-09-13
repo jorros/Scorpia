@@ -21,8 +21,13 @@ public class Button : UIElement
 
     public Button()
     {
-        Input.OnMouseButton += (sender, args) =>
+        Input.OnMouseButton += (_, args) =>
         {
+            if (!Show || !Enabled)
+            {
+                return;
+            }
+
             if (args.Type == MouseEventType.ButtonUp)
             {
                 _isPressed = false;
@@ -81,17 +86,27 @@ public class Button : UIElement
 
         _bounds = new Rectangle(stylesheet.Scale(position.X), stylesheet.Scale(position.Y), stylesheet.Scale(Width),
             stylesheet.Scale(Height));
+        
+        if (!Show)
+        {
+            return;
+        }
 
         var tint = Color.White;
 
-        if (style.HoveredTint is not null && IsInButton(Input.MousePosition))
+        if (style.HoveredTint is not null && Enabled != false && IsInButton(Input.MousePosition))
         {
             tint = style.HoveredTint.Value;
         }
 
-        if (style.PressedTint is not null && _isPressed)
+        if (style.PressedTint is not null && Enabled != false && _isPressed)
         {
             tint = style.PressedTint.Value;
+        }
+
+        if (!Enabled)
+        {
+            tint = Color.DarkGray;
         }
 
         renderContext.Viewport.Draw(style.Button, _bounds.Value, 0, tint, 255, inWorld);

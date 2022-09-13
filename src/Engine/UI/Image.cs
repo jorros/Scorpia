@@ -51,6 +51,11 @@ public class Image : UIElement
 
     public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
+        if (!Show)
+        {
+            return;
+        }
+        
         var position = stylesheet.Scale(GetPosition());
         var bounds = new Rectangle(position.X, position.Y, stylesheet.Scale(base.Width), stylesheet.Scale(base.Height));
 

@@ -35,6 +35,16 @@ public class TextInput : UIElement
 
     private void InputOnOnMouseButton(object sender, MouseButtonEventArgs e)
     {
+        if (Show == false)
+        {
+            return;
+        }
+        
+        if (Enabled == false)
+        {
+            return;
+        }
+        
         if (e.Button != MouseButton.Left)
         {
             _focus = false;
@@ -45,6 +55,7 @@ public class TextInput : UIElement
         if (_bounds.Contains(point))
         {
             _focus = true;
+            _caret = Text.Length;
             return;
         }
 
@@ -93,6 +104,11 @@ public class TextInput : UIElement
 
     private void InputOnOnKeyboard(object sender, KeyboardEventArgs e)
     {
+        if (!Show || !Enabled)
+        {
+            return;
+        }
+        
         if (!_focus)
         {
             return;
@@ -171,11 +187,23 @@ public class TextInput : UIElement
         {
             Height = style.Height;
         }
+        
+        if (!Show)
+        {
+            return;
+        }
 
         var position = stylesheet.Scale(GetPosition());
         _bounds = new Rectangle(position.X, position.Y, stylesheet.Scale(Width), stylesheet.Scale(Height));
 
-        renderContext.Viewport.Draw(style.Background, _bounds, 0, Color.White, 255, inWorld);
+        var tint = Color.White;
+
+        if (!Enabled)
+        {
+            tint = Color.DarkGray;
+        }
+
+        renderContext.Viewport.Draw(style.Background, _bounds, 0, tint, 255, inWorld);
 
         var padding = stylesheet.Scale(style.Padding);
         var textSettings = style.Text.ToFontSettings();
@@ -202,7 +230,7 @@ public class TextInput : UIElement
         
         renderContext.Viewport.SetClipping(null);
         
-        if (_focus)
+        if (_focus && Enabled != false)
         {
             renderContext.Viewport.DrawLine(new OffsetVector(startPos.X + textWidth + textCorrection, startPos.Y),
                 new OffsetVector(startPos.X + textWidth + textCorrection, startPos.Y + textHeight), style.Text.Color);

@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.HighPerformance;
 using Microsoft.Extensions.Logging;
@@ -25,12 +23,14 @@ public class NetworkManager
 
     private ushort _clientCounter = 1;
 
-    public event EventHandler<PacketReceivedEventArgs> OnPacketReceive;
+    public event EventHandler<DataReceivedEventArgs> OnPacketReceive;
     public event EventHandler<UserConnectedEventArgs> OnUserConnect;
     public event EventHandler<UserDisconnectedEventArgs> OnUserDisconnect;
     public event EventHandler<AuthenticationFailedEventArgs> OnAuthenticationFail;
 
     public bool IsConnected { get; private set; }
+
+    public ushort ClientId { get; private set; }
 
     public NetworkManager(EngineSettings settings, ILogger<NetworkManager> logger, PacketManager packetManager,
         IServiceProvider serviceProvider)
@@ -73,7 +73,7 @@ public class NetworkManager
         _client = new TcpClient();
     }
 
-    private void RunServer()
+    private async Task RunServer()
     {
         try
         {
@@ -84,58 +84,59 @@ public class NetworkManager
 
             while (_listener is not null)
             {
-                var client = _listener.AcceptTcpClient();
+                var client = await _listener.AcceptTcpClientAsync();
                 _logger.LogDebug("Incoming connection");
 
-                if (_settings.Authentication is not null)
+                var stream = client.GetStream();
+                _logger.LogDebug("Receive authentication");
+
+                var clientId = _clientCounter;
+
+                try
                 {
-                    _logger.LogDebug("Receive authentication");
-                    
-                    var stream = client.GetStream();
+                    using var buffer = new NetworkBuffer(stream, 2000);
+                    await buffer.Read();
 
-                    try
+                    var loginRequest = new LoginRequestPacket();
+                    loginRequest.Read(buffer.Stream, _packetManager);
+
+                    buffer.Flush();
+
+                    var response = _settings.Authentication(loginRequest.Auth, _serviceProvider);
+                    response.ClientId = clientId;
+                    response.Write(buffer.Stream, _packetManager);
+
+                    buffer.Write();
+
+                    if (!response.Succeeded)
                     {
-                        stream.ReadTimeout = 2000;
-
-                        var buffer = stream.ReadIntoBuffer();
-
-                        stream.ReadTimeout = Timeout.Infinite;
-
-                        var authString = buffer.ReadString();
-
-                        var response = _settings.Authentication(authString, _serviceProvider);
-
-                        response.Write(stream, _packetManager);
-
-                        if (!response.Succeeded)
-                        {
-                            _logger.LogDebug("Failed authentication: {Reason}", response.Reason);
-                            client.Close();
-                            continue;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogDebug("Failed authentication: {Reason}", e.Message);
-                        
-                        var responsePacket = new LoginResponsePacket
-                        {
-                            Reason = "NO_AUTH",
-                            Succeeded = false
-                        };
-                        responsePacket.Write(stream, _packetManager);
-
+                        _logger.LogDebug("Failed authentication: {Reason}", response.Reason);
                         client.Close();
                         continue;
                     }
                 }
+                catch (Exception e)
+                {
+                    _logger.LogDebug("Failed authentication: {Reason}", e.Message);
 
-                var clientId = _clientCounter;
+                    var responsePacket = new LoginResponsePacket
+                    {
+                        Reason = "NO_AUTH",
+                        Succeeded = false
+                    };
+                    responsePacket.Write(stream, _packetManager);
+
+                    client.Close();
+                    continue;
+                }
+
                 _clientCounter++;
 
                 var endpoint = client.Client.RemoteEndPoint as IPEndPoint;
                 _logger.LogInformation("[{ClientId}] New client connected from {IpAddress}", clientId,
                     endpoint?.Address);
+
+                stream.Write(clientId);
 
                 OnUserConnect?.Invoke(this, new UserConnectedEventArgs
                 {
@@ -143,7 +144,7 @@ public class NetworkManager
                 });
 
                 _connectedClients.Add(clientId, client);
-                Task.Run(() => ReceiveData(client, clientId));
+                Task.Run(async () => await ReceiveData(client, clientId));
             }
         }
         catch (Exception e)
@@ -153,58 +154,44 @@ public class NetworkManager
         }
     }
 
-    private void ReceiveData(TcpClient client, ushort clientId)
+    private async Task ReceiveData(TcpClient client, ushort clientId)
     {
-        var stream = client.GetStream();
-        using var buffer = new MemoryStream();
-        short bufferSize = 0;
-        Span<byte> networkBuffer = stackalloc byte[255];
+        using var buffer = new NetworkBuffer(client.GetStream());
 
         while (client.Connected)
         {
-            if (!stream.DataAvailable)
+            try
             {
-                continue;
-            }
+                await buffer.Read();
 
-            if (buffer.Length == 0)
-            {
-                bufferSize = stream.Read<byte>();
-            }
-
-            networkBuffer.Clear();
-            var data = stream.Read(networkBuffer);
-            buffer.Write(networkBuffer[..data]);
-
-            if (buffer.Length == bufferSize)
-            {
-                buffer.Seek(0, SeekOrigin.Begin);
                 _logger.LogDebug("[{ClientId}] Receiving data from remote endpoint", clientId);
 
-                var packet = _packetManager.Read(buffer);
+                var packet = _packetManager.Read(buffer.Stream);
 
-                buffer.SetLength(0);
+                buffer.Flush();
 
-                OnPacketReceive?.Invoke(this, new PacketReceivedEventArgs
+                OnPacketReceive?.Invoke(clientId, new DataReceivedEventArgs
                 {
-                    Packet = packet,
+                    Data = packet,
                     SenderId = clientId
                 });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Exception occured during data retrieval: {Error}", e.Message);
+                throw;
             }
         }
     }
 
-    public void Send<T>(T packet, ushort client = 0) where T : INetworkPacket
+    public void Send<T>(T packet, ushort client = 0)
     {
-        using var buffer = new MemoryStream();
-        _packetManager.Write(packet, buffer);
-
-        NetworkStream stream;
+        using var buffer = new NetworkBuffer(null);
+        _packetManager.Write(packet, buffer.Stream);
 
         if (IsClient)
         {
-            stream = _client.GetStream();
-            WriteToStream(stream);
+            buffer.WriteTo(_client.GetStream());
 
             return;
         }
@@ -214,24 +201,16 @@ public class NetworkManager
             foreach (var clientStream in _connectedClients.Keys.Select(clientId =>
                          _connectedClients[clientId].GetStream()))
             {
-                WriteToStream(clientStream);
+                buffer.WriteTo(clientStream);
             }
 
             return;
         }
 
-        stream = _connectedClients[client].GetStream();
-        WriteToStream(stream);
-
-        void WriteToStream(Stream networkStream)
-        {
-            networkStream.Write((byte) buffer.Length);
-            buffer.Seek(0, SeekOrigin.Begin);
-            buffer.WriteTo(networkStream);
-        }
+        buffer.WriteTo(_connectedClients[client].GetStream());
     }
 
-    public void Connect(string hostname, int port, string loginRequest = null)
+    public void Connect(string hostname, int port, string authString = null)
     {
         if (_client is null)
         {
@@ -248,31 +227,36 @@ public class NetworkManager
                 return;
             }
 
-            if (loginRequest is not null)
+            using var buffer = new NetworkBuffer(_client.GetStream());
+            var loginRequest = new LoginRequestPacket
             {
-                var stream = _client.GetStream();
-                
-                stream.Write(loginRequest);
+                Auth = authString
+            };
+            loginRequest.Write(buffer.Stream, _packetManager);
+            buffer.Write();
 
-                var buffer = stream.ReadIntoBuffer();
+            buffer.Flush();
 
-                var response = new LoginResponsePacket();
-                response.Read(buffer, _packetManager);
+            buffer.Read().Wait();
 
-                if (!response.Succeeded)
+            var response = new LoginResponsePacket();
+            response.Read(buffer.Stream, _packetManager);
+
+            if (!response.Succeeded)
+            {
+                _client.Close();
+                _client = new TcpClient();
+
+                OnAuthenticationFail?.Invoke(this, new AuthenticationFailedEventArgs
                 {
-                    _client.Close();
-                    _client = new TcpClient();
-                    
-                    OnAuthenticationFail?.Invoke(this, new AuthenticationFailedEventArgs
-                    {
-                        Reason = response.Reason
-                    });
-                    return;
-                }
+                    Reason = response.Reason
+                });
+                return;
             }
 
-            OnUserConnect?.Invoke(this, new UserConnectedEventArgs());
+            ClientId = response.ClientId;
+
+            OnUserConnect?.Invoke(this, new UserConnectedEventArgs {ClientId = ClientId});
             Task.Run(() => ReceiveData(_client, 0));
         }
         catch (SocketException e)
