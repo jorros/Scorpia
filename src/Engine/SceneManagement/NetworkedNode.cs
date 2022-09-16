@@ -4,6 +4,7 @@ using System.Reflection;
 using Scorpia.Engine.Helper;
 using Scorpia.Engine.Network;
 using Scorpia.Engine.Network.Packets;
+using Scorpia.Engine.Network.Protocol;
 
 namespace Scorpia.Engine.SceneManagement;
 
@@ -14,6 +15,8 @@ public abstract class NetworkedNode : Node
     
     private IDictionary<int, MethodBase> ClientRpcs { get; set; }
     private IDictionary<int, MethodBase> ServerRpcs { get; set; }
+    private IDictionary<int, FieldInfo> NetworkedVars { get; set; }
+    private IDictionary<int, FieldInfo> NetworkedLists { get; set; }
     
     internal void Create(uint networkId)
     {
@@ -21,6 +24,8 @@ public abstract class NetworkedNode : Node
         
         ClientRpcs = GetType().GetClientRpcs();
         ServerRpcs = GetType().GetServerRpcs();
+        NetworkedVars = GetType().GetNetworkedFields();
+        NetworkedLists = GetType().GetNetworkedLists();
         
         NetworkManager.OnPacketReceive += OnPacketReceive;
     }
@@ -54,6 +59,34 @@ public abstract class NetworkedNode : Node
                 method.Invoke(this, args);
                 break;
             }
+            case SyncVarPacket syncVarPacket:
+            {
+                if (syncVarPacket.NodeId != NetworkId || syncVarPacket.Scene != Scene.GetType().Name)
+                {
+                    break;
+                }
+
+                var field = NetworkedVars[syncVarPacket.Field];
+                dynamic netVar = field.GetValue(this);
+                netVar.Accept(syncVarPacket.Value);
+
+                break;
+            }
+            case SyncListPacket syncListPacket:
+            {
+                if (syncListPacket.NodeId != NetworkId || syncListPacket.Scene != Scene.GetType().Name)
+                {
+                    break;
+                }
+                
+                var field = NetworkedLists[syncListPacket.Field];
+                dynamic netList = field.GetValue(this);
+
+                netList.Commit(syncListPacket);
+                netList.packets.Clear();
+
+                break;
+            }
         }
     }
 
@@ -68,12 +101,62 @@ public abstract class NetworkedNode : Node
         }, clientId);
     }
 
+    internal override void Update()
+    {
+        if (NetworkManager.IsClient)
+        {
+            base.Update();
+
+            return;
+        }
+
+        foreach (var netVar in NetworkedVars)
+        {
+            dynamic field = netVar.Value.GetValue(this);
+
+            if (field is null || !field.IsDirty)
+            {
+                continue;
+            }
+
+            var change = field.GetProposedVal();
+            field.Accept(change);
+            NetworkManager.Send(new SyncVarPacket
+            {
+                Field = netVar.Key,
+                NodeId = 0,
+                Scene = GetType().Name,
+                Value = change
+            });
+        }
+
+        foreach (var netList in NetworkedLists)
+        {
+            dynamic field = netList.Value.GetValue(this);
+
+            if (field is null)
+            {
+                continue;
+            }
+
+            Queue<SyncListPacket> queue = field.packets;
+            while (queue.Count > 0)
+            {
+                var packet = queue.Dequeue();
+                NetworkManager.Send(packet with {Field = netList.Key, NodeId = 0, Scene = GetType().Name});
+                field.Commit(packet);
+            }
+        }
+
+        base.Update();
+    }
+
     public void Invoke(string name, ushort clientId = 0)
     {
         Invoke<object>(name, null, clientId);
     }
 
-    public new void Dispose()
+    public override void Dispose()
     {
         NetworkManager.OnPacketReceive -= OnPacketReceive;
         

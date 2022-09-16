@@ -69,4 +69,9 @@ public class NetworkedSceneManager : DefaultSceneManager
 
         base.Switch(scene);
     }
+    
+    internal override void Update()
+    {
+        (currentScene as NetworkedScene)?.Update();
+    }
 }

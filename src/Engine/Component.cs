@@ -27,8 +27,18 @@ public abstract class Component : IDisposable
     {
     }
 
+    internal virtual void Update()
+    {
+        OnUpdate();
+    }
+
     public virtual void OnTick()
     {
+    }
+
+    internal virtual void Tick()
+    {
+        OnTick();
     }
     
     public virtual void OnRender(RenderContext context)
@@ -41,7 +51,7 @@ public abstract class Component : IDisposable
         Parent = parent;
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         OnCleanUp();
     }

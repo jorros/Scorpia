@@ -60,7 +60,7 @@ public abstract class Scene : IDisposable
         }
     }
 
-    internal void Update()
+    internal virtual void Update()
     {
         OnUpdate();
 
@@ -68,10 +68,10 @@ public abstract class Scene : IDisposable
         {
             foreach (var component in node.Components)
             {
-                component.OnUpdate();
+                component.Update();
             }
 
-            node.OnUpdate();
+            node.Update();
         }
     }
 
@@ -83,14 +83,14 @@ public abstract class Scene : IDisposable
         {
             foreach (var component in node.Components)
             {
-                component.OnTick();
+                component.Tick();
             }
             
-            node.OnTick();
+            node.Tick();
         }
     }
 
-    internal void Load(IServiceProvider serviceProvider)
+    internal virtual void Load(IServiceProvider serviceProvider)
     {
         ServiceProvider = serviceProvider;
         SceneManager = serviceProvider.GetRequiredService<SceneManager>();
@@ -124,7 +124,7 @@ public abstract class Scene : IDisposable
     {
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         foreach (var node in Nodes.Values)
         {

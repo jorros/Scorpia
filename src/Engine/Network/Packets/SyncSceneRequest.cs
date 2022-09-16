@@ -2,7 +2,7 @@ using System.IO;
 
 namespace Scorpia.Engine.Network.Packets;
 
-public class SyncSceneRequest : INetworkPacket
+public struct SyncSceneRequest : INetworkPacket
 {
     public string Scene { get; set; }
     

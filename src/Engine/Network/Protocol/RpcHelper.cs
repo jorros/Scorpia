@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Scorpia.Engine.Helper;
 
-namespace Scorpia.Engine.Network;
+namespace Scorpia.Engine.Network.Protocol;
 
 internal static class RpcHelper
 {
@@ -21,7 +21,7 @@ internal static class RpcHelper
     private static Dictionary<int, MethodBase> RetrieveRpcs(Type type, Type attribute)
     {
         var rpcs = new Dictionary<int, MethodBase>();
-        
+
         foreach (var method in type.GetRuntimeMethods()
                      .Where(x => Attribute.IsDefined(x, attribute)))
         {

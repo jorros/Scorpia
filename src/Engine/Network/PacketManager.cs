@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CommunityToolkit.HighPerformance;
 using Microsoft.Extensions.Logging;
 using Scorpia.Engine.Helper;
@@ -26,7 +29,8 @@ public class PacketManager
         Float,
         Double,
         Bool,
-        Packet
+        Packet,
+        Array
     };
 
     public PacketManager(EngineSettings settings, ILogger<PacketManager> logger)
@@ -81,6 +85,18 @@ public class PacketManager
                 packet?.Read(stream, this);
 
                 return packet;
+            }
+            case Mapping.Array:
+            {
+                var length = stream.Read<ushort>();
+                var array = new object[length];
+
+                foreach (var i in Enumerable.Range(0, length))
+                {
+                    array[i] = Read(stream);
+                }
+
+                return array;
             }
             default:
                 throw new ArgumentOutOfRangeException();
@@ -147,6 +163,19 @@ public class PacketManager
                 stream.Write(hash);
                 packet.Write(stream, this);
 
+                break;
+            }
+            case IEnumerable<T> enumerable:
+            {
+                var array = enumerable.ToArray();
+                stream.WriteByte((byte) Mapping.Array);
+                stream.Write((ushort) array.Count());
+
+                foreach (var element in array)
+                {
+                    Write(element, stream);
+                }
+                
                 break;
             }
             default:

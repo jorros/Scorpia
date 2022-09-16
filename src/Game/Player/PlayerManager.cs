@@ -6,7 +6,7 @@ public class PlayerManager
 {
     private readonly GameState _gameState;
     private readonly UserDataManager _userDataManager;
-    private readonly Dictionary<ushort, Player> _players = new();
+    private readonly Dictionary<ushort, ServerPlayer> _players = new();
 
     public PlayerManager(GameState gameState, UserDataManager userDataManager)
     {
@@ -26,7 +26,7 @@ public class PlayerManager
             return false;
         }
 
-        _players[networkId] = new Player
+        _players[networkId] = new ServerPlayer
         {
             DeviceId = deviceId,
             Name = name,
@@ -46,7 +46,7 @@ public class PlayerManager
         _players.Remove(networkId);
     }
 
-    public Player? Get(ushort networkId)
+    public ServerPlayer? Get(ushort networkId)
     {
         return !_players.ContainsKey(networkId) ? null : _players[networkId];
     }

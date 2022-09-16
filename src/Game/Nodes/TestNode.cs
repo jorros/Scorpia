@@ -1,5 +1,6 @@
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.Network;
+using Scorpia.Engine.Network.Protocol;
 using Scorpia.Engine.SceneManagement;
 
 namespace Scorpia.Game.Nodes;

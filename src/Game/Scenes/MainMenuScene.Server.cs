@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Scorpia.Engine.Network;
+using Scorpia.Engine.Network.Protocol;
 using Scorpia.Game.Lobby;
 using Scorpia.Game.Nodes;
 using Scorpia.Game.Player;
@@ -15,8 +16,6 @@ public partial class MainMenuScene
         NetworkManager.OnUserConnect += ServerOnUserConnect;
 
         PlayerManager = ServiceProvider.GetRequiredService<PlayerManager>();
-
-        SpawnNode<TestNode>();
     }
 
     private void ServerOnUserDisconnect(object? sender, UserDisconnectedEventArgs e)
@@ -34,7 +33,7 @@ public partial class MainMenuScene
         if (PlayerManager.Add(packet.DeviceId, packet.Name, sender.Id))
         {
             Logger.LogInformation("New player {Name} joined with device id {DeviceId}", packet.Name, packet.DeviceId);
-            Invoke(nameof(PlayerJoinedClientRpc), sender.Id);
+            Invoke(nameof(SetLobbyClientRpc), (byte)LobbyEnum.NotReady);
 
             return;
         }
@@ -47,11 +46,13 @@ public partial class MainMenuScene
     {
         var playerDevice = PlayerManager.Get(sender.Id)?.DeviceId;
 
-        if (playerDevice is not null)
+        if (playerDevice is null)
         {
-            PlayerManager.Remove(sender.Id);
-            Invoke(nameof(LeaveClientRpc), playerDevice);
+            return;
         }
+        
+        PlayerManager.Remove(sender.Id);
+        Invoke(nameof(SetLobbyClientRpc), (byte)LobbyEnum.Outside);
     }
 
     [ServerRpc]
@@ -59,13 +60,16 @@ public partial class MainMenuScene
     {
         var player = PlayerManager.Get(sender.Id);
 
-        if (player == null)
+        if (player is null)
         {
             return;
         }
 
         player.Color = (PlayerColor) color;
-        Invoke(nameof(PlayerReadyClientRpc), player);
+        
+        Players.Add(player);
+        
+        Invoke(nameof(SetLobbyClientRpc), (byte)LobbyEnum.Ready);
     }
 
     [ServerRpc]
@@ -73,12 +77,15 @@ public partial class MainMenuScene
     {
         var player = PlayerManager.Get(sender.Id);
 
-        if (player == null)
+        if (player is null)
         {
             return;
         }
 
         player.Color = null;
-        Invoke(nameof(PlayerNotReadyClientRpc), player);
+
+        Players.Remove(player);
+        
+        Invoke(nameof(SetLobbyClientRpc), (byte)LobbyEnum.NotReady);
     }
 }

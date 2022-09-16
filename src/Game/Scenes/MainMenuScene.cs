@@ -4,6 +4,7 @@ using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.Network;
+using Scorpia.Engine.Network.Protocol;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Lobby;
 using Scorpia.Game.Player;
@@ -16,14 +17,16 @@ public partial class MainMenuScene : NetworkedScene
     private PlayerLobby _currentLobby;
     public PlayerManager PlayerManager { get; private set; }
 
+    private NetworkedList<Player.Player> Players { get; set; } = new();
+
     protected override void OnLoad(AssetManager assetManager)
     {
         PlayerManager = ServiceProvider.GetRequiredService<PlayerManager>();
-        
+
         assetManager.Load("UI");
         ScorpiaStyle.Setup(assetManager);
         SetupUI(assetManager);
-        
+
         _nameInput!.Text = UserDataManager.Get("player_name", string.Empty);
 
         _currentLobby = new OutsidePlayerLobby(this);
@@ -36,66 +39,36 @@ public partial class MainMenuScene : NetworkedScene
         NetworkManager.OnUserConnect += OnUserConnect;
 
         NetworkManager.OnAuthenticationFail += OnAuthenticationFail;
+        
+        Players.OnChange += OnPlayerChange;
+    }
+
+    private void OnPlayerChange(object? sender, ListChangedEventArgs<Player.Player> e)
+    {
+        if (e.Action == NetworkedListAction.Add)
+        {
+            _playerList.Attach(new PlayerPreviewUI(_assetManager, e.Value.Name, e.Value.Color!.Value));
+        }
+        else if (e.Action == NetworkedListAction.Remove)
+        {
+            _playerList.Remove(x => ((PlayerPreviewUI) x).Name == e.Value.Name);
+        }
     }
 
     [ClientRpc]
-    public void PlayerJoinedClientRpc()
+    public void SetLobbyClientRpc(LobbyEnum lobby)
     {
-        Logger.LogInformation("Joined server successfully");
-        _currentLobby = new NotReadyPlayerLobby(this);
+        Logger.LogInformation("Changing room to {Lobby}", lobby.ToString());
+        _currentLobby = lobby switch
+        {
+            LobbyEnum.Outside => new OutsidePlayerLobby(this),
+            LobbyEnum.NotReady => new NotReadyPlayerLobby(this),
+            LobbyEnum.Ready => new ReadyPlayerLobby(this),
+            _ => _currentLobby
+        };
         RefreshButtons();
     }
 
-    [ClientRpc]
-    public void LeaveClientRpc(string deviceId)
-    {
-        var ownId = PlayerManager.GetDeviceId();
-
-        if (deviceId == ownId)
-        {
-            _currentLobby = new OutsidePlayerLobby(this);
-            RefreshButtons();
-        }
-    }
-
-    [ClientRpc]
-    public void PlayerReadyClientRpc(Player.Player player)
-    {
-        var ownId = PlayerManager.GetDeviceId();
-
-        if (player.DeviceId == ownId)
-        {
-            _currentLobby = new ReadyPlayerLobby(this);
-            RefreshButtons();
-        }
-        else
-        {
-            var button = _colourGroup.GetButton(player.Color);
-            button.Enabled = false;
-        }
-        
-        _playerList.Attach(new PlayerPreviewUI(_assetManager, player.Name, player.Color!.Value));
-    }
-    
-    [ClientRpc]
-    public void PlayerNotReadyClientRpc(Player.Player player)
-    {
-        var ownId = PlayerManager.GetDeviceId();
-
-        if (player.DeviceId == ownId)
-        {
-            _currentLobby = new NotReadyPlayerLobby(this);
-            RefreshButtons();
-        }
-        else
-        {
-            var button = _colourGroup.GetButton(player.Color);
-            button.Enabled = true;
-        }
-        
-        _playerList.Remove(x => ((PlayerPreviewUI)x).Name == player.Name);
-    }
-    
     private void JoinButtonOnOnClick(object sender, MouseButtonEventArgs e)
     {
         _currentLobby.ConfirmAction();
@@ -110,7 +83,7 @@ public partial class MainMenuScene : NetworkedScene
     {
         _quitButton!.Text = _currentLobby.CancelLabel;
         _joinButton!.Text = _currentLobby.ConfirmLabel;
-        
+
         _colourGroup!.Show = _currentLobby.ShowLobby;
         _divider.Show = _currentLobby.ShowLobby;
         _colorLabel.Show = _currentLobby.ShowLobby;
@@ -126,6 +99,8 @@ public partial class MainMenuScene : NetworkedScene
         {
             return;
         }
+
+        Console.WriteLine($"Name: {string.Join(",", Players)}");
 
         var renderContext = ServiceProvider.GetService<RenderContext>();
         if (renderContext is not null)

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.Helper;
 using Scorpia.Engine.Network;
 using Scorpia.Engine.Network.Packets;
+using Scorpia.Engine.Network.Protocol;
 
 namespace Scorpia.Engine.SceneManagement;
 
@@ -19,6 +20,9 @@ public abstract class NetworkedScene : Scene
 
     private IDictionary<int, MethodBase> ClientRpcs { get; set; }
     private IDictionary<int, MethodBase> ServerRpcs { get; set; }
+
+    private IDictionary<int, FieldInfo> NetworkedVars { get; set; }
+    private IDictionary<int, FieldInfo> NetworkedLists { get; set; }
 
     protected NetworkedNode SpawnNode<T>() where T : NetworkedNode
     {
@@ -44,7 +48,7 @@ public abstract class NetworkedScene : Scene
         return node;
     }
 
-    public void SyncNodes()
+    private void SyncNodes()
     {
         if (NetworkManager.IsServer)
         {
@@ -85,7 +89,7 @@ public abstract class NetworkedScene : Scene
                 {
                     break;
                 }
-                
+
                 SpawnNode(createNodePacket.Node, createNodePacket.NetworkId);
                 break;
             }
@@ -95,7 +99,7 @@ public abstract class NetworkedScene : Scene
                 {
                     break;
                 }
-                
+
                 var method = NetworkManager.IsClient
                     ? ClientRpcs[remoteCallPacket.Method]
                     : ServerRpcs[remoteCallPacket.Method];
@@ -133,21 +137,51 @@ public abstract class NetworkedScene : Scene
 
                 break;
             }
+            case SyncVarPacket syncVarPacket:
+            {
+                if (syncVarPacket.NodeId != 0 || syncVarPacket.Scene != GetType().Name)
+                {
+                    break;
+                }
+
+                var field = NetworkedVars[syncVarPacket.Field];
+                dynamic netVar = field.GetValue(this);
+                netVar.Accept(syncVarPacket.Value);
+
+                break;
+            }
+            case SyncListPacket syncListPacket:
+            {
+                if (syncListPacket.NodeId != 0 || syncListPacket.Scene != GetType().Name)
+                {
+                    break;
+                }
+                
+                var field = NetworkedLists[syncListPacket.Field];
+                dynamic netList = field.GetValue(this);
+
+                netList.Commit(syncListPacket);
+                netList.packets.Clear();
+
+                break;
+            }
         }
     }
-    
+
     private void OnUserConnect(object sender, UserConnectedEventArgs e)
     {
         SyncNodes();
     }
 
-    internal new void Load(IServiceProvider serviceProvider)
+    internal override void Load(IServiceProvider serviceProvider)
     {
         NetworkManager = serviceProvider.GetRequiredService<NetworkManager>();
         Settings = serviceProvider.GetRequiredService<EngineSettings>();
 
         ClientRpcs = GetType().GetClientRpcs();
         ServerRpcs = GetType().GetServerRpcs();
+        NetworkedVars = GetType().GetNetworkedFields();
+        NetworkedLists = GetType().GetNetworkedLists();
 
         NetworkManager.OnPacketReceive += OnPacketReceive;
         NetworkManager.OnUserConnect += OnUserConnect;
@@ -158,6 +192,56 @@ public abstract class NetworkedScene : Scene
         {
             ServerOnLoad();
         }
+    }
+
+    internal override void Update()
+    {
+        if (NetworkManager.IsClient)
+        {
+            base.Update();
+
+            return;
+        }
+
+        foreach (var netVar in NetworkedVars)
+        {
+            dynamic field = netVar.Value.GetValue(this);
+
+            if (field is null || !field.IsDirty)
+            {
+                continue;
+            }
+
+            var change = field.GetProposedVal();
+            field.Accept(change);
+            NetworkManager.Send(new SyncVarPacket
+            {
+                Field = netVar.Key,
+                NodeId = 0,
+                Scene = GetType().Name,
+                Value = change
+            });
+        }
+
+        foreach (var netList in NetworkedLists)
+        {
+            dynamic field = netList.Value.GetValue(this);
+
+            if (field is null)
+            {
+                continue;
+            }
+
+            Queue<SyncListPacket> queue = field.packets;
+            while (queue.Count > 0)
+            {
+                var packet = queue.Dequeue();
+                NetworkManager.Send(packet with {Field = netList.Key, NodeId = 0, Scene = GetType().Name});
+                field.Commit(packet);
+            }
+        }
+
+        base.Update();
     }
 
     protected virtual void ServerOnLoad()
@@ -179,13 +263,13 @@ public abstract class NetworkedScene : Scene
     {
         Invoke<object>(name, null, clientId);
     }
-    
-    public new void Dispose()
+
+    public override void Dispose()
     {
         NetworkManager.OnPacketReceive -= OnPacketReceive;
         NetworkManager.OnUserConnect -= OnUserConnect;
         _networkedNodes.Clear();
-        
+
         base.Dispose();
     }
 }

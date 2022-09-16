@@ -9,7 +9,7 @@ namespace Scorpia.Engine.SceneManagement;
 public class DefaultSceneManager : SceneManager
 {
     private readonly IServiceProvider _serviceProvider;
-    private Scene _currentScene;
+    protected Scene currentScene;
     private readonly RenderContext _renderContext;
     private CancellationTokenSource _cancellationTokenSource;
     
@@ -37,9 +37,9 @@ public class DefaultSceneManager : SceneManager
             throw new EngineException($"Switching scene failed. {nameof(scene)} is not loaded.");
         }
 
-        _currentScene?.Dispose();
+        currentScene?.Dispose();
 
-        _currentScene = loadedScenes[scene];
+        currentScene = loadedScenes[scene];
     }
 
     public override void Quit()
@@ -49,7 +49,7 @@ public class DefaultSceneManager : SceneManager
 
     public override Scene GetCurrentScene()
     {
-        return _currentScene;
+        return currentScene;
     }
 
     internal override void SetCancellationToken(CancellationTokenSource source)
@@ -59,18 +59,18 @@ public class DefaultSceneManager : SceneManager
 
     internal override void Tick()
     {
-        _currentScene.Tick();
+        currentScene.Tick();
     }
 
     internal override void Update()
     {
-        _currentScene.Update();
+        currentScene.Update();
     }
 
     internal override void Render(TimeSpan elapsedTime)
     {
         _renderContext.Begin();
-        _currentScene.Render(_renderContext);
+        currentScene.Render(_renderContext);
         _renderContext.End();
     }
 }
