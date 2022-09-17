@@ -1,89 +1,89 @@
 title_icons.png
-size: 1000, 2777
+size: 955, 757
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 title_icon_blue
-  rotate: true
-  xy: 1, 1
-  size: 399, 501
-  orig: 512, 512
-  offset: 54, 5
+  rotate: false
+  xy: 704, 246
+  size: 201, 252
+  orig: 256, 256
+  offset: 26, 2
   index: -1
 title_icon_broken_wall
   rotate: false
-  xy: 1, 815
-  size: 498, 467
-  orig: 512, 512
-  offset: 11, 19
+  xy: 1, 1
+  size: 250, 235
+  orig: 256, 256
+  offset: 5, 9
   index: -1
 title_icon_brown
-  rotate: true
-  xy: 495, 1365
-  size: 446, 504
-  orig: 512, 512
-  offset: 33, 5
+  rotate: false
+  xy: 252, 500
+  size: 224, 253
+  orig: 256, 256
+  offset: 16, 2
   index: -1
 title_icon_capital
-  rotate: true
-  xy: 502, 414
-  size: 471, 484
-  orig: 512, 512
-  offset: 23, 11
+  rotate: false
+  xy: 494, 1
+  size: 237, 243
+  orig: 256, 256
+  offset: 11, 5
   index: -1
 title_icon_green
-  rotate: true
-  xy: 484, 1813
-  size: 460, 510
-  orig: 512, 512
-  offset: 24, 1
+  rotate: false
+  xy: 722, 500
+  size: 232, 256
+  orig: 256, 256
+  offset: 11, 0
   index: -1
 title_icon_grey
   rotate: false
-  xy: 1, 1763
-  size: 481, 504
-  orig: 512, 512
-  offset: 16, 5
+  xy: 478, 500
+  size: 242, 253
+  orig: 256, 256
+  offset: 7, 2
   index: -1
 title_icon_hunger
-  rotate: true
-  xy: 1, 1284
-  size: 477, 492
-  orig: 512, 512
-  offset: 18, 5
+  rotate: false
+  xy: 1, 246
+  size: 240, 247
+  orig: 256, 256
+  offset: 8, 2
   index: -1
 title_icon_orange
   rotate: false
-  xy: 1, 2275
-  size: 497, 495
-  orig: 512, 512
-  offset: 5, 5
+  xy: 243, 246
+  size: 250, 249
+  orig: 256, 256
+  offset: 2, 2
   index: -1
 title_icon_purple
   rotate: false
-  xy: 501, 887
-  size: 476, 476
-  orig: 512, 512
-  offset: 17, 22
+  xy: 253, 1
+  size: 239, 240
+  orig: 256, 256
+  offset: 8, 10
   index: -1
 title_icon_red
   rotate: false
-  xy: 500, 2275
-  size: 496, 501
-  orig: 512, 512
-  offset: 7, 7
+  xy: 1, 500
+  size: 249, 252
+  orig: 256, 256
+  offset: 3, 3
   index: -1
 title_icon_wall
-  rotate: true
-  xy: 504, 1
-  size: 411, 484
-  orig: 512, 512
-  offset: 51, 12
+  rotate: false
+  xy: 733, 1
+  size: 207, 243
+  orig: 256, 256
+  offset: 25, 5
   index: -1
 title_icon_yellow
-  rotate: true
-  xy: 1, 402
-  size: 411, 499
-  orig: 512, 512
-  offset: 47, 6
+  rotate: false
+  xy: 495, 246
+  size: 207, 251
+  orig: 256, 256
+  offset: 23, 2
   index: -1
