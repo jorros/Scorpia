@@ -85,7 +85,17 @@ public class Viewport
             dest = dest with {X = dest.X - WorldPosition.X, Y = dest.Y - WorldPosition.Y};
         }
 
-        sprite.Render(_graphicsManager, dest, angle, color, alpha);
+        sprite.Render(_graphicsManager, null, dest, angle, color, alpha);
+    }
+    
+    public void Draw(Sprite sprite, Rectangle src, Rectangle dest, double angle, Color color, byte alpha, bool inWorld = true)
+    {
+        if (inWorld)
+        {
+            dest = dest with {X = dest.X - WorldPosition.X, Y = dest.Y - WorldPosition.Y};
+        }
+
+        sprite.Render(_graphicsManager, src, dest, angle, color, alpha);
     }
 
     public void DrawText(Font font, OffsetVector position, string text, FontSettings settings, bool inWorld = true)

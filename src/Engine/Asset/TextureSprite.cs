@@ -13,7 +13,6 @@ public class TextureSprite : Sprite
 
     internal TextureSprite(IntPtr texture, int width, int height) : base(texture, new OffsetVector(width, height))
     {
-        Center = new OffsetVector(width / 2, height / 2);
     }
 
     internal TextureSprite(IntPtr texture, SpritesheetFrame frame) : this(texture, frame.OriginalSize.X,
@@ -22,7 +21,7 @@ public class TextureSprite : Sprite
         _frame = frame;
     }
 
-    internal override void Render(GraphicsManager context, Rectangle dest, double angle, Color color, byte alpha)
+    internal override void Render(GraphicsManager context, Rectangle? src, Rectangle dest, double angle, Color color, byte alpha)
     {
         var target = new SDL_Rect
         {
@@ -32,25 +31,39 @@ public class TextureSprite : Sprite
             w = dest.Width
         };
 
-        var src = IntPtr.Zero;
+        var source = IntPtr.Zero;
 
         if (_frame is not null)
         {
             var srcRect = new SDL_Rect
             {
-                w = _frame.Rotated ? _frame.Size.Y : _frame.Size.X,
-                h = _frame.Rotated ? _frame.Size.X : _frame.Size.Y,
+                w = _frame.Size.X,
+                h = _frame.Size.Y,
                 x = _frame.Position.X,
                 y = _frame.Position.Y
             };
 
-            var offX = _frame.Rotated ? _frame.Offset.Y : _frame.Offset.X;
-            var offY = _frame.Rotated ? _frame.Offset.X : _frame.Offset.Y;
+            if (src is not null)
+            {
+                var maxW = srcRect.x + srcRect.w;
+                var maxH = srcRect.y + srcRect.h;
+                var actW = srcRect.x + src.Value.X + src.Value.Width;
+                var actH = srcRect.y + src.Value.Y + src.Value.Height;
 
-            var w = _frame.Rotated ? _frame.Size.Y : _frame.Size.X;
-            var h = _frame.Rotated ? _frame.Size.X : _frame.Size.Y;
+                srcRect = new SDL_Rect
+                {
+                    x = srcRect.x + src.Value.X,
+                    y = srcRect.y + src.Value.Y,
+                    w = actW > maxW ? maxW - (srcRect.x + src.Value.X) : src.Value.Width,
+                    h = actH > maxH ? maxH - (srcRect.y + src.Value.Y) : src.Value.Height
+                };
+            }
 
-            Center = new OffsetVector(w / 2 + offX, h / 2 + offY);
+            var offX = _frame.Offset.X;
+            var offY = _frame.Offset.Y;
+
+            var w = _frame.Size.X;
+            var h = _frame.Size.Y;
 
             var otherOffX = Size.X - offX - w;
             var otherOffY = Size.Y - offY - h;
@@ -62,16 +75,18 @@ public class TextureSprite : Sprite
                 w = (int)(dest.Width / (double)Size.X * w),
                 h = (int)(dest.Height / (double)Size.Y * h)
             };
-
-            if (_frame.Rotated)
-            {
-                angle += 90;
-            }
-
+            
             // Center = new OffsetVector(w / 2, h / 2);
 
-            src = Marshal.AllocHGlobal(Marshal.SizeOf(srcRect));
-            Marshal.StructureToPtr(srcRect, src, false);
+            source = Marshal.AllocHGlobal(Marshal.SizeOf(srcRect));
+            Marshal.StructureToPtr(srcRect, source, false);
+        }
+        else if(src is not null)
+        {
+            var srcRect = src.Value.ToSdl();
+            
+            source = Marshal.AllocHGlobal(Marshal.SizeOf(srcRect));
+            Marshal.StructureToPtr(srcRect, source, false);
         }
 
         // var debugRect = dest.ToSdl();
@@ -85,12 +100,12 @@ public class TextureSprite : Sprite
         SDL_SetTextureColorMod(Texture, color.R, color.G, color.B);
         SDL_SetTextureAlphaMod(Texture, alpha);
 
-        SDL_RenderCopyEx(context.Renderer, Texture, src, ref target, angle, IntPtr.Zero, 
+        SDL_RenderCopyEx(context.Renderer, Texture, source, ref target, angle, IntPtr.Zero, 
             SDL_RendererFlip.SDL_FLIP_NONE);
 
-        if (src != IntPtr.Zero)
+        if (source != IntPtr.Zero)
         {
-            Marshal.FreeHGlobal(src);
+            Marshal.FreeHGlobal(source);
         }
     }
 }

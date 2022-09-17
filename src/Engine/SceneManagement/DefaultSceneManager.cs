@@ -30,14 +30,17 @@ public class DefaultSceneManager : SceneManager
         loadedScenes.Add(typeof(T).Name, scene);
     }
 
-    public override void Switch(string scene)
+    public override void Switch(string scene, bool unloadCurrent = true)
     {
         if (string.IsNullOrEmpty(scene) || !loadedScenes.ContainsKey(scene))
         {
-            throw new EngineException($"Switching scene failed. {nameof(scene)} is not loaded.");
+            throw new EngineException($"Switching scene failed. {scene} is not loaded.");
         }
 
-        currentScene?.Dispose();
+        if (unloadCurrent)
+        {
+            currentScene?.Dispose();
+        }
 
         currentScene = loadedScenes[scene];
     }

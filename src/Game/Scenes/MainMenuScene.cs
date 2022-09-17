@@ -97,6 +97,8 @@ public partial class MainMenuScene : NetworkedScene
     {
         if (NetworkManager.IsServer)
         {
+            ServerOnTick();
+            
             return;
         }
 

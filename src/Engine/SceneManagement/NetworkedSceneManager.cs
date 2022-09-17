@@ -39,7 +39,7 @@ public class NetworkedSceneManager : DefaultSceneManager
         loadedScenes.Add(typeof(T).Name, scene);
     }
 
-    public override void Switch(string scene)
+    public override void Switch(string scene, bool unloadCurrent = true)
     {
         if (_networkManager.IsClient)
         {
@@ -55,7 +55,7 @@ public class NetworkedSceneManager : DefaultSceneManager
             Name = scene
         });
 
-        base.Switch(scene);
+        base.Switch(scene, unloadCurrent);
     }
 
     private void SwitchInternally(string scene)

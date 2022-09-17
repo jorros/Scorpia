@@ -1,11 +1,11 @@
 elements@2x.png
-size: 2209, 229
+size: 3888, 352
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 button_green
   rotate: false
-  xy: 405, 29
+  xy: 405, 1
   size: 346, 130
   split: 86, 86, 46, 46
   pad: 87, 86, 33, 32
@@ -14,7 +14,7 @@ button_green
   index: -1
 button_red
   rotate: false
-  xy: 753, 29
+  xy: 753, 1
   size: 346, 130
   split: 86, 86, 46, 46
   pad: 87, 86, 33, 32
@@ -23,7 +23,7 @@ button_red
   index: -1
 button_regular
   rotate: false
-  xy: 1101, 29
+  xy: 1101, 1
   size: 346, 130
   split: 86, 86, 46, 46
   pad: 87, 86, 33, 32
@@ -32,23 +32,37 @@ button_regular
   index: -1
 horizontal_divider
   rotate: false
-  xy: 1, 1
+  xy: 1, 202
   size: 2207, 26
   orig: 2207, 26
   offset: 0, 0
   index: -1
 input
   rotate: false
-  xy: 1449, 29
+  xy: 1449, 1
   size: 552, 92
   split: 15, 15, 15, 15
   pad: 138, 138, 23, 23
   orig: 552, 92
   offset: 0, 0
   index: -1
+loading_progress
+  rotate: false
+  xy: 1, 230
+  size: 1942, 121
+  orig: 1942, 121
+  offset: 0, 0
+  index: -1
+loading_progress_fill
+  rotate: false
+  xy: 1945, 230
+  size: 1942, 121
+  orig: 1942, 121
+  offset: 0, 0
+  index: -1
 radio_button_content
   rotate: false
-  xy: 1, 29
+  xy: 1, 1
   size: 200, 199
   split: 63, 50, 50, 57
   pad: 50, 50, 50, 50
@@ -57,7 +71,7 @@ radio_button_content
   index: -1
 radio_button_content_selected
   rotate: false
-  xy: 203, 29
+  xy: 203, 1
   size: 200, 199
   split: 63, 50, 50, 57
   pad: 50, 50, 50, 50

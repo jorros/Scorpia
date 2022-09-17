@@ -27,6 +27,14 @@ public partial class MainMenuScene
     {
     }
 
+    private void ServerOnTick()
+    {
+        if (PlayerManager.AllReady())
+        {
+            SceneManager.Switch(nameof(LoadingScene));
+        }
+    }
+
     [ServerRpc]
     public void JoinServerRpc(JoinMatchPacket packet, SenderInfo sender)
     {

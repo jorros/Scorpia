@@ -85,6 +85,13 @@ public static class ScorpiaStyle
         Stylesheet.CopyButtonStyle(regularActionButton, "action_red", "UI:button_red");
         
         //
+        // PROGRESS BARS
+        //
+        var loadingProgressBar =
+            Stylesheet.CreateProgressBarStyle("loading", "UI:loading_progress", "UI:loading_progress_fill");
+        loadingProgressBar.Height = 121;
+        
+        //
         // WINDOWS
         //
 

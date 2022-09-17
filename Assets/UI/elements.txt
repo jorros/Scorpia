@@ -1,5 +1,5 @@
 elements.png
-size: 1106, 117
+size: 1946, 180
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
@@ -44,6 +44,20 @@ input
   split: 8, 8, 8, 8
   pad: 69, 69, 12, 12
   orig: 276, 46
+  offset: 0, 0
+  index: -1
+loading_progress
+  rotate: false
+  xy: 1, 118
+  size: 971, 61
+  orig: 971, 61
+  offset: 0, 0
+  index: -1
+loading_progress_fill
+  rotate: false
+  xy: 974, 118
+  size: 971, 61
+  orig: 971, 61
   offset: 0, 0
   index: -1
 radio_button_content

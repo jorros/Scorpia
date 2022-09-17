@@ -15,6 +15,7 @@ public class Stylesheet
     private readonly Dictionary<string, TextInputStyle> _inputs = new();
     private readonly Dictionary<string, RadioButtonStyle> _radios = new();
     private readonly Dictionary<string, HorizontalDividerStyle> _horizontalDividers = new();
+    private readonly Dictionary<string, ProgressBarStyle> _progressBars = new();
 
     private Font? _defaultFont;
     private ButtonStyle? _defaultButton;
@@ -23,6 +24,7 @@ public class Stylesheet
     private TextInputStyle? _defaultInput;
     private RadioButtonStyle? _defaultRadio;
     private HorizontalDividerStyle? _defaultHorizontalDivider;
+    private ProgressBarStyle? _defaultProgressBar;
     private readonly AssetManager _assetManager;
 
     public Stylesheet(AssetManager assetManager)
@@ -42,6 +44,41 @@ public class Stylesheet
     {
         return new OffsetVector(Scale(val.X), Scale(val.Y));
     }
+    
+    #region ProgressBar
+    public ProgressBarStyle CreateProgressBarStyle(string? name, string backgroundSprite, string fillSprite)
+    {
+        var style = new ProgressBarStyle
+        {
+            Background = _assetManager.Get<Sprite>(backgroundSprite),
+            Fill = _assetManager.Get<Sprite>(fillSprite)
+        };
+
+        if (name is null)
+        {
+            _defaultProgressBar = style;
+            return style;
+        }
+
+        _progressBars[name] = style;
+        return style;
+    }
+    
+    public ProgressBarStyle GetProgressBar(string? name = null)
+    {
+        if (name is not null && _progressBars.ContainsKey(name))
+        {
+            return _progressBars[name];
+        }
+        
+        if (_defaultProgressBar is null)
+        {
+            throw new EngineException("No default progress bar style set in stylesheet.");
+        }
+
+        return _defaultProgressBar;
+    }
+    #endregion
     
     #region HorizontalDivider
     public HorizontalDividerStyle CreateHorizontalDividerStyle(string? name, string backgroundSprite)

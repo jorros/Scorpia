@@ -45,8 +45,10 @@ public class Game : Engine.Engine
     protected override void Load(IServiceProvider serviceProvider)
     {
         var sceneManager = serviceProvider.GetRequiredService<SceneManager>();
-
+        
         sceneManager.Load<MainMenuScene>();
+        sceneManager.Load<LoadingScene>();
+        
         sceneManager.Switch(nameof(MainMenuScene));
     }
 }

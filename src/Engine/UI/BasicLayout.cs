@@ -63,18 +63,17 @@ public class BasicLayout : UIElement
             switch (ratio)
             {
                 case > 1:
-                    backgroundRect.Height = Height;
-                    backgroundRect.Width = (int)(Height * ratio);
-                    backgroundRect.X = position.X + Width / 2 - backgroundRect.Width / 2;
-                    backgroundRect.Y = position.Y + Height / 2 - backgroundRect.Height / 2;
+                    backgroundRect.Height = (int)(Width / ratio);
+                    backgroundRect.Width = Width;
                     break;
                 case < 1:
-                    backgroundRect.Height = (int)(Width * ratio);
-                    backgroundRect.Width = Width;
-                    backgroundRect.X = position.X + backgroundRect.Width / 2;
-                    backgroundRect.Y = position.Y + backgroundRect.Height / 2;
+                    backgroundRect.Height = Height;
+                    backgroundRect.Width = (int)(Height * ratio);
                     break;
             }
+            
+            backgroundRect.X = position.X + Width / 2 - backgroundRect.Width / 2;
+            backgroundRect.Y = position.Y + Height / 2 - backgroundRect.Height / 2;
             
             renderContext.Viewport.Draw(Background, backgroundRect, 0, Color.White, 255, inWorld);
         }
