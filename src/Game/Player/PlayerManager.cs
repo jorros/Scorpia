@@ -41,6 +41,11 @@ public class PlayerManager
         return _players.Any() && _players.All(x => x.Value.Ready);
     }
 
+    public bool AllLoaded()
+    {
+        return _players.Any() && _players.All(x => x.Value.LoadingProgress == 100);
+    }
+
     public bool HasAccess(string deviceId)
     {
         return _gameState.Current == GameState.State.Lobby || _players.Any(x => x.Value.DeviceId == deviceId);

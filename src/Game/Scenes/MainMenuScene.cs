@@ -102,8 +102,6 @@ public partial class MainMenuScene : NetworkedScene
             return;
         }
 
-        Console.WriteLine($"Name: {string.Join(",", Players)}");
-
         var renderContext = ServiceProvider.GetService<RenderContext>();
         if (renderContext is not null)
         {

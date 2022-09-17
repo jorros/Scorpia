@@ -191,6 +191,10 @@ public class NetworkManager
 
         if (IsClient)
         {
+            if (!_client.Connected)
+            {
+                return;
+            }
             buffer.WriteTo(_client.GetStream());
 
             return;
