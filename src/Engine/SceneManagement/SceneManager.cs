@@ -5,7 +5,7 @@ namespace Scorpia.Engine.SceneManagement;
 
 public abstract class SceneManager
 {
-    public abstract void Load<T>() where T : Scene;
+    public abstract T Load<T>() where T : Scene;
     public abstract void Switch(string scene, bool unloadCurrent = true);
     public abstract void Quit();
     public abstract Scene GetCurrentScene();

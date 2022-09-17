@@ -4,7 +4,7 @@ using static SDL2.SDL;
 
 namespace Scorpia.Engine;
 
-public struct OffsetVector
+public readonly struct OffsetVector : IEquatable<OffsetVector>
 {
     public OffsetVector(int x, int y)
     {
@@ -19,7 +19,7 @@ public struct OffsetVector
     public static OffsetVector Zero { get; } = new(0, 0);
 
     public static OffsetVector One { get; } = new(1, 1);
-    
+
     public static OffsetVector operator +(OffsetVector a) => a;
     public static OffsetVector operator -(OffsetVector a) => new(-a.X, -a.Y);
 
@@ -38,9 +38,10 @@ public struct OffsetVector
         {
             throw new DivideByZeroException();
         }
+
         return new OffsetVector(a.X / b.X, a.Y / b.Y);
     }
-    
+
     public static OffsetVector operator +(OffsetVector a, int b)
         => new(a.X + b, a.Y + b);
 
@@ -48,7 +49,7 @@ public struct OffsetVector
         => a + (-b);
 
     public static OffsetVector operator *(OffsetVector a, int b)
-        => new OffsetVector(a.X * b, a.Y * b);
+        => new(a.X * b, a.Y * b);
 
     public static OffsetVector operator /(OffsetVector a, int b)
     {
@@ -56,8 +57,12 @@ public struct OffsetVector
         {
             throw new DivideByZeroException();
         }
+
         return new OffsetVector(a.X / b, a.Y / b);
     }
+    
+    public static bool operator ==(OffsetVector obj1, OffsetVector obj2) => obj1.Equals(obj2);
+    public static bool operator !=(OffsetVector obj1, OffsetVector obj2) => !(obj1 == obj2);
 
     internal SDL_Point ToSdl()
     {
@@ -71,5 +76,29 @@ public struct OffsetVector
     internal Point ToPoint()
     {
         return new Point(X, Y);
+    }
+
+    public CubeVector ToCube()
+    {
+        var q = X - (Y - (X & 1)) / 2;
+        var r = Y;
+        var s = -q - r;
+
+        return new CubeVector(q, r, s);
+    }
+
+    public bool Equals(OffsetVector other)
+    {
+        return X == other.X && Y == other.Y;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is OffsetVector other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(X, Y);
     }
 }

@@ -11,6 +11,7 @@ public partial class LoadingScene
     
     protected override void ServerOnLoad()
     {
+        Seed.Value = new Random().Next();
         SceneManager.Load<GameScene>();
 
         _playerManager = ServiceProvider.GetRequiredService<PlayerManager>();
@@ -26,7 +27,7 @@ public partial class LoadingScene
         }
     }
 
-    protected void ServerOnTick()
+    private void ServerOnTick()
     {
         if (_playerManager.AllLoaded())
         {

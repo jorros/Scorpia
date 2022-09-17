@@ -24,7 +24,7 @@ public abstract class NetworkedScene : Scene
     private IDictionary<int, FieldInfo> NetworkedVars { get; set; }
     private IDictionary<int, FieldInfo> NetworkedLists { get; set; }
 
-    protected NetworkedNode SpawnNode<T>() where T : NetworkedNode
+    protected T SpawnNode<T>() where T : NetworkedNode
     {
         if (NetworkManager.IsClient)
         {
@@ -45,7 +45,7 @@ public abstract class NetworkedScene : Scene
 
         _lastNetworkId++;
 
-        return node;
+        return (T)node;
     }
 
     private void SyncNodes()

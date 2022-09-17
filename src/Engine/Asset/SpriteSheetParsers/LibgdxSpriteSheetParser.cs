@@ -85,6 +85,10 @@ internal class LibgdxSpriteSheetParser : ISpriteSheetParser
             case "rotate":
                 frame.Rotated = (bool) data.value;
                 break;
+            
+            case "index":
+                frame.Index = (int) data.value;
+                break;
         }
     }
 
@@ -117,7 +121,7 @@ internal class LibgdxSpriteSheetParser : ISpriteSheetParser
             return (kvp[0], point);
         }
 
-        if (int.TryParse(line, out var integer))
+        if (int.TryParse(kvp[1], out var integer))
         {
             return (kvp[0], integer);
         }

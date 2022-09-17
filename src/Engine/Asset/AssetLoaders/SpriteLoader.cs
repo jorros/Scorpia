@@ -70,8 +70,15 @@ internal class SpriteLoader : IAssetLoader
                 sprite = new TextureSprite(texture, frame);
             }
 
+            var indexKey = string.Empty;
+
+            if (frame.Index != -1)
+            {
+                indexKey = $"_{frame.Index}";
+            }
+
             var path = Path.GetDirectoryName(key);
-            var frameKey = Path.Combine(path!, frame.Name);
+            var frameKey = Path.Combine(path!, $"{frame.Name}{indexKey}");
 
             sprites.Add((frameKey, sprite));
         }

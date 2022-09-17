@@ -18,9 +18,9 @@ public abstract class Scene : IDisposable
 
     private ulong _nodeIdCounter;
 
-    protected Node CreateNode<T>() where T : Node
+    protected T CreateNode<T>() where T : Node
     {
-        return CreateNode(typeof(T));
+        return (T)CreateNode(typeof(T));
     }
 
     public Node FindNode<T>() where T : Node

@@ -1,11 +1,14 @@
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.Network.Protocol;
 using Scorpia.Engine.SceneManagement;
 
 namespace Scorpia.Game.Scenes;
 
 public partial class LoadingScene : NetworkedScene
 {
+    public NetworkedVar<int> Seed { get; } = new();
+    
     private bool _started;
 
     protected override void OnLoad(AssetManager assetManager)
@@ -32,8 +35,14 @@ public partial class LoadingScene : NetworkedScene
         SetProgress(0);
         _assetManager.Load("Game");
         SetProgress(80);
+
+        while (Seed.Value == 0)
+        {
+            Thread.Sleep(100);
+        }
         
-        SceneManager.Load<GameScene>();
+        var game = SceneManager.Load<GameScene>();
+        game.InitMap(Seed.Value);
         SetProgress(100);
     }
 

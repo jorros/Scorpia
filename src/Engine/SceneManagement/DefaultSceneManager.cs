@@ -22,12 +22,14 @@ public class DefaultSceneManager : SceneManager
         _renderContext = serviceProvider.GetService<RenderContext>();
     }
 
-    public override void Load<T>()
+    public override T Load<T>()
     {
         var scene = Activator.CreateInstance(typeof(T), true) as Scene;
         scene?.Load(_serviceProvider);
 
         loadedScenes.Add(typeof(T).Name, scene);
+
+        return (T)scene;
     }
 
     public override void Switch(string scene, bool unloadCurrent = true)

@@ -31,12 +31,16 @@ public class NetworkedSceneManager : DefaultSceneManager
         }
     }
 
-    public override void Load<T>()
+    public override T Load<T>()
     {
         var scene = Activator.CreateInstance(typeof(T), true) as NetworkedScene;
         scene?.Load(_serviceProvider);
 
         loadedScenes.Add(typeof(T).Name, scene);
+
+        var baseScene = (Scene) scene;
+
+        return (T) baseScene;
     }
 
     public override void Switch(string scene, bool unloadCurrent = true)
@@ -47,7 +51,7 @@ public class NetworkedSceneManager : DefaultSceneManager
 
             return;
         }
-        
+
         _logger.LogInformation("Force all clients to switch scene to {Scene}", scene);
 
         _networkManager.Send(new SwitchScenePacket
@@ -64,12 +68,12 @@ public class NetworkedSceneManager : DefaultSceneManager
         {
             return;
         }
-        
+
         _logger.LogInformation("Server switches scene to {Scene}", scene);
 
         base.Switch(scene);
     }
-    
+
     internal override void Update()
     {
         (currentScene as NetworkedScene)?.Update();

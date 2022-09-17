@@ -17,7 +17,7 @@ public class Game : Engine.Engine
         services.AddSingleton<GameState>();
         services.AddSingleton<PlayerManager>();
         
-        networkedNodes.Add(typeof(TestNode));
+        networkedNodes.Add(typeof(LocationNode));
         AddNetworkPacketsFrom(GetType().Assembly);
         
         SetAuthentication(Auth);

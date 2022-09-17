@@ -12,6 +12,7 @@ internal class SpritesheetFrame
     public bool Rotated { get; set; }
     public Point OriginalSize { get; set; }
     public Point Offset { get; set; }
+    public int Index { get; set; }
 }
 
 internal class SpritesheetDescriptor
