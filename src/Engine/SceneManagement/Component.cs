@@ -2,9 +2,8 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
-using Scorpia.Engine.SceneManagement;
 
-namespace Scorpia.Engine;
+namespace Scorpia.Engine.SceneManagement;
 
 public abstract class Component : IDisposable
 {

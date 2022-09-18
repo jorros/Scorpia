@@ -1,11 +1,13 @@
+using System.Drawing;
 using Scorpia.Engine;
+using Scorpia.Engine.Maths;
 using Scorpia.Game.Nodes;
 
 namespace Scorpia.Game.World;
 
 public class MapTile : IEquatable<MapTile>
 {
-    public MapTile(OffsetVector position)
+    public MapTile(Point position)
     {
         Position = position;
         _features = new HashSet<MapTileFeature>();
@@ -25,7 +27,7 @@ public class MapTile : IEquatable<MapTile>
 
     public Direction? River { get; set; }
 
-    public OffsetVector Position { get; }
+    public Point Position { get; }
 
     public LocationNode Location { get; set; }
 
@@ -37,8 +39,8 @@ public class MapTile : IEquatable<MapTile>
     {
         var vectors = new[]
         {
-            new CubeVector(1, -1, 0), new CubeVector(1, 0, -1), new CubeVector(0, 1, -1), new CubeVector(-1, 1, 0),
-            new CubeVector(-1, 0, 1), new CubeVector(0, -1, 1)
+            new Hex(1, -1, 0), new Hex(1, 0, -1), new Hex(0, 1, -1), new Hex(-1, 1, 0),
+            new Hex(-1, 0, 1), new Hex(0, -1, 1)
         };
         var directions = new[]
         {

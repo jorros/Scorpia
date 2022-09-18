@@ -39,12 +39,12 @@ public class Image : UIElement
             _sprite = value;
             if (_width is null)
             {
-                base.Width = value.Size.X;
+                base.Width = value.Size.Width;
             }
 
             if (_height is null)
             {
-                base.Height = value.Size.Y;
+                base.Height = value.Size.Height;
             }
         }
     }
@@ -59,6 +59,6 @@ public class Image : UIElement
         var position = stylesheet.Scale(GetPosition());
         var bounds = new Rectangle(position.X, position.Y, stylesheet.Scale(base.Width), stylesheet.Scale(base.Height));
 
-        renderContext.Camera.Draw(Sprite, bounds, 0, Color.White, 255, inWorld);
+        renderContext.Draw(Sprite, bounds, 0, Color.White, 255, inWorld);
     }
 }

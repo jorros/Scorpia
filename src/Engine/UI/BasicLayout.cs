@@ -51,15 +51,15 @@ public class BasicLayout : UIElement
         if (Width == 0)
         {
             var renderSize = renderContext.GetDrawSize();
-            Width = renderSize.X;
-            Height = renderSize.Y;
+            Width = renderSize.Width;
+            Height = renderSize.Height;
         }
 
         if (Background is not null && Show)
         {
             var position = GetPosition();
-            var backgroundRect = new Rectangle(position.X + Width / 2, position.Y + Height / 2, Background.Size.X, Background.Size.Y);
-            var ratio = Background.Size.X / (double)Background.Size.Y;
+            var backgroundRect = new Rectangle(position.X + Width / 2, position.Y + Height / 2, Background.Size.Width, Background.Size.Height);
+            var ratio = Background.Size.Width / (double)Background.Size.Height;
             switch (ratio)
             {
                 case > 1:
@@ -75,7 +75,7 @@ public class BasicLayout : UIElement
             backgroundRect.X = position.X + Width / 2 - backgroundRect.Width / 2;
             backgroundRect.Y = position.Y + Height / 2 - backgroundRect.Height / 2;
             
-            renderContext.Camera.Draw(Background, backgroundRect, 0, Color.White, 255, inWorld);
+            renderContext.Draw(Background, backgroundRect, 0, Color.White, 255, inWorld);
         }
         
         foreach (var element in Elements)

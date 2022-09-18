@@ -3,6 +3,7 @@ using System.Drawing;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
+using Scorpia.Engine.Maths;
 using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Engine.UI;
@@ -57,7 +58,7 @@ public class Button : UIElement
         };
     }
 
-    private bool IsInButton(OffsetVector position)
+    private bool IsInButton(Point position)
     {
         if (_bounds is null)
         {
@@ -109,10 +110,10 @@ public class Button : UIElement
             tint = Color.DarkGray;
         }
 
-        renderContext.Camera.Draw(style.Button, _bounds.Value, 0, tint, 255, inWorld);
+        renderContext.Draw(style.Button, _bounds.Value, 0, tint, 255, inWorld);
 
-        var textPosition = new OffsetVector(Width / 2, Height / 2) + position + style.TextPosition;
-        renderContext.Camera.DrawText(style.LabelStyle.Font,
+        var textPosition = new Point(Width / 2, Height / 2).Add(position).Add(style.TextPosition);
+        renderContext.DrawText(style.LabelStyle.Font,
             stylesheet.Scale(textPosition),
             Text,
             fontSettings,

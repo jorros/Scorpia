@@ -56,7 +56,7 @@ public static class ScorpiaStyle
         var textInput = Stylesheet.CreateTextInputStyle(null, "UI:input", "InputLabel");
         textInput.Width = 550;
         textInput.Height = 90;
-        textInput.Padding = new OffsetVector(30, 30);
+        textInput.Padding = new Point(30, 30);
         
         //
         // RADIO BUTTONS
@@ -77,8 +77,8 @@ public static class ScorpiaStyle
             Stylesheet.CreateButtonStyle("action_regular", "UI:button_regular", "Button");
         regularActionButton.MinHeight = 130;
         regularActionButton.MinWidth = 350;
-        regularActionButton.TextPosition = new OffsetVector(0, -18);
-        regularActionButton.Padding = new OffsetVector(40, 0);
+        regularActionButton.TextPosition = new Point(0, -18);
+        regularActionButton.Padding = new Point(40, 0);
         regularActionButton.PressedTint = Color.Gray;
 
         Stylesheet.CopyButtonStyle(regularActionButton, "action_green", "UI:button_green");
@@ -96,14 +96,14 @@ public static class ScorpiaStyle
         //
 
         var defaultWindow = Stylesheet.CreateWindowStyle(null, "UI:container", "UI:button_bar");
-        defaultWindow.Padding = new OffsetVector(80, 80);
+        defaultWindow.Padding = new Point(80, 80);
         defaultWindow.Height = 1186;
         defaultWindow.Width = 2073;
         defaultWindow.ActionBarHeight = 118;
         defaultWindow.ActionBarPadding = new Rectangle(215, 0, 200, 0);
         defaultWindow.ActionBarMinWidth = 560;
         defaultWindow.ActionBarSpaceBetween = 0;
-        defaultWindow.ActionBarMargin = new OffsetVector(0, 35);
+        defaultWindow.ActionBarMargin = new Point(0, 35);
 
         var defaultDivider = Stylesheet.CreateHorizontalDividerStyle(null, "UI:horizontal_divider");
         defaultDivider.Height = 26;

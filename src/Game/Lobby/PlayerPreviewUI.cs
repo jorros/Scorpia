@@ -1,3 +1,4 @@
+using System.Drawing;
 using Scorpia.Engine;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.UI;
@@ -28,7 +29,7 @@ public class PlayerPreviewUI : BasicLayout
             Text = name,
             TextAlign = TextAlign.Center,
             Type = "PlayerPreview",
-            Position = new OffsetVector(125, 270)
+            Position = new Point(125, 270)
         };
         Attach(playerLabel);
     }

@@ -11,7 +11,7 @@ public class TextureSprite : Sprite
 {
     private SpritesheetFrame _frame;
 
-    internal TextureSprite(IntPtr texture, int width, int height) : base(texture, new OffsetVector(width, height))
+    internal TextureSprite(IntPtr texture, int width, int height) : base(texture, new Size(width, height))
     {
     }
 
@@ -21,9 +21,9 @@ public class TextureSprite : Sprite
         _frame = frame;
     }
 
-    internal override void Render(GraphicsManager context, Rectangle? src, Rectangle dest, double angle, Color color, byte alpha)
+    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha)
     {
-        var target = new SDL_Rect
+        var target = new SDL_FRect
         {
             x = dest.X,
             y = dest.Y,
@@ -65,15 +65,15 @@ public class TextureSprite : Sprite
             var w = _frame.Size.X;
             var h = _frame.Size.Y;
 
-            var otherOffX = Size.X - offX - w;
-            var otherOffY = Size.Y - offY - h;
+            var otherOffX = Size.Width - offX - w;
+            var otherOffY = Size.Height - offY - h;
 
-            target = new SDL_Rect
+            target = new SDL_FRect
             {
                 x = target.x + offX,
                 y = target.y + otherOffY,
-                w = (int)(dest.Width / (double)Size.X * w),
-                h = (int)(dest.Height / (double)Size.Y * h)
+                w = (int)(dest.Width / (double)Size.Width * w),
+                h = (int)(dest.Height / (double)Size.Height * h)
             };
             
             // Center = new OffsetVector(w / 2, h / 2);
@@ -100,7 +100,7 @@ public class TextureSprite : Sprite
         SDL_SetTextureColorMod(Texture, color.R, color.G, color.B);
         SDL_SetTextureAlphaMod(Texture, alpha);
 
-        SDL_RenderCopyEx(context.Renderer, Texture, source, ref target, angle, IntPtr.Zero, 
+        SDL_RenderCopyExF(context.Renderer, Texture, source, ref target, angle, IntPtr.Zero, 
             SDL_RendererFlip.SDL_FLIP_NONE);
 
         if (source != IntPtr.Zero)

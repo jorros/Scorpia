@@ -1,3 +1,5 @@
+using System;
+using System.Drawing;
 using Scorpia.Engine.Asset;
 
 namespace Scorpia.Engine.Graphics;
@@ -6,11 +8,11 @@ public class TilemapLayer
 {
     private readonly int _width;
     private readonly int _height;
-    private readonly OffsetVector _size;
+    private readonly Size _size;
     private readonly TilemapOrientationMatrix _orientationMatrix;
     private readonly Sprite[] _tiles;
     
-    internal TilemapLayer(int width, int height, OffsetVector size, TilemapOrientationMatrix orientationMatrix)
+    internal TilemapLayer(int width, int height, Size size, TilemapOrientationMatrix orientationMatrix)
     {
         _width = width;
         _height = height;
@@ -19,33 +21,31 @@ public class TilemapLayer
         _tiles = new Sprite[width * height];
     }
 
-    public void SetTile(OffsetVector position, Sprite tile)
+    public void SetTile(Point position, Sprite tile)
     {
         _tiles[position.Y * _width + position.X] = tile;
     }
 
-    public void SetTile(CubeVector position, Sprite tile)
+    public void SetTile(Hex position, Sprite tile)
     {
-        SetTile(position.ToOffset(), tile);
+        SetTile(position.ToPoint(), tile);
     }
 
-    public Sprite GetTile(OffsetVector position)
+    public Sprite GetTile(Point position)
     {
         return _tiles[position.Y * _width + position.X];
     }
 
-    public Sprite GetTile(CubeVector position)
+    public Sprite GetTile(Hex position)
     {
-        return GetTile(position.ToOffset());
+        return GetTile(position.ToPoint());
     }
 
-    private OffsetVector HexToScreen(OffsetVector pos)
+    private PointF HexToScreen(Hex h)
     {
-        var h = pos.ToCube();
-        
-        var x = (_orientationMatrix.f0 * pos.X + _orientationMatrix.f1 * pos.Y) * _size.X;
-        var y = (_orientationMatrix.f2 * pos.X + _orientationMatrix.f3 * pos.Y) * _size.Y;
-        return new OffsetVector((int)x, (int)y);
+        var x = (_orientationMatrix.f0 * h.Q + _orientationMatrix.f1 * h.R) * _size.Width;
+        var y = (_orientationMatrix.f2 * h.Q + _orientationMatrix.f3 * h.R) * _size.Height;
+        return new PointF(x + _size.Width / 2f, y + _size.Height / 2f);
     }
     
     public void Render(RenderContext renderContext)
@@ -54,14 +54,16 @@ public class TilemapLayer
         {
             for (var x = 0; x < _width; x++)
             {
-                var pos = new OffsetVector(x, y);
+                var pos = new Point(x, y);
                 var sprite = GetTile(pos);
                 if (sprite is null)
                 {
                     continue;
                 }
+
+                var q = x - (y >> 1);
                 
-                var position = HexToScreen(pos);
+                var position = HexToScreen(new Hex(q, y, 0));
                 renderContext.Draw(sprite, position);
             }
         }

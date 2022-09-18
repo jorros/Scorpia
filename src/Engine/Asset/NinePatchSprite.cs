@@ -21,7 +21,7 @@ internal class NinePatchSprite : Sprite
     private SpritesheetFrame _frame;
 
     public NinePatchSprite(IntPtr texture, SpritesheetFrame frame) : base(texture,
-        new OffsetVector(frame.OriginalSize.X, frame.OriginalSize.Y))
+        new Size(frame.OriginalSize.X, frame.OriginalSize.Y))
     {
         _frame = frame;
 
@@ -39,12 +39,12 @@ internal class NinePatchSprite : Sprite
         _center = SdlHelper.Create(frame.Position.X + split.X, frame.Position.Y + split.Y, size.X - (split.Width + split.X), size.Y - (split.Height + split.Y));
     }
 
-    internal override void Render(GraphicsManager context, Rectangle? src, Rectangle dest, double angle, Color color, byte alpha)
+    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha)
     {
         SDL_SetTextureColorMod(Texture, color.R, color.G, color.B);
         SDL_SetTextureAlphaMod(Texture, alpha);
 
-        var center = new SDL_Point()
+        var center = new SDL_FPoint()
         {
             x = 0,
             y = 0
@@ -56,110 +56,110 @@ internal class NinePatchSprite : Sprite
         SDL_SetRenderDrawColor(context.Renderer, 255, 0, 0, 100);
 
         // Draw top left
-        var target = new SDL_Rect
+        var target = new SDL_FRect
         {
             x = dest.X,
             y = dest.Y,
             w = _topLeft.w,
             h = _topLeft.h
         };
-        SDL_RenderCopyEx(context.Renderer, Texture, ref _topLeft, ref target, 0, IntPtr.Zero,
+        SDL_RenderCopyExF(context.Renderer, Texture, ref _topLeft, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
         // SDL_RenderDrawRect(context.Renderer, ref target);
 
         // Draw top
-        target = new SDL_Rect
+        target = new SDL_FRect
         {
             x = dest.X + _topLeft.w,
             y = dest.Y,
             w = centerWidth,
             h = _top.h
         };
-        SDL_RenderCopyEx(context.Renderer, Texture, ref _top, ref target, 0, IntPtr.Zero,
+        SDL_RenderCopyExF(context.Renderer, Texture, ref _top, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
         // SDL_RenderDrawRect(context.Renderer, ref target);
 
         // Draw top right
-        target = new SDL_Rect
+        target = new SDL_FRect
         {
             x = dest.X + _topLeft.w + centerWidth,
             y = dest.Y,
             w = _topRight.w,
             h = _topRight.h
         };
-        SDL_RenderCopyEx(context.Renderer, Texture, ref _topRight, ref target, 0, IntPtr.Zero,
+        SDL_RenderCopyExF(context.Renderer, Texture, ref _topRight, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
         // SDL_RenderDrawRect(context.Renderer, ref target);
 
         // Draw left
-        target = new SDL_Rect
+        target = new SDL_FRect
         {
             x = dest.X,
             y = dest.Y + _topLeft.h,
             w = _left.w,
             h = centerHeight
         };
-        SDL_RenderCopyEx(context.Renderer, Texture, ref _left, ref target, 0, IntPtr.Zero,
+        SDL_RenderCopyExF(context.Renderer, Texture, ref _left, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
         // SDL_RenderDrawRect(context.Renderer, ref target);
         
         // // Draw center
-        target = new SDL_Rect
+        target = new SDL_FRect
         {
             x = dest.X + _topLeft.w,
             y = dest.Y + _topLeft.h,
             w = centerWidth,
             h = centerHeight
         };
-        SDL_RenderCopyEx(context.Renderer, Texture, ref _center, ref target, 0, IntPtr.Zero,
+        SDL_RenderCopyExF(context.Renderer, Texture, ref _center, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
         // SDL_RenderDrawRect(context.Renderer, ref target);
         
         // Draw right
-        target = new SDL_Rect
+        target = new SDL_FRect
         {
             x = dest.X + _left.w + centerWidth,
             y = dest.Y + _topLeft.h,
             w = _right.w,
             h = centerHeight
         };
-        SDL_RenderCopyEx(context.Renderer, Texture, ref _right, ref target, 0, IntPtr.Zero,
+        SDL_RenderCopyExF(context.Renderer, Texture, ref _right, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
         // SDL_RenderDrawRect(context.Renderer, ref target);
         
         // Draw bottom left
-        target = new SDL_Rect
+        target = new SDL_FRect
         {
             x = dest.X,
             y = dest.Y + _topLeft.h + centerHeight,
             w = _bottomLeft.w,
             h = _bottomLeft.h
         };
-        SDL_RenderCopyEx(context.Renderer, Texture, ref _bottomLeft, ref target, 0, IntPtr.Zero,
+        SDL_RenderCopyExF(context.Renderer, Texture, ref _bottomLeft, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
         // SDL_RenderDrawRect(context.Renderer, ref target);
         
         // Draw bottom
-        target = new SDL_Rect
+        target = new SDL_FRect
         {
             x = dest.X + _bottomLeft.w,
             y = dest.Y + _topLeft.h + centerHeight,
             w = centerWidth,
             h = _bottom.h
         };
-        SDL_RenderCopyEx(context.Renderer, Texture, ref _bottom, ref target, 0, IntPtr.Zero,
+        SDL_RenderCopyExF(context.Renderer, Texture, ref _bottom, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
         // SDL_RenderDrawRect(context.Renderer, ref target);
         
         // Draw bottom right
-        target = new SDL_Rect
+        target = new SDL_FRect
         {
             x = dest.X + _bottomLeft.w + centerWidth,
             y = dest.Y + _topLeft.h + centerHeight,
             w = _bottomRight.w,
             h = _bottomRight.h
         };
-        SDL_RenderCopyEx(context.Renderer, Texture, ref _bottomRight, ref target, 0, ref center,
+        SDL_RenderCopyExF(context.Renderer, Texture, ref _bottomRight, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
         // SDL_RenderDrawRect(context.Renderer, ref target);
     }

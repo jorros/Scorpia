@@ -13,6 +13,7 @@ public abstract class Scene : IDisposable
     protected IServiceProvider ServiceProvider { get; private set; }
     public SceneManager SceneManager { get; private set; }
     public UserDataManager UserDataManager { get; private set; }
+    public Camera Camera { get; private set; }
     public Dictionary<ulong, Node> Nodes { get; } = new();
     public ILogger Logger { get; private set; }
 
@@ -102,6 +103,7 @@ public abstract class Scene : IDisposable
 
         if (assetManager is not null)
         {
+            Camera = serviceProvider.GetRequiredService<RenderContext>().Camera;
             OnLoad(assetManager);
         }
     }

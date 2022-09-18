@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.Maths;
 using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Engine.UI;
@@ -16,7 +17,7 @@ public class HorizontalGridLayout : UIElement
     public int MinWidth { get; set; }
     public Rectangle Padding { get; set; }
     public int SpaceBetween { get; set; }
-    public OffsetVector Margin { get; set; } = OffsetVector.Zero;
+    public Point Margin { get; set; } = Point.Empty;
     
     public void Attach(UIElement element)
     {
@@ -47,12 +48,12 @@ public class HorizontalGridLayout : UIElement
         
         if (Background is not null && Show)
         {
-            var scaledPos = stylesheet.Scale(GetPosition()) + stylesheet.Scale(Margin);
+            var scaledPos = stylesheet.Scale(GetPosition()).Add(stylesheet.Scale(Margin));
             var rect = new Rectangle(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), scaledHeight);
-            renderContext.Camera.Draw(Background, rect, 0, Color.White, 255, inWorld);
+            renderContext.Draw(Background, rect, 0, Color.White, 255, inWorld);
         }
         
-        var currentPos = new OffsetVector(Padding.X, Padding.Y) + Margin;
+        var currentPos = new Point(Padding.X, Padding.Y).Add(Margin);
 
         foreach (var element in Elements)
         {
@@ -60,7 +61,7 @@ public class HorizontalGridLayout : UIElement
 
             element.Render(renderContext, stylesheet, inWorld);
 
-            currentPos += new OffsetVector(SpaceBetween + element.Width, 0);
+            currentPos = currentPos.Add(new Point(SpaceBetween + element.Width, 0));
         }
     }
 }

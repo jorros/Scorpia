@@ -98,7 +98,7 @@ public class RadioButton : UIElement
 
         var tint = Color.White;
 
-        if (style.HoveredTint is not null && Enabled && _bounds.Value.Contains(Input.MousePosition.ToPoint()))
+        if (style.HoveredTint is not null && Enabled && _bounds.Value.Contains(Input.MousePosition))
         {
             tint = style.HoveredTint.Value;
         }
@@ -119,11 +119,11 @@ public class RadioButton : UIElement
             sprite = style.CheckedButton;
         }
 
-        renderContext.Camera.Draw(sprite, _bounds.Value, 0, tint, 255, inWorld);
+        renderContext.Draw(sprite, _bounds.Value, 0, tint, 255, inWorld);
 
         if (Content is not null)
         {
-            Content.Value.Position = new OffsetVector(style.Padding.X, style.Padding.Y);
+            Content.Value.Position = new Point(style.Padding.X, style.Padding.Y);
             Content.Value.Render(renderContext, stylesheet, inWorld);
         }
     }

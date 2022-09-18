@@ -13,9 +13,9 @@ public record ButtonStyle
     
     public int MinHeight { get; set; }
     
-    public OffsetVector TextPosition { get; set; } = OffsetVector.Zero;
+    public Point TextPosition { get; set; } = Point.Empty;
     
-    public OffsetVector Padding { get; set; } = OffsetVector.Zero;
+    public Point Padding { get; set; } = Point.Empty;
     
     public Color? PressedTint { get; set; }
     

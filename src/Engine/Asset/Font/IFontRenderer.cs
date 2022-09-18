@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using Scorpia.Engine.Asset.Markup;
 using static SDL2.SDL;
 
@@ -9,9 +10,9 @@ public interface IFontRenderer
 {
     Type Type { get; }
 
-    IEnumerable<(IntPtr texture, SDL_Rect target)> Render(Font font, IBlock block, OffsetVector position, ref OffsetVector cursor);
+    IEnumerable<(IntPtr texture, SDL_Rect target)> Render(Font font, IBlock block, Point position, ref Point cursor);
 
-    void CalculateSize(string text, Font font, IBlock block, ref OffsetVector cursor);
+    void CalculateSize(string text, Font font, IBlock block, ref Point cursor);
 
     void Clear();
 }

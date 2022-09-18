@@ -1,7 +1,9 @@
+using System.Drawing;
 using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.Maths;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Utils;
 using Scorpia.Game.World;
@@ -38,7 +40,7 @@ public class MapNode : Node
             new ResourceGenerator()
         };
 
-        Map = new Tilemap(Width, Height, new OffsetVector(77, 77), TilemapOrientation.Pointy);
+        Map = new Tilemap(Width, Height, new Size(95, 95), TilemapOrientation.Pointy);
         var ground = Map.AddLayer();
         var river = Map.AddLayer();
         var locations = Map.AddLayer();
@@ -56,7 +58,7 @@ public class MapNode : Node
             {
                 for (var x = 0; x < 20; x++)
                 {
-                    ground.SetTile(new OffsetVector(x, y), grass);
+                    ground.SetTile(new Point(x, y), grass);
                 }
             }
         }
@@ -69,7 +71,7 @@ public class MapNode : Node
         {
             for (var y = 0; y < Height; y++)
             {
-                var tile = new MapTile(new OffsetVector(x, y));
+                var tile = new MapTile(new Point(x, y));
 
                 Tiles[y * Width + x] = tile;
             }
@@ -81,7 +83,7 @@ public class MapNode : Node
         }
         
         var noiseMap = new NoiseMap(Width, Height);
-        noiseMap.Generate(seed, Scale, Octaves, Persistence, Lacunarity, new OffsetVectorF(0, 0));
+        noiseMap.Generate(seed, Scale, Octaves, Persistence, Lacunarity, new PointF(0, 0));
             
         foreach(var generator in _generators)
         {
@@ -89,7 +91,7 @@ public class MapNode : Node
         }
     }
     
-    public MapTile? GetTile(OffsetVector position)
+    public MapTile? GetTile(Point position)
     {
         if (position.X < 0 || position.Y < 0 || position.X >= Width || position.Y >= Height)
         {
@@ -99,9 +101,9 @@ public class MapNode : Node
         return Tiles[position.Y * Width + position.X];
     }
 
-    public MapTile? GetTile(CubeVector position)
+    public MapTile? GetTile(Hex position)
     {
-        return GetTile(position.ToOffset());
+        return GetTile(position.ToPoint());
     }
     
     public bool HasNeighbour(MapTile start, Func<MapTile, bool> predicate, int range = 1)
@@ -122,7 +124,7 @@ public class MapNode : Node
                         continue;
                     }
 
-                    var pos = new CubeVector(q, r, s);
+                    var pos = new Hex(q, r, s);
                     var tile = GetTile(pos + position);
                     if(tile == null || tile == start)
                     {
@@ -160,7 +162,7 @@ public class MapNode : Node
                         continue;
                     }
 
-                    var pos = new CubeVector(q, r, s);
+                    var pos = new Hex(q, r, s);
                     var tile = GetTile(pos + position);
                     if(tile == null || tile == start)
                     {

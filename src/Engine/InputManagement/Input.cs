@@ -14,7 +14,7 @@ public static class Input
     public static event EventHandler<MouseButtonEventArgs> OnMouseButton; 
     public static event EventHandler<MouseWheelEventArgs> OnMouseWheel; 
 
-    public static OffsetVector MousePosition { get; private set; }
+    public static Point MousePosition { get; private set; }
 
     private static int CalculateWithDpi(int val, bool highDpi)
     {
@@ -41,7 +41,7 @@ public static class Input
 
     internal static void CaptureMouseMotion(SDL_MouseMotionEvent motion, bool highDpi)
     {
-        MousePosition = new OffsetVector(motion.x, motion.y);
+        MousePosition = new Point(motion.x, motion.y);
         OnMouseMove?.Invoke(null, new MouseMoveEventArgs
         {
             X = CalculateWithDpi(motion.x, highDpi),

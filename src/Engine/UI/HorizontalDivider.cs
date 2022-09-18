@@ -31,6 +31,6 @@ public class HorizontalDivider : UIElement
         var target = new Rectangle(stylesheet.Scale(position.X), stylesheet.Scale(position.Y), stylesheet.Scale(width),
             stylesheet.Scale(Height));
         
-        renderContext.Camera.Draw(style.Background, target, 0, Color.White, 255, inWorld);
+        renderContext.Draw(style.Background, target, 0, Color.White, 255, inWorld);
     }
 }

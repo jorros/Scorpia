@@ -16,6 +16,17 @@ public static class SdlExtensions
         };
     }
 
+    public static SDL_FRect ToSdl(this RectangleF rectangle)
+    {
+        return new SDL_FRect
+        {
+            x = rectangle.X,
+            y = rectangle.Y,
+            w = rectangle.Width,
+            h = rectangle.Height
+        };
+    }
+
     public static SDL_Color ToSdl(this Color color)
     {
         return new SDL_Color

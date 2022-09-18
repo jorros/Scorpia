@@ -38,7 +38,7 @@ public partial class MainMenuScene
             Anchor = UIAnchor.BottomRight,
             Color = Color.White,
             Size = 42,
-            Position = new OffsetVector(20, 20)
+            Position = new Point(20, 20)
         };
         _layout.Attach(versionLabel);
         
@@ -48,7 +48,7 @@ public partial class MainMenuScene
             Anchor = UIAnchor.TopLeft,
             Color = Color.White,
             Size = 36,
-            Position = new OffsetVector(20, 20)
+            Position = new Point(20, 20)
         };
         _layout.Attach(_fpsLabel);
 
@@ -60,7 +60,7 @@ public partial class MainMenuScene
         
         var nameLabel = new Label
         {
-            Position = new OffsetVector(0, 40),
+            Position = new Point(0, 40),
             Type = "Form",
             Text = "Your name:"
         };
@@ -68,13 +68,13 @@ public partial class MainMenuScene
         
         _nameInput = new TextInput
         {
-            Position = new OffsetVector(180, 10)
+            Position = new Point(180, 10)
         };
         window.Attach(_nameInput);
 
         _serverStatus = new Label
         {
-            Position = new OffsetVector(0, 20),
+            Position = new Point(0, 20),
             Type = "Header",
             Text = "Server <text color='red' size='70'>OFFLINE</text>",
             Anchor = UIAnchor.TopRight
@@ -83,7 +83,7 @@ public partial class MainMenuScene
         
         _colorLabel = new Label
         {
-            Position = new OffsetVector(0, 140),
+            Position = new Point(0, 140),
             Type = "Form",
             Text = "Your colour:"
         };
@@ -101,7 +101,7 @@ public partial class MainMenuScene
             {
                 Type = "content",
                 Value = colour,
-                Position = new OffsetVector(-20 + 240 * i, 180),
+                Position = new Point(-20 + 240 * i, 180),
                 Content = new Image
                 {
                     Sprite = assetManager.Get<Sprite>($"UI:player_icon_{colour.ToString().ToLower()}"),
@@ -115,7 +115,7 @@ public partial class MainMenuScene
 
         _divider = new HorizontalDivider
         {
-            Position = new OffsetVector(0, 450),
+            Position = new Point(0, 450),
             Width = 1900,
             Show = false
         };
@@ -123,17 +123,17 @@ public partial class MainMenuScene
 
         _playerList = new HorizontalGridLayout
         {
-            Position = new OffsetVector(0, 500),
+            Position = new Point(0, 500),
             MinWidth = 1900,
             SpaceBetween = 80,
-            Margin = new OffsetVector(20, 20)
+            Margin = new Point(20, 20)
         };
         _playerList.SetHeight(400);
         window.Attach(_playerList);
 
         _quitButton = new Button
         {
-            Position = new OffsetVector(0, 0),
+            Position = new Point(0, 0),
             Text = "QUIT",
             Type = "action_red"
         };
@@ -141,7 +141,7 @@ public partial class MainMenuScene
 
         _joinButton = new Button
         {
-            Position = new OffsetVector(0, 0),
+            Position = new Point(0, 0),
             Text = "JOIN",
             Type = "action_green"
         };
@@ -149,7 +149,7 @@ public partial class MainMenuScene
 
         _settingsButton = new Button
         {
-            Position = new OffsetVector(0, 0),
+            Position = new Point(0, 0),
             Text = "SETTINGS",
             Type = "action_regular"
         };

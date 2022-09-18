@@ -43,6 +43,6 @@ public class Label : UIElement
             return;
         }
         
-        renderContext.Camera.DrawText(font, stylesheet.Scale(GetPosition()), Text, fontSettings, inWorld);
+        renderContext.DrawText(font, stylesheet.Scale(GetPosition()), Text, fontSettings, inWorld);
     }
 }

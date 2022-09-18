@@ -50,7 +50,7 @@ public class Font : IAsset, IDisposable
         return font;
     }
 
-    internal void Render(OffsetVector position, string text, FontSettings settings)
+    internal void Render(Point position, string text, FontSettings settings)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -60,7 +60,7 @@ public class Font : IAsset, IDisposable
         var startBlock = settings.ToTextBlock();
 
         var blocks = _fontMarkupReader.Read(text, startBlock);
-        var cursor = new OffsetVector(position.X, position.Y);
+        var cursor = new Point(position.X, position.Y);
 
         var toBeRendered = new List<(IntPtr texture, SDL_Rect target)>();
 
@@ -90,24 +90,24 @@ public class Font : IAsset, IDisposable
         return TTF_FontHeight(font);
     }
 
-    public OffsetVector CalculateSize(string text, FontSettings settings)
+    public Point CalculateSize(string text, FontSettings settings)
     {
         if (string.IsNullOrEmpty(text))
         {
-            return OffsetVector.Zero;
+            return Point.Empty;
         }
         
         var startBlock = settings.ToTextBlock();
         var blocks = _fontMarkupReader.Read(text, startBlock);
 
-        var cursor = new OffsetVector();
-        var size = new OffsetVector();
+        var cursor = new Point();
+        var size = new Point();
 
         foreach (var block in blocks)
         {
             if (block is NewLineBlock)
             {
-                size = new OffsetVector(Math.Max(cursor.X, size.X), size.Y + cursor.Y);
+                size = new Point(Math.Max(cursor.X, size.X), size.Y + cursor.Y);
                 
                 continue;
             }
@@ -116,7 +116,7 @@ public class Font : IAsset, IDisposable
             renderer.CalculateSize(text, this, block, ref cursor);
         }
         
-        size = new OffsetVector(Math.Max(cursor.X, size.X), size.Y + cursor.Y);
+        size = new Point(Math.Max(cursor.X, size.X), size.Y + cursor.Y);
 
         return size;
     }

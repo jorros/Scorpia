@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using Scorpia.Engine.Asset.Markup;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.Helper;
@@ -12,15 +13,16 @@ public class TextBlockRenderer : IFontRenderer
 {
     private readonly GraphicsManager _graphicsManager;
     public Type Type => typeof(TextBlock);
-    
-    private readonly Dictionary<(OffsetVector position, bool isOutline), (string text, IntPtr texture)> _textureCache = new();
+
+    private readonly Dictionary<(Point position, bool isOutline), (string text, IntPtr texture)> _textureCache = new();
 
     public TextBlockRenderer(GraphicsManager graphicsManager)
     {
         _graphicsManager = graphicsManager;
     }
-    
-    public IEnumerable<(IntPtr texture, SDL_Rect target)> Render(Font font, IBlock block, OffsetVector position, ref OffsetVector cursor)
+
+    public IEnumerable<(IntPtr texture, SDL_Rect target)> Render(Font font, IBlock block, Point position,
+        ref Point cursor)
     {
         var textBlock = (TextBlock) block;
         var cachedOptions = CachedTextOptions.FromTextBlock(textBlock);
@@ -37,7 +39,7 @@ public class TextBlockRenderer : IFontRenderer
 
         cursor = cursor with {X = cursor.X + width};
 
-        int RenderTexture(bool isOutline, OffsetVector pos)
+        int RenderTexture(bool isOutline, Point pos)
         {
             var fnt = font.LoadFont(cachedOptions);
 
@@ -52,9 +54,9 @@ public class TextBlockRenderer : IFontRenderer
                 w = w,
                 h = h
             };
-            
+
             textures.Add((texture, target));
-            
+
             if (surface != IntPtr.Zero)
             {
                 SDL_FreeSurface(surface);
@@ -66,14 +68,14 @@ public class TextBlockRenderer : IFontRenderer
         return textures;
     }
 
-    public void CalculateSize(string text, Font font, IBlock block, ref OffsetVector cursor)
+    public void CalculateSize(string text, Font font, IBlock block, ref Point cursor)
     {
         var textBlock = (TextBlock) block;
         var cachedOptions = CachedTextOptions.FromTextBlock(textBlock);
-        
+
         var fnt = font.LoadFont(cachedOptions);
         TTF_SizeUTF8(fnt, textBlock.Text, out var w, out var h);
-        cursor = new OffsetVector {X = cursor.X + w, Y = Math.Max(h, cursor.Y)};
+        cursor = new Point {X = cursor.X + w, Y = Math.Max(h, cursor.Y)};
     }
 
     public void Clear()
@@ -85,7 +87,7 @@ public class TextBlockRenderer : IFontRenderer
     }
 
     private (IntPtr texture, IntPtr surface) GenerateTexture(GraphicsManager context, IntPtr font,
-        TextBlock text, OffsetVector position, bool isOutline)
+        TextBlock text, Point position, bool isOutline)
     {
         var texture = IntPtr.Zero;
         var surface = IntPtr.Zero;

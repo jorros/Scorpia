@@ -78,7 +78,7 @@ public class Window : UIElement
                 Background = style.ActionBarBackground,
                 Parent = this,
                 Padding = style.ActionBarPadding,
-                Position = new OffsetVector(0, Height / 2 - style.ActionBarHeight),
+                Position = new Point(0, Height / 2 - style.ActionBarHeight),
                 SpaceBetween = style.ActionBarSpaceBetween,
                 MinWidth = style.ActionBarMinWidth,
                 Anchor = UIAnchor.Center,
@@ -102,7 +102,7 @@ public class Window : UIElement
         var position = stylesheet.Scale(pos);
         var rect = new Rectangle(position.X, position.Y, stylesheet.Scale(Width), stylesheet.Scale(Height - style.ActionBarHeight));
 
-        renderContext.Camera.Draw(style.Background, rect, 0, Color.White, 255, inWorld);
+        renderContext.Draw(style.Background, rect, 0, Color.White, 255, inWorld);
         Content.Render(renderContext, inWorld);
         
         ActionBar.Render(renderContext, stylesheet, inWorld);

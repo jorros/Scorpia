@@ -1,3 +1,4 @@
+using System.Drawing;
 using Scorpia.Engine.Asset;
 
 namespace Scorpia.Engine.UI.Style;
@@ -8,7 +9,7 @@ public record TextInputStyle
     
     public Sprite Background { get; set; }
     
-    public OffsetVector Padding { get; set; }
+    public Point Padding { get; set; }
     
     public int Width { get; set; }
     

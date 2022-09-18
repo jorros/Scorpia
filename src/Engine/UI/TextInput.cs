@@ -4,6 +4,7 @@ using System.Drawing;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.Helper;
 using Scorpia.Engine.InputManagement;
+using Scorpia.Engine.Maths;
 using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Engine.UI;
@@ -203,7 +204,7 @@ public class TextInput : UIElement
             tint = Color.DarkGray;
         }
 
-        renderContext.Camera.Draw(style.Background, _bounds, 0, tint, 255, inWorld);
+        renderContext.Draw(style.Background, _bounds, 0, tint, 255, inWorld);
 
         var padding = stylesheet.Scale(style.Padding);
         var textSettings = style.Text.ToFontSettings();
@@ -212,9 +213,9 @@ public class TextInput : UIElement
         var clippingRect = new Rectangle(position.X + padding.X, position.Y + padding.Y,
             _bounds.Width - padding.X * 2, _bounds.Height - padding.Y * 2);
 
-        renderContext.Camera.SetClipping(clippingRect);
+        renderContext.SetClipping(clippingRect);
 
-        var startPos = position + padding;
+        var startPos = position.Add(padding);
         var textWidth = style.Text.Font.CalculateSize(Text[.._caret], textSettings).X;
         var textHeight = style.Text.Font.GetHeight(textSettings);
         var textCorrection = 0;
@@ -224,16 +225,16 @@ public class TextInput : UIElement
             textCorrection = clippingRect.Right - (startPos.X + textWidth) - stylesheet.Scale(InputStartScrolling);
         }
 
-        renderContext.Camera.DrawText(style.Text.Font,
-            new OffsetVector(position.X + padding.X + textCorrection, position.Y + padding.Y), Text, textSettings,
+        renderContext.DrawText(style.Text.Font,
+            new Point(position.X + padding.X + textCorrection, position.Y + padding.Y), Text, textSettings,
             inWorld);
         
-        renderContext.Camera.SetClipping(null);
+        renderContext.SetClipping(null);
         
         if (_focus && Enabled != false)
         {
-            renderContext.Camera.DrawLine(new OffsetVector(startPos.X + textWidth + textCorrection, startPos.Y),
-                new OffsetVector(startPos.X + textWidth + textCorrection, startPos.Y + textHeight), style.Text.Color);
+            renderContext.DrawLine(new Point(startPos.X + textWidth + textCorrection, startPos.Y),
+                new Point(startPos.X + textWidth + textCorrection, startPos.Y + textHeight), style.Text.Color);
         }
     }
 }

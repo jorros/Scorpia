@@ -10,14 +10,14 @@ public class PerlinWorm
         private readonly float _persistance;
         private readonly float _startFrequency;
         private double _currentDirection;
-        private CubeVector _currentPosition;
-        private readonly CubeVector _convergencePoint;
+        private Hex _currentPosition;
+        private readonly Hex _convergencePoint;
 
         private readonly bool _moveToConvergencePoint;
         private float _weight = 0.6f;
 
-        public PerlinWorm(int octaves, float persistance, float startFrequency, CubeVector startPosition,
-            CubeVector convergencePoint)
+        public PerlinWorm(int octaves, float persistance, float startFrequency, Hex startPosition,
+            Hex convergencePoint)
         {
             this._octaves = octaves;
             this._persistance = persistance;
@@ -27,7 +27,7 @@ public class PerlinWorm
             _moveToConvergencePoint = true;
         }
 
-        public PerlinWorm(int octaves, float persistance, float startFrequency, CubeVector startPosition)
+        public PerlinWorm(int octaves, float persistance, float startFrequency, Hex startPosition)
         {
             this._octaves = octaves;
             this._persistance = persistance;
@@ -36,17 +36,17 @@ public class PerlinWorm
             _moveToConvergencePoint = false;
         }
 
-        private CubeVector MoveTowardsConvergencePoint()
+        private Hex MoveTowardsConvergencePoint()
         {
             var angle = GetPerlinNoiseAngle();
-            var directionToConvergencePoint = (_convergencePoint - _currentPosition).ToOffset();
+            var directionToConvergencePoint = (_convergencePoint - _currentPosition).ToPoint();
 
             var angleToConvergencePoint =
                 Math.Atan2(directionToConvergencePoint.Y, directionToConvergencePoint.X) * 180 / Math.PI;
 
             var endAngle = (angle * (1 - _weight) + angleToConvergencePoint * _weight) % 360;
             endAngle = ClampAngle(endAngle);
-            var endVector = CubeVector.FromAngle(endAngle);
+            var endVector = Hex.FromAngle(endAngle);
 
             _currentPosition += endVector;
 
@@ -75,16 +75,16 @@ public class PerlinWorm
             return _currentDirection;
         }
 
-        private CubeVector Move()
+        private Hex Move()
         {
             var angle = GetPerlinNoiseAngle();
-            _currentPosition += CubeVector.FromAngle(angle);
+            _currentPosition += Hex.FromAngle(angle);
             return _currentPosition;
         }
 
-        public IReadOnlyList<CubeVector> MoveLength(int length)
+        public IReadOnlyList<Hex> MoveLength(int length)
         {
-            var list = new List<CubeVector>();
+            var list = new List<Hex>();
             foreach (var item in Enumerable.Range(0, length))
             {
                 if (_moveToConvergencePoint)

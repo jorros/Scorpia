@@ -1,7 +1,9 @@
 using System;
 using System.Drawing;
+using System.Numerics;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Asset.Font;
+using Scorpia.Engine.Maths;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine.Graphics;
@@ -9,120 +11,168 @@ namespace Scorpia.Engine.Graphics;
 public class Camera
 {
     private readonly GraphicsManager _graphicsManager;
-    private SDL_Rect _rect;
+    private SDL_Rect _viewport;
     private SDL_Rect _previousRect;
+    private float _zoom;
+    private float _minimumZoom;
+    private float _maximumZoom;
 
-    public OffsetVector Position { get; set; }
+    public Vector2 Position { get; set; }
     public float Rotation { get; set; }
-    public float Zoom { get; set; }
-    public float MinimumZoom { get; set; }
-    public float MaximumZoom { get; set; }
-    public Rectangle BoundingRectangle { get; set; }
-    public OffsetVector Origin { get; set; }
-    public OffsetVector Center { get; set; }
 
-    internal Camera(GraphicsManager graphicsManager, SDL_Rect rect)
+    public float Zoom
+    {
+        get => _zoom;
+        set
+        {
+            if ((value < MinimumZoom) || (value > MaximumZoom))
+                throw new EngineException("Zoom must be between MinimumZoom and MaximumZoom");
+
+            _zoom = value;
+        }
+    }
+
+    public float MinimumZoom
+    {
+        get => _minimumZoom;
+        set
+        {
+            if (value < 0)
+                throw new EngineException("MinimumZoom must be greater than zero");
+
+            if (Zoom < value)
+                Zoom = MinimumZoom;
+
+            _minimumZoom = value;
+        }
+    }
+
+    public float MaximumZoom
+    {
+        get => _maximumZoom;
+        set
+        {
+            if (value < 0)
+                throw new EngineException("MaximumZoom must be greater than zero");
+
+            if (Zoom > value)
+                Zoom = value;
+
+            _maximumZoom = value;
+        }
+    }
+
+    public RectangleF BoundingRectangle
+    {
+        get
+        {
+            var frustum = GetBoundingFrustum();
+            var corners = frustum.GetCorners();
+            var topLeft = corners[0];
+            var bottomRight = corners[2];
+            var width = bottomRight.X - topLeft.X;
+            var height = bottomRight.Y - topLeft.Y;
+            return new RectangleF(topLeft.X, topLeft.Y, width, height);
+        }
+    }
+
+    public Vector2 Origin { get; set; }
+    public Vector2 Center => Position + Origin;
+
+    internal Camera(GraphicsManager graphicsManager, SDL_Rect viewport)
     {
         _graphicsManager = graphicsManager;
-        _rect = rect;
-        Position = OffsetVector.Zero;
+        _viewport = viewport;
+        Position = Vector2.Zero;
+
+        MaximumZoom = 2;
+        MinimumZoom = 0;
+
+        Zoom = 1;
+        Rotation = 0;
+        Origin = new Vector2(viewport.w / 2f, viewport.h / 2f);
     }
 
-    public void Begin()
+    public void Move(Vector2 direction)
     {
-        SDL_RenderGetViewport(_graphicsManager.Renderer, out _previousRect);
-        SDL_RenderSetViewport(_graphicsManager.Renderer, ref _rect);
+        Position += Vector2.Transform(direction, Matrix4x4.CreateRotationZ(-Rotation));
     }
 
-    public void End()
+    public void Rotate(float deltaRadians)
     {
-        SDL_RenderSetViewport(_graphicsManager.Renderer, ref _previousRect);
+        Rotation += deltaRadians;
     }
 
-    public void SetClipping(Rectangle? rectangle)
+    public void ZoomIn(float deltaZoom)
     {
-        if (rectangle is null)
-        {
-            SDL_RenderSetClipRect(_graphicsManager.Renderer, IntPtr.Zero);
-
-            return;
-        }
-
-        var rect = new SDL_Rect
-        {
-            x = rectangle.Value.Left,
-            y = rectangle.Value.Top,
-            h = rectangle.Value.Height,
-            w = rectangle.Value.Width
-        };
-
-        if (_rect.x == rect.x && _rect.y == rect.y && _rect.w == rect.w && _rect.h == rect.h)
-        {
-            SDL_RenderSetClipRect(_graphicsManager.Renderer, IntPtr.Zero);
-
-            return;
-        }
-
-        SDL_RenderSetClipRect(_graphicsManager.Renderer, ref rect);
+        ClampZoom(Zoom + deltaZoom);
     }
 
-    public Rectangle GetClipping()
+    public void ZoomOut(float deltaZoom)
     {
-        SDL_RenderGetClipRect(_graphicsManager.Renderer, out var rect);
-
-        return new Rectangle
-        {
-            X = rect.x,
-            Y = rect.y,
-            Height = rect.h,
-            Width = rect.w
-        };
+        ClampZoom(Zoom - deltaZoom);
     }
 
-    public void SetDistance(float distance = 10)
+    private void ClampZoom(float value)
     {
-        
+        if (value < MinimumZoom)
+            Zoom = MinimumZoom;
+        else
+            Zoom = value > MaximumZoom ? MaximumZoom : value;
     }
 
-    public void Draw(Sprite sprite, OffsetVector position)
+    public void LookAt(Vector2 position)
     {
-        var dest = new Rectangle(position.X, position.Y, sprite.Size.X, sprite.Size.Y);
-        Draw(sprite, dest, 0, Color.White, 255);
+        Position = position - new Vector2(_viewport.w / 2f, _viewport.h / 2f);
     }
 
-    public void Draw(Sprite sprite, Rectangle dest, double angle, Color color, byte alpha, bool inWorld = true)
+    public Vector2 WorldToScreen(Vector2 worldPosition)
     {
-        if (inWorld)
-        {
-            dest = dest with {X = dest.X - Position.X, Y = dest.Y - Position.Y};
-        }
+        var vector = Vector2.Transform(worldPosition + new Vector2(_viewport.x, _viewport.y), GetViewMatrix());
+        return vector;
+    }
 
-        sprite.Render(_graphicsManager, null, dest, angle, color, alpha);
+    public Vector2 ScreenToWorld(Vector2 screenPosition)
+    {
+        Matrix4x4.Invert(GetViewMatrix(), out var inverted);
+        return Vector2.Transform(screenPosition - new Vector2(_viewport.x, _viewport.y),
+            inverted);
+    }
+
+    private Matrix4x4 GetVirtualViewMatrix()
+    {
+        return
+            Matrix4x4.CreateTranslation(new Vector3(-Position, 0.0f)) *
+            Matrix4x4.CreateTranslation(new Vector3(-Origin, 0.0f)) *
+            Matrix4x4.CreateRotationZ(Rotation) *
+            Matrix4x4.CreateScale(Zoom, Zoom, 1) *
+            Matrix4x4.CreateTranslation(new Vector3(Origin, 0.0f));
+    }
+
+    private Matrix4x4 GetViewMatrix()
+    {
+        return GetVirtualViewMatrix() * Matrix4x4.Identity;
+    }
+
+    public Matrix4x4 GetInverseViewMatrix()
+    {
+        Matrix4x4.Invert(GetViewMatrix(), out var inverted);
+
+        return inverted;
     }
     
-    public void Draw(Sprite sprite, Rectangle src, Rectangle dest, double angle, Color color, byte alpha, bool inWorld = true)
+    private Matrix4x4 GetProjectionMatrix(Matrix4x4 viewMatrix)
     {
-        if (inWorld)
-        {
-            dest = dest with {X = dest.X - Position.X, Y = dest.Y - Position.Y};
-        }
-
-        sprite.Render(_graphicsManager, src, dest, angle, color, alpha);
+        var projection = Matrix4x4.CreateOrthographicOffCenter(0, _viewport.w, _viewport.h, 0, -1, 0);
+        projection = Matrix4x4.Multiply(viewMatrix, projection);
+        return projection;
     }
 
-    public void DrawText(Font font, OffsetVector position, string text, FontSettings settings, bool inWorld = true)
+    private BoundingFrustum GetBoundingFrustum()
     {
-        if (inWorld)
-        {
-            position -= Position;
-        }
+        var viewMatrix = GetVirtualViewMatrix();
+        var projectionMatrix = GetProjectionMatrix(viewMatrix);
         
-        font.Render(position, text, settings);
-    }
-
-    public void DrawLine(OffsetVector from, OffsetVector to, Color color)
-    {
-        SDL_SetRenderDrawColor(_graphicsManager.Renderer, color.R, color.G, color.B, color.A);
-        SDL_RenderDrawLine(_graphicsManager.Renderer, from.X, from.Y, to.X, to.Y);
+        return new BoundingFrustum(projectionMatrix);
     }
 }

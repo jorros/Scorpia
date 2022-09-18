@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Asset.Font;
 
@@ -40,9 +41,9 @@ public class Stylesheet
         return (int)Math.Floor(val * ScaleModifier);
     }
 
-    public OffsetVector Scale(OffsetVector val)
+    public Point Scale(Point val)
     {
-        return new OffsetVector(Scale(val.X), Scale(val.Y));
+        return new Point(Scale(val.X), Scale(val.Y));
     }
     
     #region ProgressBar

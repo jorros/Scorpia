@@ -1,3 +1,4 @@
+using System.Drawing;
 using Scorpia.Engine;
 using Scorpia.Engine.Maths;
 
@@ -8,16 +9,16 @@ public class NoiseMap
     private double[] noiseMap;
     private int mapWidth, mapHeight;
 
-    private static readonly List<OffsetVector> Directions = new()
+    private static readonly List<Point> Directions = new()
     {
-        new OffsetVector(0, 1), //N
-        new OffsetVector(1, 1), //NE
-        new OffsetVector(1, 0), //E
-        new OffsetVector(-1, 1), //SE
-        new OffsetVector(-1, 0), //S
-        new OffsetVector(-1, -1), //SW
-        new OffsetVector(0, -1), //W
-        new OffsetVector(1, -1) //NW
+        new Point(0, 1), //N
+        new Point(1, 1), //NE
+        new Point(1, 0), //E
+        new Point(-1, 1), //SE
+        new Point(-1, 0), //S
+        new Point(-1, -1), //SW
+        new Point(0, -1), //W
+        new Point(1, -1) //NW
     };
 
     public NoiseMap(int width, int height)
@@ -31,9 +32,9 @@ public class NoiseMap
         return noiseMap[y * mapWidth + x];
     }
 
-    public IReadOnlyList<OffsetVector> FindLocalMaxima()
+    public IReadOnlyList<Point> FindLocalMaxima()
     {
-        var maximas = new List<OffsetVector>();
+        var maximas = new List<Point>();
         for (var x = 0; x < mapWidth; x++)
         {
             for (var y = 0; y < mapHeight; y++)
@@ -41,7 +42,7 @@ public class NoiseMap
                 var noiseVal = GetPosition(x, y);
                 if (CheckNeighbours(x, y, neighbourNoise => neighbourNoise > noiseVal))
                 {
-                    maximas.Add(new OffsetVector(x, y));
+                    maximas.Add(new Point(x, y));
                 }
             }
         }
@@ -49,9 +50,9 @@ public class NoiseMap
         return maximas;
     }
 
-    public IReadOnlyList<OffsetVector> FindLocalMinima()
+    public IReadOnlyList<Point> FindLocalMinima()
     {
-        var minimas = new List<OffsetVector>();
+        var minimas = new List<Point>();
         for (var x = 0; x < mapWidth; x++)
         {
             for (var y = 0; y < mapHeight; y++)
@@ -59,7 +60,7 @@ public class NoiseMap
                 var noiseVal = GetPosition(x, y);
                 if (CheckNeighbours(x, y, neighbourNoise => neighbourNoise < noiseVal))
                 {
-                    minimas.Add(new OffsetVector(x, y));
+                    minimas.Add(new Point(x, y));
                 }
             }
         }
@@ -71,7 +72,7 @@ public class NoiseMap
     {
         foreach (var dir in Directions)
         {
-            var newPost = new OffsetVector(x + dir.X, y + dir.Y);
+            var newPost = new Point(x + dir.X, y + dir.Y);
 
             if (newPost.X < 0 || newPost.X >= mapWidth || newPost.Y < 0 || newPost.Y >= mapHeight)
             {
@@ -87,7 +88,7 @@ public class NoiseMap
         return true;
     }
 
-    public void Generate(int seed, float scale, int octaves, float persistance, float lacunarity, OffsetVectorF offset)
+    public void Generate(int seed, float scale, int octaves, float persistance, float lacunarity, PointF offset)
     {
         noiseMap = new double[mapWidth * mapHeight];
 
@@ -99,12 +100,12 @@ public class NoiseMap
             octaves = 1;
         }
 
-        var octaveOffsets = new OffsetVectorF[octaves];
+        var octaveOffsets = new PointF[octaves];
         for (var i = 0; i < octaves; i++)
         {
             var offsetX = random.Next(-100000, 100000) + offset.X;
             var offsetY = random.Next(-100000, 100000) + offset.Y;
-            octaveOffsets[i] = new OffsetVectorF(offsetX, offsetY);
+            octaveOffsets[i] = new PointF(offsetX, offsetY);
         }
 
         if (scale <= 0f)

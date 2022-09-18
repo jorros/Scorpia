@@ -21,7 +21,7 @@ public record WindowStyle
     
     public int ActionBarMinWidth { get; set; }
     
-    public OffsetVector Padding { get; set; }
+    public Point Padding { get; set; }
     
-    public OffsetVector ActionBarMargin { get; set; }
+    public Point ActionBarMargin { get; set; }
 }

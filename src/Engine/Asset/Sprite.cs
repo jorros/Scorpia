@@ -7,17 +7,17 @@ namespace Scorpia.Engine.Asset;
 
 public abstract class Sprite : IAsset, IDisposable
 {
-    public OffsetVector Size { get; }
+    public Size Size { get; }
 
     internal IntPtr Texture { get; }
 
-    protected Sprite(IntPtr texture, OffsetVector size)
+    protected Sprite(IntPtr texture, Size size)
     {
         Texture = texture;
         Size = size;
     }
     
-    internal abstract void Render(GraphicsManager context, Rectangle? src, Rectangle dest, double angle, Color color, byte alpha);
+    internal abstract void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha);
     
     public void Dispose()
     {

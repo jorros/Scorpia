@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.Maths;
 using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Engine.UI;
@@ -9,7 +11,7 @@ public abstract class UIElement
 {
     public int Width { get; protected set; }
     public int Height { get; protected set; }
-    public OffsetVector Position { get; set; } = OffsetVector.Zero;
+    public Point Position { get; set; } = Point.Empty;
     public UIElement Parent { get; internal set; }
     public UIAnchor Anchor { get; set; } = UIAnchor.TopLeft;
     
@@ -44,7 +46,7 @@ public abstract class UIElement
         set => _show = value;
     }
 
-    protected OffsetVector GetPosition()
+    protected Point GetPosition()
     {
         if (Parent is null)
         {
@@ -52,22 +54,22 @@ public abstract class UIElement
         }
 
         var parentsPos = Parent.GetPosition();
-        var relativePos = parentsPos + Position;
+        var relativePos = parentsPos.Add(Position);
 
         return Anchor switch
         {
             UIAnchor.TopLeft => relativePos,
-            UIAnchor.Top => new OffsetVector(relativePos.X + Parent.Width / 2 - Width / 2, relativePos.Y),
-            UIAnchor.TopRight => new OffsetVector(parentsPos.X + Parent.Width - Width - Position.X, relativePos.Y),
-            UIAnchor.Left => new OffsetVector(relativePos.X, relativePos.Y + Parent.Height / 2 - Height / 2),
-            UIAnchor.Center => new OffsetVector(relativePos.X + Parent.Width / 2 - Width / 2,
+            UIAnchor.Top => new Point(relativePos.X + Parent.Width / 2 - Width / 2, relativePos.Y),
+            UIAnchor.TopRight => new Point(parentsPos.X + Parent.Width - Width - Position.X, relativePos.Y),
+            UIAnchor.Left => new Point(relativePos.X, relativePos.Y + Parent.Height / 2 - Height / 2),
+            UIAnchor.Center => new Point(relativePos.X + Parent.Width / 2 - Width / 2,
                 relativePos.Y + Parent.Height / 2 - Height / 2),
-            UIAnchor.Right => new OffsetVector(parentsPos.X + Parent.Width - Width - Position.X,
+            UIAnchor.Right => new Point(parentsPos.X + Parent.Width - Width - Position.X,
                 relativePos.Y + Parent.Height / 2 - Height / 2),
-            UIAnchor.BottomLeft => new OffsetVector(relativePos.X, parentsPos.Y + Parent.Height - Height - Position.Y),
-            UIAnchor.Bottom => new OffsetVector(relativePos.X + Parent.Width / 2 - Width / 2,
+            UIAnchor.BottomLeft => new Point(relativePos.X, parentsPos.Y + Parent.Height - Height - Position.Y),
+            UIAnchor.Bottom => new Point(relativePos.X + Parent.Width / 2 - Width / 2,
                 parentsPos.Y + Parent.Height - Height - Position.Y),
-            UIAnchor.BottomRight => new OffsetVector(parentsPos.X + Parent.Width - Width - Position.X,
+            UIAnchor.BottomRight => new Point(parentsPos.X + Parent.Width - Width - Position.X,
                 parentsPos.Y + Parent.Height - Height - Position.Y),
             _ => relativePos
         };

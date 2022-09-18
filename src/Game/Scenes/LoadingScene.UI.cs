@@ -1,3 +1,4 @@
+using System.Drawing;
 using Scorpia.Engine;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.UI;
@@ -23,7 +24,7 @@ public partial class LoadingScene
         _loadingBar = new ProgressBar
         {
             Anchor = UIAnchor.Bottom,
-            Position = new OffsetVector(0, 100),
+            Position = new Point(0, 100),
             Type = "loading"
         };
         _loadingBar.SetWidth(1942);

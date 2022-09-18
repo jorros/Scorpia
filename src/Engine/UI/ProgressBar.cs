@@ -37,11 +37,11 @@ public class ProgressBar : UIElement
 
         var target = new Rectangle(position.X, position.Y, width, height);
 
-        renderContext.Camera.Draw(style.Background, target, 0, Color.White, 255, inWorld);
+        renderContext.Draw(style.Background, target, 0, Color.White, 255, inWorld);
         
         target = new Rectangle(position.X, position.Y, (int)Math.Round(width / 100.0 * Progress), height);
         var src = target with {X = 0, Y = 0};
         
-        renderContext.Camera.Draw(style.Fill, src, target, 0, Color.White, 255, inWorld);
+        renderContext.Draw(style.Fill, src, target, 0, Color.White, 255, inWorld);
     }
 }

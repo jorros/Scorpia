@@ -72,7 +72,7 @@ public class RiverGenerator : IGenerator
         }
     }
     
-    private IReadOnlyList<CubeVector> CreateRiver(CubeVector startPosition, IEnumerable<CubeVector> waterMinimas)
+    private IReadOnlyList<Hex> CreateRiver(Hex startPosition, IEnumerable<Hex> waterMinimas)
     {
         PerlinWorm worm;
         if (ConverganceEnabled)
