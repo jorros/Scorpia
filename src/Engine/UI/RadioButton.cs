@@ -119,7 +119,7 @@ public class RadioButton : UIElement
             sprite = style.CheckedButton;
         }
 
-        renderContext.Viewport.Draw(sprite, _bounds.Value, 0, tint, 255, inWorld);
+        renderContext.Camera.Draw(sprite, _bounds.Value, 0, tint, 255, inWorld);
 
         if (Content is not null)
         {

@@ -49,7 +49,7 @@ public class HorizontalGridLayout : UIElement
         {
             var scaledPos = stylesheet.Scale(GetPosition()) + stylesheet.Scale(Margin);
             var rect = new Rectangle(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), scaledHeight);
-            renderContext.Viewport.Draw(Background, rect, 0, Color.White, 255, inWorld);
+            renderContext.Camera.Draw(Background, rect, 0, Color.White, 255, inWorld);
         }
         
         var currentPos = new OffsetVector(Padding.X, Padding.Y) + Margin;

@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine;
+using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Utils;
@@ -36,7 +38,7 @@ public class MapNode : Node
             new ResourceGenerator()
         };
 
-        Map = new Tilemap(Width, Height, 180, 180);
+        Map = new Tilemap(Width, Height, new OffsetVector(77, 77), TilemapOrientation.Pointy);
         var ground = Map.AddLayer();
         var river = Map.AddLayer();
         var locations = Map.AddLayer();
@@ -44,6 +46,20 @@ public class MapNode : Node
         var flair = Map.AddLayer();
         var temp = Map.AddLayer();
         var selected = Map.AddLayer();
+
+        var assetManager = ServiceProvider.GetService<AssetManager>();
+
+        if (assetManager is not null)
+        {
+            var grass = assetManager.Get<Sprite>("Game:tile_grassland_dense_clear_green_4");
+            for (var y = 0; y < 20; y++)
+            {
+                for (var x = 0; x < 20; x++)
+                {
+                    ground.SetTile(new OffsetVector(x, y), grass);
+                }
+            }
+        }
     }
 
     public void Generate(int seed)

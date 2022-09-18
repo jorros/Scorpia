@@ -6,16 +6,16 @@ public class TilemapLayer
 {
     private readonly int _width;
     private readonly int _height;
-    private readonly int _tileWidth;
-    private readonly int _tileHeight;
+    private readonly OffsetVector _size;
+    private readonly TilemapOrientationMatrix _orientationMatrix;
     private readonly Sprite[] _tiles;
     
-    internal TilemapLayer(int width, int height, int tileWidth, int tileHeight)
+    internal TilemapLayer(int width, int height, OffsetVector size, TilemapOrientationMatrix orientationMatrix)
     {
         _width = width;
         _height = height;
-        _tileWidth = tileWidth;
-        _tileHeight = tileHeight;
+        _size = size;
+        _orientationMatrix = orientationMatrix;
         _tiles = new Sprite[width * height];
     }
 
@@ -38,6 +38,15 @@ public class TilemapLayer
     {
         return GetTile(position.ToOffset());
     }
+
+    private OffsetVector HexToScreen(OffsetVector pos)
+    {
+        var h = pos.ToCube();
+        
+        var x = (_orientationMatrix.f0 * pos.X + _orientationMatrix.f1 * pos.Y) * _size.X;
+        var y = (_orientationMatrix.f2 * pos.X + _orientationMatrix.f3 * pos.Y) * _size.Y;
+        return new OffsetVector((int)x, (int)y);
+    }
     
     public void Render(RenderContext renderContext)
     {
@@ -45,14 +54,14 @@ public class TilemapLayer
         {
             for (var x = 0; x < _width; x++)
             {
-                var sprite = GetTile(new OffsetVector(x, y));
+                var pos = new OffsetVector(x, y);
+                var sprite = GetTile(pos);
                 if (sprite is null)
                 {
                     continue;
                 }
                 
-                var position = new OffsetVector(x * _tileWidth, y * _tileHeight);
-                
+                var position = HexToScreen(pos);
                 renderContext.Draw(sprite, position);
             }
         }

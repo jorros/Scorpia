@@ -109,10 +109,10 @@ public class Button : UIElement
             tint = Color.DarkGray;
         }
 
-        renderContext.Viewport.Draw(style.Button, _bounds.Value, 0, tint, 255, inWorld);
+        renderContext.Camera.Draw(style.Button, _bounds.Value, 0, tint, 255, inWorld);
 
         var textPosition = new OffsetVector(Width / 2, Height / 2) + position + style.TextPosition;
-        renderContext.Viewport.DrawText(style.LabelStyle.Font,
+        renderContext.Camera.DrawText(style.LabelStyle.Font,
             stylesheet.Scale(textPosition),
             Text,
             fontSettings,

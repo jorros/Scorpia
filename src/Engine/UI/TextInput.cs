@@ -203,7 +203,7 @@ public class TextInput : UIElement
             tint = Color.DarkGray;
         }
 
-        renderContext.Viewport.Draw(style.Background, _bounds, 0, tint, 255, inWorld);
+        renderContext.Camera.Draw(style.Background, _bounds, 0, tint, 255, inWorld);
 
         var padding = stylesheet.Scale(style.Padding);
         var textSettings = style.Text.ToFontSettings();
@@ -212,7 +212,7 @@ public class TextInput : UIElement
         var clippingRect = new Rectangle(position.X + padding.X, position.Y + padding.Y,
             _bounds.Width - padding.X * 2, _bounds.Height - padding.Y * 2);
 
-        renderContext.Viewport.SetClipping(clippingRect);
+        renderContext.Camera.SetClipping(clippingRect);
 
         var startPos = position + padding;
         var textWidth = style.Text.Font.CalculateSize(Text[.._caret], textSettings).X;
@@ -224,15 +224,15 @@ public class TextInput : UIElement
             textCorrection = clippingRect.Right - (startPos.X + textWidth) - stylesheet.Scale(InputStartScrolling);
         }
 
-        renderContext.Viewport.DrawText(style.Text.Font,
+        renderContext.Camera.DrawText(style.Text.Font,
             new OffsetVector(position.X + padding.X + textCorrection, position.Y + padding.Y), Text, textSettings,
             inWorld);
         
-        renderContext.Viewport.SetClipping(null);
+        renderContext.Camera.SetClipping(null);
         
         if (_focus && Enabled != false)
         {
-            renderContext.Viewport.DrawLine(new OffsetVector(startPos.X + textWidth + textCorrection, startPos.Y),
+            renderContext.Camera.DrawLine(new OffsetVector(startPos.X + textWidth + textCorrection, startPos.Y),
                 new OffsetVector(startPos.X + textWidth + textCorrection, startPos.Y + textHeight), style.Text.Color);
         }
     }

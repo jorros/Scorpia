@@ -6,19 +6,26 @@ using static SDL2.SDL;
 
 namespace Scorpia.Engine.Graphics;
 
-public class Viewport
+public class Camera
 {
     private readonly GraphicsManager _graphicsManager;
     private SDL_Rect _rect;
     private SDL_Rect _previousRect;
 
-    public OffsetVector WorldPosition { get; set; }
+    public OffsetVector Position { get; set; }
+    public float Rotation { get; set; }
+    public float Zoom { get; set; }
+    public float MinimumZoom { get; set; }
+    public float MaximumZoom { get; set; }
+    public Rectangle BoundingRectangle { get; set; }
+    public OffsetVector Origin { get; set; }
+    public OffsetVector Center { get; set; }
 
-    internal Viewport(GraphicsManager graphicsManager, SDL_Rect rect)
+    internal Camera(GraphicsManager graphicsManager, SDL_Rect rect)
     {
         _graphicsManager = graphicsManager;
         _rect = rect;
-        WorldPosition = OffsetVector.Zero;
+        Position = OffsetVector.Zero;
     }
 
     public void Begin()
@@ -72,6 +79,11 @@ public class Viewport
         };
     }
 
+    public void SetDistance(float distance = 10)
+    {
+        
+    }
+
     public void Draw(Sprite sprite, OffsetVector position)
     {
         var dest = new Rectangle(position.X, position.Y, sprite.Size.X, sprite.Size.Y);
@@ -82,7 +94,7 @@ public class Viewport
     {
         if (inWorld)
         {
-            dest = dest with {X = dest.X - WorldPosition.X, Y = dest.Y - WorldPosition.Y};
+            dest = dest with {X = dest.X - Position.X, Y = dest.Y - Position.Y};
         }
 
         sprite.Render(_graphicsManager, null, dest, angle, color, alpha);
@@ -92,7 +104,7 @@ public class Viewport
     {
         if (inWorld)
         {
-            dest = dest with {X = dest.X - WorldPosition.X, Y = dest.Y - WorldPosition.Y};
+            dest = dest with {X = dest.X - Position.X, Y = dest.Y - Position.Y};
         }
 
         sprite.Render(_graphicsManager, src, dest, angle, color, alpha);
@@ -102,7 +114,7 @@ public class Viewport
     {
         if (inWorld)
         {
-            position -= WorldPosition;
+            position -= Position;
         }
         
         font.Render(position, text, settings);

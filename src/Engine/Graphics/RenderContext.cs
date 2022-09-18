@@ -10,7 +10,7 @@ namespace Scorpia.Engine.Graphics;
 public class RenderContext
 {
     private readonly GraphicsManager _graphicsManager;
-    public Viewport Viewport { get; private set; }
+    public Camera Camera { get; private set; }
     private ulong _currentTick;
     private readonly Dictionary<Action, ulong> _timedActions;
     public int FPS => _graphicsManager.FPS;
@@ -24,7 +24,7 @@ public class RenderContext
     internal void Init()
     {
         SDL_RenderGetViewport(_graphicsManager.Renderer, out var rect);
-        Viewport = new Viewport(_graphicsManager, rect);
+        Camera = new Camera(_graphicsManager, rect);
     }
     
     internal void Begin(ScaleQuality scaleQuality = ScaleQuality.Nearest)
@@ -33,12 +33,12 @@ public class RenderContext
 
         _currentTick = SDL_GetTicks64();
         
-        Viewport.Begin();
+        Camera.Begin();
     }
 
     internal void End()
     {
-        Viewport.End();
+        Camera.End();
     }
 
     public void InvokeIn(uint ms, Action action)
@@ -73,16 +73,16 @@ public class RenderContext
 
     public void Draw(Sprite sprite, OffsetVector position)
     {
-        Viewport.Draw(sprite, position);
+        Camera.Draw(sprite, position);
     }
 
     public void Draw(Sprite sprite, Rectangle target)
     {
-        Viewport.Draw(sprite, target, 0, Color.White, 255);
+        Camera.Draw(sprite, target, 0, Color.White, 255);
     }
     
     public void DrawText(Font font, OffsetVector position, string text, FontSettings settings)
     {
-        Viewport.DrawText(font, position, text, settings);
+        Camera.DrawText(font, position, text, settings);
     }
 }

@@ -102,7 +102,7 @@ public class Window : UIElement
         var position = stylesheet.Scale(pos);
         var rect = new Rectangle(position.X, position.Y, stylesheet.Scale(Width), stylesheet.Scale(Height - style.ActionBarHeight));
 
-        renderContext.Viewport.Draw(style.Background, rect, 0, Color.White, 255, inWorld);
+        renderContext.Camera.Draw(style.Background, rect, 0, Color.White, 255, inWorld);
         Content.Render(renderContext, inWorld);
         
         ActionBar.Render(renderContext, stylesheet, inWorld);

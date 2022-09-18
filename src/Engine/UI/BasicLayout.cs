@@ -75,7 +75,7 @@ public class BasicLayout : UIElement
             backgroundRect.X = position.X + Width / 2 - backgroundRect.Width / 2;
             backgroundRect.Y = position.Y + Height / 2 - backgroundRect.Height / 2;
             
-            renderContext.Viewport.Draw(Background, backgroundRect, 0, Color.White, 255, inWorld);
+            renderContext.Camera.Draw(Background, backgroundRect, 0, Color.White, 255, inWorld);
         }
         
         foreach (var element in Elements)

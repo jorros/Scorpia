@@ -12,7 +12,7 @@ public abstract class Component : IDisposable
     protected AssetManager AssetManager => ServiceProvider.GetService<AssetManager>();
     protected DefaultSceneManager SceneManager => ServiceProvider.GetRequiredService<DefaultSceneManager>();
     protected UserDataManager UserDataManager => ServiceProvider.GetRequiredService<UserDataManager>();
-    protected Viewport Viewport => ServiceProvider.GetRequiredService<RenderContext>().Viewport;
+    protected Camera Camera => ServiceProvider.GetRequiredService<RenderContext>().Camera;
     protected Node Parent { get; private set; }
 
     public virtual void OnCleanUp()
