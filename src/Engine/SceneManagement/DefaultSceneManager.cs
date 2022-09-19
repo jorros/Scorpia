@@ -74,7 +74,7 @@ public class DefaultSceneManager : SceneManager
 
     internal override void Render(TimeSpan elapsedTime)
     {
-        _renderContext.Begin();
+        _renderContext.Begin(currentScene.BackgroundColor);
         currentScene.Render(_renderContext);
         _renderContext.End();
     }

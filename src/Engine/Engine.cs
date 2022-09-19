@@ -190,6 +190,8 @@ public abstract class Engine
                 {
                     stopwatch.Start();
 
+                    Input.UpdateMouseState();
+
                     sceneManager.Update();
 
                     await Task.Delay((int) Math.Floor(Math.Max(1000 / 30.0 - stopwatch.ElapsedMilliseconds, 0)), token);
@@ -255,8 +257,6 @@ public abstract class Engine
                         break;
                 }
             }
-
-            graphicsManager.Clear();
 
             sceneManager.Render(stopwatch.Elapsed);
 

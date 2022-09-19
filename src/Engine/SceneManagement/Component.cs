@@ -48,6 +48,7 @@ public abstract class Component : IDisposable
     {
         ServiceProvider = serviceProvider;
         Parent = parent;
+        OnInit();
     }
 
     public virtual void Dispose()

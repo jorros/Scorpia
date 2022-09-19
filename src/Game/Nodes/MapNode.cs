@@ -8,6 +8,7 @@ using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Utils;
 using Scorpia.Game.World;
 using Scorpia.Game.World.Generation;
+using Scorpia.Game.World.Render;
 
 namespace Scorpia.Game.Nodes;
 
@@ -18,13 +19,14 @@ public class MapNode : Node
     public MapTile[] Tiles { get; private set; } = null!;
     public int Width { get; private set; }
     public int Height { get; private set; }
-    
+
     private const float Scale = 20;
     private const int Octaves = 5;
     private const float Persistence = 0.35f;
     private const float Lacunarity = 5f;
-    
+
     private IReadOnlyList<IGenerator> _generators = null!;
+    private IReadOnlyList<TileRenderer> _renderers = null!;
 
     public override void OnInit()
     {
@@ -41,7 +43,12 @@ public class MapNode : Node
         };
 
         Map = new Tilemap(Width, Height, new Size(95, 95), TilemapOrientation.Pointy);
-        var ground = Map.AddLayer();
+
+        _renderers = new TileRenderer[]
+        {
+            new BiomeRenderer(Map.AddLayer(), AssetManager)
+        };
+
         var river = Map.AddLayer();
         var locations = Map.AddLayer();
         var fow = Map.AddLayer();
@@ -50,18 +57,8 @@ public class MapNode : Node
         var selected = Map.AddLayer();
 
         var assetManager = ServiceProvider.GetService<AssetManager>();
-
-        if (assetManager is not null)
-        {
-            var grass = assetManager.Get<Sprite>("Game:tile_grassland_dense_clear_green_4");
-            for (var y = 0; y < 20; y++)
-            {
-                for (var x = 0; x < 20; x++)
-                {
-                    ground.SetTile(new Point(x, y), grass);
-                }
-            }
-        }
+        
+        AttachComponent(new MapNodeCamera());
     }
 
     public void Generate(int seed)
@@ -81,31 +78,45 @@ public class MapNode : Node
         {
             tile.Neighbours = GetNeighbours(tile);
         }
-        
+
         var noiseMap = new NoiseMap(Width, Height);
         noiseMap.Generate(seed, Scale, Octaves, Persistence, Lacunarity, new PointF(0, 0));
-            
-        foreach(var generator in _generators)
+
+        foreach (var generator in _generators)
         {
             generator.Generate(this, noiseMap);
         }
+        
+        RefreshTilemap();
     }
-    
-    public MapTile? GetTile(Point position)
+
+    public void RefreshTilemap()
+    {
+        foreach (var renderer in _renderers)
+        {
+            foreach (var mapTile in Tiles)
+            {
+                var sprite = renderer.GetTile(mapTile);
+                renderer.Layer.SetTile(mapTile.Position, sprite);
+            }
+        }
+    }
+
+    public MapTile? GetTile(PointF position)
     {
         if (position.X < 0 || position.Y < 0 || position.X >= Width || position.Y >= Height)
         {
             return null;
         }
 
-        return Tiles[position.Y * Width + position.X];
+        return Tiles[(int)position.Y * Width + (int)position.X];
     }
 
     public MapTile? GetTile(Hex position)
     {
         return GetTile(position.ToPoint());
     }
-    
+
     public bool HasNeighbour(MapTile start, Func<MapTile, bool> predicate, int range = 1)
     {
         var min = -range;
@@ -119,14 +130,14 @@ public class MapNode : Node
                 for (var s = min; s <= range; s++)
                 {
                     // Sum of cube coordinates should equal 0
-                    if(q + r + s != 0)
+                    if (q + r + s != 0)
                     {
                         continue;
                     }
 
                     var pos = new Hex(q, r, s);
                     var tile = GetTile(pos + position);
-                    if(tile == null || tile == start)
+                    if (tile == null || tile == start)
                     {
                         continue;
                     }
@@ -141,7 +152,7 @@ public class MapNode : Node
 
         return false;
     }
-    
+
     public IReadOnlyList<MapTile> GetNeighbours(MapTile start, Func<MapTile, bool>? predicate = null, int range = 1)
     {
         var list = new List<MapTile>();
@@ -157,14 +168,14 @@ public class MapNode : Node
                 for (var s = min; s <= range; s++)
                 {
                     // Sum of cube coordinates should equal 0
-                    if(q + r + s != 0)
+                    if (q + r + s != 0)
                     {
                         continue;
                     }
 
                     var pos = new Hex(q, r, s);
                     var tile = GetTile(pos + position);
-                    if(tile == null || tile == start)
+                    if (tile == null || tile == start)
                     {
                         continue;
                     }

@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Numerics;
 using Scorpia.Engine.Asset;
 
 namespace Scorpia.Engine.Graphics;
@@ -9,16 +10,22 @@ public class TilemapLayer
     private readonly int _width;
     private readonly int _height;
     private readonly Size _size;
-    private readonly TilemapOrientationMatrix _orientationMatrix;
+    private readonly Matrix3x2 _matrix;
     private readonly Sprite[] _tiles;
-    
-    internal TilemapLayer(int width, int height, Size size, TilemapOrientationMatrix orientationMatrix)
+
+    private static readonly Matrix3x2 PointyOrientation = new((float) Math.Sqrt(3.0), 0.0f, (float) Math.Sqrt(3.0) / 2.0f,
+        3.0f / 2.0f, 0, 0);
+    private static readonly Matrix3x2 FlatOrientation = new(3.0f / 2.0f, (float)Math.Sqrt(3.0) / 2.0f, 0.0f,
+        (float)Math.Sqrt(3.0), 0, 0);
+
+    internal TilemapLayer(int width, int height, Size size, TilemapOrientation orientation)
     {
         _width = width;
         _height = height;
         _size = size;
-        _orientationMatrix = orientationMatrix;
         _tiles = new Sprite[width * height];
+
+        _matrix = orientation == TilemapOrientation.Flat ? FlatOrientation : PointyOrientation;
     }
 
     public void SetTile(Point position, Sprite tile)
@@ -43,11 +50,12 @@ public class TilemapLayer
 
     private PointF HexToScreen(Hex h)
     {
-        var x = (_orientationMatrix.f0 * h.Q + _orientationMatrix.f1 * h.R) * _size.Width;
-        var y = (_orientationMatrix.f2 * h.Q + _orientationMatrix.f3 * h.R) * _size.Height;
-        return new PointF(x + _size.Width / 2f, y + _size.Height / 2f);
+        var result = Vector2.Transform(new Vector2(h.Q, h.R), _matrix);
+        result *= new Vector2(_size.Width, _size.Height);
+
+        return new PointF(result.X + _size.Width / 2f, result.Y + _size.Height / 2f);
     }
-    
+
     public void Render(RenderContext renderContext)
     {
         for (var y = 0; y < _height; y++)
@@ -62,7 +70,7 @@ public class TilemapLayer
                 }
 
                 var q = x - (y >> 1);
-                
+
                 var position = HexToScreen(new Hex(q, y, 0));
                 renderContext.Draw(sprite, position);
             }

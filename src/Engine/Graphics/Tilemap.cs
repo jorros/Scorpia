@@ -8,26 +8,29 @@ public class Tilemap
     private readonly int _width;
     private readonly int _height;
     private readonly Size _size;
+    private readonly TilemapOrientation _orientation;
     private readonly List<TilemapLayer> _layers;
-    private readonly TilemapOrientationMatrix _orientationMatrix;
 
     public Tilemap(int width, int height, Size size, TilemapOrientation orientation)
     {
         _width = width;
         _height = height;
         _size = size;
+        _orientation = orientation;
         _layers = new List<TilemapLayer>();
-        _orientationMatrix = orientation == TilemapOrientation.Flat
-            ? TilemapOrientationMatrix.Flat
-            : TilemapOrientationMatrix.Pointy;
     }
 
     public TilemapLayer AddLayer()
     {
-        var layer = new TilemapLayer(_width, _height, _size, _orientationMatrix);
+        var layer = new TilemapLayer(_width, _height, _size, _orientation);
         _layers.Add(layer);
 
         return layer;
+    }
+
+    public Size GetSize()
+    {
+        return new Size(_width * _size.Width + _size.Width / 2, _height * _size.Height);
     }
     
     public void Render(RenderContext renderContext)

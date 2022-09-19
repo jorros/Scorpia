@@ -10,13 +10,13 @@ namespace Scorpia.Engine.Graphics;
 
 public class Camera
 {
-    private readonly GraphicsManager _graphicsManager;
     private SDL_Rect _viewport;
     private SDL_Rect _previousRect;
     private float _zoom;
     private float _minimumZoom;
     private float _maximumZoom;
 
+    public RenderContext RenderContext { get; }
     public Vector2 Position { get; set; }
     public float Rotation { get; set; }
 
@@ -79,9 +79,9 @@ public class Camera
     public Vector2 Origin { get; set; }
     public Vector2 Center => Position + Origin;
 
-    internal Camera(GraphicsManager graphicsManager, SDL_Rect viewport)
+    internal Camera(RenderContext renderContext, SDL_Rect viewport)
     {
-        _graphicsManager = graphicsManager;
+        RenderContext = renderContext;
         _viewport = viewport;
         Position = Vector2.Zero;
 
@@ -132,11 +132,20 @@ public class Camera
         return vector;
     }
 
+    public PointF WorldToScreen(PointF worldPosition)
+    {
+        return WorldToScreen(worldPosition.ToVector2()).ToPointF();
+    }
+
     public Vector2 ScreenToWorld(Vector2 screenPosition)
     {
-        Matrix4x4.Invert(GetViewMatrix(), out var inverted);
         return Vector2.Transform(screenPosition - new Vector2(_viewport.x, _viewport.y),
-            inverted);
+            GetInverseViewMatrix());
+    }
+
+    public PointF ScreenToWorld(PointF screenPosition)
+    {
+        return ScreenToWorld(screenPosition.ToVector2()).ToPointF();
     }
 
     private Matrix4x4 GetVirtualViewMatrix()

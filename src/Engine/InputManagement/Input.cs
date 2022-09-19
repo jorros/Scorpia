@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using Scorpia.Engine.Helper;
@@ -11,16 +12,68 @@ public static class Input
     public static event EventHandler<KeyboardEventArgs> OnKeyboard;
     public static event EventHandler<TextInputEventArgs> OnTextInput;
     public static event EventHandler<MouseMoveEventArgs> OnMouseMove;
-    public static event EventHandler<MouseButtonEventArgs> OnMouseButton; 
-    public static event EventHandler<MouseWheelEventArgs> OnMouseWheel; 
+    public static event EventHandler<MouseButtonEventArgs> OnMouseButton;
+    public static event EventHandler<MouseWheelEventArgs> OnMouseWheel;
 
     public static Point MousePosition { get; private set; }
+
+    private static Dictionary<MouseButton, State> MouseState { get; } = new();
+
+    private static IEnumerable<(MouseButton, uint)> _mButtons = new[]
+    {
+        (MouseButton.Left, SDL_BUTTON_LMASK), (MouseButton.Middle, SDL_BUTTON_MMASK),
+        (MouseButton.Right, SDL_BUTTON_RMASK), (MouseButton.X1, SDL_BUTTON_X1MASK), (MouseButton.X2, SDL_BUTTON_X2MASK)
+    };
+
+    private enum State
+    {
+        Active,
+        Down,
+        Up
+    }
+
+    internal static void UpdateMouseState()
+    {
+        var state = SDL_GetMouseState(IntPtr.Zero, IntPtr.Zero);
+        var buttons = SDL_BUTTON(state);
+
+        foreach (var mButton in _mButtons)
+        {
+            if ((buttons & mButton.Item2) != 0)
+            {
+                if (MouseState.ContainsKey(mButton.Item1))
+                {
+                    MouseState[mButton.Item1] = State.Active;
+                }
+                else
+                {
+                    MouseState[mButton.Item1] = State.Down;
+                }
+            }
+            else
+            {
+                if (!MouseState.ContainsKey(mButton.Item1))
+                {
+                    return;
+                }
+
+                if (MouseState[mButton.Item1] != State.Up)
+                {
+                    MouseState[mButton.Item1] = State.Up;
+                }
+                else
+                {
+                    MouseState.Remove(mButton.Item1);
+                }
+            }
+        }
+    }
 
     private static int CalculateWithDpi(int val, bool highDpi)
     {
         return highDpi ? val * 2 : val;
     }
-    
+
     internal static void RaiseEvent(SDL_KeyboardEvent key)
     {
         OnKeyboard?.Invoke(null, new KeyboardEventArgs
@@ -30,7 +83,7 @@ public static class Input
             Key = key.keysym.scancode.ToKey()
         });
     }
-    
+
     internal static void RaiseTextInput(char input)
     {
         OnTextInput?.Invoke(null, new TextInputEventArgs
@@ -41,7 +94,7 @@ public static class Input
 
     internal static void CaptureMouseMotion(SDL_MouseMotionEvent motion, bool highDpi)
     {
-        MousePosition = new Point(motion.x, motion.y);
+        MousePosition = new Point(CalculateWithDpi(motion.x, highDpi), CalculateWithDpi(motion.y, highDpi));
         OnMouseMove?.Invoke(null, new MouseMoveEventArgs
         {
             X = CalculateWithDpi(motion.x, highDpi),
@@ -70,7 +123,7 @@ public static class Input
             Type = button.type == SDL_EventType.SDL_MOUSEBUTTONUP ? MouseEventType.ButtonUp : MouseEventType.ButtonDown,
             X = CalculateWithDpi(button.x, highDpi),
             Y = CalculateWithDpi(button.y, highDpi),
-            Button = (MouseButton)button.button
+            Button = (MouseButton) button.button
         });
     }
 
@@ -85,8 +138,31 @@ public static class Input
 
     public static bool IsButtonDown(MouseButton button)
     {
-        var state = SDL_GetMouseState(IntPtr.Zero, IntPtr.Zero);
+        if (MouseState.ContainsKey(button))
+        {
+            return MouseState[button] == State.Down;
+        }
 
-        return SDL_BUTTON(state) == (uint) button;
+        return false;
+    }
+    
+    public static bool IsButton(MouseButton button)
+    {
+        if (MouseState.ContainsKey(button))
+        {
+            return MouseState[button] == State.Active;
+        }
+
+        return false;
+    }
+    
+    public static bool IsButtonUp(MouseButton button)
+    {
+        if (MouseState.ContainsKey(button))
+        {
+            return MouseState[button] == State.Up;
+        }
+
+        return false;
     }
 }

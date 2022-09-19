@@ -1,3 +1,4 @@
+using System.Drawing;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.SceneManagement;
@@ -7,7 +8,8 @@ namespace Scorpia.Game.Scenes;
 
 public partial class GameScene : NetworkedScene
 {
-    private MapNode _map;
+    private MapNode _map = null!;
+    public override Color BackgroundColor => Color.FromArgb(105, 105, 108);
 
     protected override void OnLoad(AssetManager assetManager)
     {

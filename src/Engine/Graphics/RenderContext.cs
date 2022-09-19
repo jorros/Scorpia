@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Microsoft.Extensions.Logging;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Asset.Font;
+using Scorpia.Engine.Helper;
 using Scorpia.Engine.Maths;
 using static SDL2.SDL;
 
@@ -11,25 +13,30 @@ namespace Scorpia.Engine.Graphics;
 public class RenderContext
 {
     private readonly GraphicsManager _graphicsManager;
+    private readonly ILogger<RenderContext> _logger;
     public Camera Camera { get; private set; }
     private ulong _currentTick;
     private readonly Dictionary<Action, ulong> _timedActions;
     public int FPS => _graphicsManager.FPS;
 
-    public RenderContext(GraphicsManager graphicsManager)
+    public RenderContext(GraphicsManager graphicsManager, ILogger<RenderContext> logger)
     {
         _graphicsManager = graphicsManager;
+        _logger = logger;
         _timedActions = new Dictionary<Action, ulong>();
     }
 
     internal void Init()
     {
         SDL_RenderGetViewport(_graphicsManager.Renderer, out var rect);
-        Camera = new Camera(_graphicsManager, rect);
+        Camera = new Camera(this, rect);
     }
 
-    internal void Begin(ScaleQuality scaleQuality = ScaleQuality.Nearest)
+    internal void Begin(Color clearColor, ScaleQuality scaleQuality = ScaleQuality.Nearest)
     {
+        ErrorHandling.Handle(_logger, SDL_SetRenderDrawColor(_graphicsManager.Renderer, clearColor.R, clearColor.G, clearColor.B, 255));
+        ErrorHandling.Handle(_logger, SDL_RenderClear(_graphicsManager.Renderer));
+        
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, $"{(int) scaleQuality}");
 
         _currentTick = SDL_GetTicks64();

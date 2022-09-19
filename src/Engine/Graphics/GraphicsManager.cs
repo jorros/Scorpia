@@ -105,12 +105,6 @@ public class GraphicsManager
         SDL_Quit();
     }
 
-    internal void Clear()
-    {
-        ErrorHandling.Handle(_logger, SDL_SetRenderDrawColor(Renderer, 0, 0, 235, 255));
-        ErrorHandling.Handle(_logger, SDL_RenderClear(Renderer));
-    }
-
     internal void Flush()
     {
         SDL_RenderPresent(Renderer);

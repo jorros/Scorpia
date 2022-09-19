@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,8 @@ public abstract class Scene : IDisposable
     public ILogger Logger { get; private set; }
 
     private ulong _nodeIdCounter;
+    
+    public virtual Color BackgroundColor { get; } = Color.Firebrick;
 
     protected T CreateNode<T>() where T : Node
     {
@@ -42,7 +45,7 @@ public abstract class Scene : IDisposable
         Nodes.Add(_nodeIdCounter, node);
 
         _nodeIdCounter++;
-
+        
         return node;
     }
     
