@@ -1,10 +1,8 @@
 using System.Drawing;
 using Microsoft.Extensions.DependencyInjection;
-using Scorpia.Engine;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.HexMap;
-using Scorpia.Engine.Maths;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Utils;
 using Scorpia.Game.World;

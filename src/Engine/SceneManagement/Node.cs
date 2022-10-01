@@ -27,6 +27,5 @@ public abstract class Node : Component
         Scene = scene;
         
         Init(this, serviceProvider);
-        OnInit();
     }
 }

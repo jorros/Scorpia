@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -17,7 +18,7 @@ public static class Input
 
     public static Point MousePosition { get; private set; }
 
-    private static Dictionary<MouseButton, State> MouseState { get; } = new();
+    private static ConcurrentDictionary<MouseButton, State> MouseState { get; } = new();
 
     private static IEnumerable<(MouseButton, uint)> _mButtons = new[]
     {
@@ -63,7 +64,7 @@ public static class Input
                 }
                 else
                 {
-                    MouseState.Remove(mButton.Item1);
+                    MouseState.Remove(mButton.Item1, out _);
                 }
             }
         }

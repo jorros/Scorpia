@@ -5,6 +5,7 @@ using Scorpia.Engine.Maths;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Player;
 using Scorpia.Game.World;
+using SDL2;
 
 namespace Scorpia.Game.Nodes;
 
@@ -89,6 +90,7 @@ public class MapNodeCamera : Component
         if(Input.IsButtonDown(MouseButton.Left))
         {
             _dragOrigin = Camera.ScreenToWorld(Input.MousePosition.ToVector());
+            Console.WriteLine("Start dragging");
         }
 
         if (!Input.IsButton(MouseButton.Left) || _dragOrigin == null)
