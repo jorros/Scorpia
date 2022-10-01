@@ -62,6 +62,7 @@ public abstract class Engine
         services.AddSingleton(_ => settings);
         
         services.AddSingleton<UserDataManager>();
+        services.AddSingleton<EventManager>();
 
         if (!settings.Headless)
         {

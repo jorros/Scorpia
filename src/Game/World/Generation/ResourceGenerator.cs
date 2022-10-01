@@ -12,8 +12,10 @@ public class ResourceGenerator : IGenerator
     
     public void Generate(MapNode map, NoiseMap noiseMap)
     {
-        foreach (var tile in map.Tiles)
+        foreach (var position in map.Map)
         {
+            var tile = map.Map.GetData(position);
+            
             if (tile.Biome != Biome.Grass)
             {
                 continue;
@@ -48,7 +50,7 @@ public class ResourceGenerator : IGenerator
 
     private bool CheckGold(MapTile tile, MapNode map)
     {
-        if (HasChance(map, GoldSpawnChance) && map.HasNeighbour(tile, x => x.Biome == Biome.Mountain, 2))
+        if (HasChance(map, GoldSpawnChance) && map.Map.HasNeighbour(tile.Position, x => x.Biome == Biome.Mountain, 2))
         {
             tile.Resource = Resource.Gold;
 
@@ -84,7 +86,7 @@ public class ResourceGenerator : IGenerator
 
     private bool CheckZellos(MapTile tile, MapNode map)
     {
-        if (HasChance(map, ZellosSpawnChance) && map.HasNeighbour(tile, x => x.Biome == Biome.Water || x.River != null, 4))
+        if (HasChance(map, ZellosSpawnChance) && map.Map.HasNeighbour(tile.Position, x => x.Biome == Biome.Water || x.River != null, 4))
         {
             tile.Resource = Resource.Zellos;
 

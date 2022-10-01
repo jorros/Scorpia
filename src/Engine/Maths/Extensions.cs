@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Numerics;
+using Scorpia.Engine.HexMap;
 
 namespace Scorpia.Engine.Maths;
 

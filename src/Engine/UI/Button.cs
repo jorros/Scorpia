@@ -110,7 +110,7 @@ public class Button : UIElement
             tint = Color.DarkGray;
         }
 
-        renderContext.Draw(style.Button, _bounds.Value, 0, tint, 255, inWorld);
+        renderContext.Draw(style.Button, _bounds.Value, 0, tint, 255, -1, inWorld);
 
         var textPosition = new Point(Width / 2, Height / 2).Add(position).Add(style.TextPosition);
         renderContext.DrawText(style.LabelStyle.Font,

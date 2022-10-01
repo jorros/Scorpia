@@ -58,7 +58,7 @@ public class AssetManager
 
             foreach (var asset in assets)
             {
-                bundle.Add(asset.key, asset.asset);
+                bundle.TryAdd(asset.key, asset.asset);
             }
         }
 

@@ -17,7 +17,7 @@ public abstract class Sprite : IAsset, IDisposable
         Size = size;
     }
     
-    internal abstract void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha);
+    internal abstract void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha, int index);
     
     public void Dispose()
     {

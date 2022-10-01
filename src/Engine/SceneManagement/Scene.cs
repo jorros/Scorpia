@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
+using static SDL2.SDL;
 
 namespace Scorpia.Engine.SceneManagement;
 
@@ -53,14 +54,22 @@ public abstract class Scene : IDisposable
     {
         OnRender(context);
 
+        var current = SDL_GetTicks64();
+
         foreach (var node in Nodes.Values)
         {
+            float dT;
             foreach (var component in node.Components)
             {
-                component.OnRender(context);
+                dT = (current - component.lastRender) / 1000f;
+                
+                component.OnRender(context, dT);
+                component.lastRender = current;
             }
-
-            node.OnRender(context);
+            
+            dT = (current - node.lastRender) / 1000f;
+            node.OnRender(context, dT);
+            node.lastRender = current;
         }
     }
 

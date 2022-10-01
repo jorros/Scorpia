@@ -1,4 +1,5 @@
 using Scorpia.Engine;
+using Scorpia.Engine.HexMap;
 using Scorpia.Engine.Maths;
 using Scorpia.Game.Nodes;
 using Scorpia.Game.Utils;
@@ -40,7 +41,7 @@ public class RiverGenerator : IGenerator
 
             foreach (var position in river)
             {
-                var currentTile = map.GetTile(position);
+                var currentTile = map.Map.GetData(position);
 
                 if (currentTile == null)
                 {

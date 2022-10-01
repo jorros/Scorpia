@@ -50,7 +50,7 @@ public class HorizontalGridLayout : UIElement
         {
             var scaledPos = stylesheet.Scale(GetPosition()).Add(stylesheet.Scale(Margin));
             var rect = new Rectangle(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), scaledHeight);
-            renderContext.Draw(Background, rect, 0, Color.White, 255, inWorld);
+            renderContext.Draw(Background, rect, 0, Color.White, 255, -1, inWorld);
         }
         
         var currentPos = new Point(Padding.X, Padding.Y).Add(Margin);

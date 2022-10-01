@@ -124,12 +124,12 @@ public class RenderContext
         Draw(sprite, null, dest, 0, Color.White, 255);
     }
 
-    public void Draw(Sprite sprite, RectangleF dest, double angle, Color color, byte alpha, bool inWorld = true)
+    public void Draw(Sprite sprite, RectangleF dest, double angle, Color color, byte alpha, int index = -1, bool inWorld = true)
     {
-        Draw(sprite, null, dest, angle, color, alpha, inWorld);
+        Draw(sprite, null, dest, angle, color, alpha, index, inWorld);
     }
 
-    public void Draw(Sprite sprite, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha,
+    public void Draw(Sprite sprite, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha, int index = -1,
         bool inWorld = true)
     {
         if (inWorld)
@@ -142,7 +142,7 @@ public class RenderContext
             dest = new RectangleF(position.ToPointF(), size.ToSize());
         }
 
-        sprite.Render(_graphicsManager, src, dest, angle, color, alpha);
+        sprite.Render(_graphicsManager, src, dest, angle, color, alpha, index);
     }
 
     public void DrawText(Font font, PointF position, string text, FontSettings settings, bool inWorld = true)
@@ -157,7 +157,19 @@ public class RenderContext
 
     public void DrawLine(Point from, Point to, Color color)
     {
+        var f = Camera.WorldToScreen(from);
+        var t = Camera.WorldToScreen(to);
+        
         SDL_SetRenderDrawColor(_graphicsManager.Renderer, color.R, color.G, color.B, color.A);
-        SDL_RenderDrawLine(_graphicsManager.Renderer, from.X, from.Y, to.X, to.Y);
+        SDL_RenderDrawLineF(_graphicsManager.Renderer, f.X, f.Y, t.X, t.Y);
+    }
+    
+    public void DrawLine(PointF from, PointF to, Color color)
+    {
+        var f = Camera.WorldToScreen(from);
+        var t = Camera.WorldToScreen(to);
+        
+        SDL_SetRenderDrawColor(_graphicsManager.Renderer, color.R, color.G, color.B, color.A);
+        SDL_RenderDrawLineF(_graphicsManager.Renderer, f.X, f.Y, t.X, t.Y);
     }
 }

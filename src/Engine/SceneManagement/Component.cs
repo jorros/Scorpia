@@ -8,11 +8,14 @@ namespace Scorpia.Engine.SceneManagement;
 public abstract class Component : IDisposable
 {
     protected IServiceProvider ServiceProvider { get; private set; }
-    protected AssetManager AssetManager => ServiceProvider.GetService<AssetManager>();
-    protected DefaultSceneManager SceneManager => ServiceProvider.GetRequiredService<DefaultSceneManager>();
-    protected UserDataManager UserDataManager => ServiceProvider.GetRequiredService<UserDataManager>();
-    protected Camera Camera => ServiceProvider.GetRequiredService<RenderContext>().Camera;
+    protected AssetManager AssetManager { get; private set; }
+    protected SceneManager SceneManager { get; private set; }
+    protected UserDataManager UserDataManager { get; private set; }
+    protected Camera Camera { get; private set; }
+    protected EventManager EventManager { get; private set; }
     protected Node Parent { get; private set; }
+
+    internal ulong lastRender;
 
     public virtual void OnCleanUp()
     {
@@ -40,7 +43,7 @@ public abstract class Component : IDisposable
         OnTick();
     }
     
-    public virtual void OnRender(RenderContext context)
+    public virtual void OnRender(RenderContext context, float dT)
     {
     }
 
@@ -48,11 +51,20 @@ public abstract class Component : IDisposable
     {
         ServiceProvider = serviceProvider;
         Parent = parent;
+
+        Camera = ServiceProvider.GetRequiredService<RenderContext>().Camera;
+        UserDataManager = ServiceProvider.GetRequiredService<UserDataManager>();
+        SceneManager = ServiceProvider.GetRequiredService<SceneManager>();
+        AssetManager = ServiceProvider.GetService<AssetManager>();
+        EventManager = serviceProvider.GetRequiredService<EventManager>();
+        EventManager.RegisterAll(this);
+        
         OnInit();
     }
 
     public virtual void Dispose()
     {
+        EventManager.RemoveAll(this);
         OnCleanUp();
     }
 }

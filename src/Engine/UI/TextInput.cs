@@ -204,7 +204,7 @@ public class TextInput : UIElement
             tint = Color.DarkGray;
         }
 
-        renderContext.Draw(style.Background, _bounds, 0, tint, 255, inWorld);
+        renderContext.Draw(style.Background, _bounds, 0, tint, 255, -1, inWorld);
 
         var padding = stylesheet.Scale(style.Padding);
         var textSettings = style.Text.ToFontSettings();

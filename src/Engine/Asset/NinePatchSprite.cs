@@ -39,7 +39,7 @@ internal class NinePatchSprite : Sprite
         _center = SdlHelper.Create(frame.Position.X + split.X, frame.Position.Y + split.Y, size.X - (split.Width + split.X), size.Y - (split.Height + split.Y));
     }
 
-    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha)
+    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha, int index)
     {
         SDL_SetTextureColorMod(Texture, color.R, color.G, color.B);
         SDL_SetTextureAlphaMod(Texture, alpha);

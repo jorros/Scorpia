@@ -59,6 +59,6 @@ public class Image : UIElement
         var position = stylesheet.Scale(GetPosition());
         var bounds = new Rectangle(position.X, position.Y, stylesheet.Scale(base.Width), stylesheet.Scale(base.Height));
 
-        renderContext.Draw(Sprite, bounds, 0, Color.White, 255, inWorld);
+        renderContext.Draw(Sprite, bounds, 0, Color.White, 255, -1, inWorld);
     }
 }

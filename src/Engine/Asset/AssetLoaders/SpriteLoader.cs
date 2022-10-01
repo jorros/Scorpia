@@ -61,45 +61,53 @@ internal class SpriteLoader : IAssetLoader
         foreach (var frame in descriptor.Frames)
         {
             Sprite sprite;
+
+            var path = Path.GetDirectoryName(key);
+            var frameKey = Path.Combine(path!, $"{frame.Name}");
+
             if (frame.Split is not null)
             {
                 sprite = new NinePatchSprite(texture, frame);
             }
             else
             {
+                if (frame.Index != -1)
+                {
+                    sprite = sprites.FirstOrDefault(x => x.key == frameKey).asset as AnimatedSprite;
+
+                    if (sprite is null)
+                    {
+                        sprite = new AnimatedSprite(texture, frame);
+                        sprites.Add((frameKey, sprite));
+                    }
+                    
+                    ((AnimatedSprite)sprite).AddFrame(frame);
+                    continue;
+                }
+
                 sprite = new TextureSprite(texture, frame);
             }
-
-            var indexKey = string.Empty;
-
-            if (frame.Index != -1)
-            {
-                indexKey = $"_{frame.Index}";
-            }
-
-            var path = Path.GetDirectoryName(key);
-            var frameKey = Path.Combine(path!, $"{frame.Name}{indexKey}");
 
             sprites.Add((frameKey, sprite));
         }
 
         return sprites;
     }
-    
+
     private IntPtr LoadTexture(byte[] data, string format)
     {
         unsafe
         {
             fixed (byte* p = data)
             {
-                var ptr = (IntPtr)p;
+                var ptr = (IntPtr) p;
                 var size = Marshal.SizeOf(typeof(byte)) * data.Length;
-                
+
                 var rw = SDL_RWFromMem(ptr, size);
                 var surface = IMG_LoadTyped_RW(rw, 1, format);
                 var texture = SDL_CreateTextureFromSurface(_graphicsManager.Renderer, surface);
                 SDL_FreeSurface(surface);
-                
+
                 return texture;
             }
         }

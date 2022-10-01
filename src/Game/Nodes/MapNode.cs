@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.HexMap;
 using Scorpia.Engine.Maths;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Utils;
@@ -14,9 +15,8 @@ namespace Scorpia.Game.Nodes;
 
 public class MapNode : Node
 {
-    public Tilemap Map { get; private set; } = null!;
+    public HexMap<MapTile> Map { get; private set; } = null!;
     public Random Rnd { get; private set; } = new();
-    public MapTile[] Tiles { get; private set; } = null!;
     public int Width { get; private set; }
     public int Height { get; private set; }
 
@@ -27,12 +27,14 @@ public class MapNode : Node
 
     private IReadOnlyList<IGenerator> _generators = null!;
     private IReadOnlyList<TileRenderer> _renderers = null!;
+    private HexMapLayer<MapTile>? _selectedLayer;
+
+    private Sprite _selectedTile;
 
     public override void OnInit()
     {
         Width = 60;
         Height = 40;
-        Tiles = new MapTile[Width * Height];
 
         _generators = new IGenerator[]
         {
@@ -42,21 +44,27 @@ public class MapNode : Node
             new ResourceGenerator()
         };
 
-        Map = new Tilemap(Width, Height, new Size(95, 95), TilemapOrientation.Pointy);
+        Map = new HexMap<MapTile>(Width, Height, new Size(95, 95), hex => new MapTile(hex));
 
+        var biomeLayer = Map.AddLayer();
+        var riverLayer = Map.AddLayer();
+        var locationsLayer = Map.AddLayer();
+        var fowLayer = Map.AddLayer();
+        var flairLayer = Map.AddLayer();
+        var tempLayer = Map.AddLayer();
+        _selectedLayer = Map.AddLayer();
+        
         _renderers = new TileRenderer[]
         {
-            new BiomeRenderer(Map.AddLayer(), AssetManager)
+            new BiomeRenderer(biomeLayer, AssetManager)
         };
 
-        var river = Map.AddLayer();
-        var locations = Map.AddLayer();
-        var fow = Map.AddLayer();
-        var flair = Map.AddLayer();
-        var temp = Map.AddLayer();
-        var selected = Map.AddLayer();
-
         var assetManager = ServiceProvider.GetService<AssetManager>();
+
+        if (assetManager is not null)
+        {
+            _selectedTile = assetManager.Get<Sprite>("Game:selected_tile");
+        }
         
         AttachComponent(new MapNodeCamera());
     }
@@ -64,19 +72,10 @@ public class MapNode : Node
     public void Generate(int seed)
     {
         Rnd = new Random(seed);
-        for (var x = 0; x < Width; x++)
-        {
-            for (var y = 0; y < Height; y++)
-            {
-                var tile = new MapTile(new Point(x, y));
 
-                Tiles[y * Width + x] = tile;
-            }
-        }
-
-        foreach (var tile in Tiles)
+        foreach (var tile in Map)
         {
-            tile.Neighbours = GetNeighbours(tile);
+            Map.GetData(tile).Neighbours = Map.GetNeighbours(tile);
         }
 
         var noiseMap = new NoiseMap(Width, Height);
@@ -94,104 +93,29 @@ public class MapNode : Node
     {
         foreach (var renderer in _renderers)
         {
-            foreach (var mapTile in Tiles)
+            foreach (var position in Map)
             {
+                var mapTile = Map.GetData(position);
                 var sprite = renderer.GetTile(mapTile);
-                renderer.Layer.SetTile(mapTile.Position, sprite);
+                renderer.Layer.SetSprite(mapTile.Position, sprite);
             }
         }
     }
 
-    public MapTile? GetTile(PointF position)
+    [Event(nameof(SelectTile))]
+    public void SelectTile(MapTile select)
     {
-        if (position.X < 0 || position.Y < 0 || position.X >= Width || position.Y >= Height)
-        {
-            return null;
-        }
-
-        return Tiles[(int)position.Y * Width + (int)position.X];
+        _selectedLayer.Clear();
+        _selectedLayer.SetSprite(select.Position, _selectedTile);
     }
 
-    public MapTile? GetTile(Hex position)
+    [Event(nameof(DeselectTile))]
+    public void DeselectTile()
     {
-        return GetTile(position.ToPoint());
+        _selectedLayer.Clear();
     }
 
-    public bool HasNeighbour(MapTile start, Func<MapTile, bool> predicate, int range = 1)
-    {
-        var min = -range;
-
-        var position = start.Position.ToCube();
-
-        for (var q = min; q <= range; q++)
-        {
-            for (var r = min; r <= range; r++)
-            {
-                for (var s = min; s <= range; s++)
-                {
-                    // Sum of cube coordinates should equal 0
-                    if (q + r + s != 0)
-                    {
-                        continue;
-                    }
-
-                    var pos = new Hex(q, r, s);
-                    var tile = GetTile(pos + position);
-                    if (tile == null || tile == start)
-                    {
-                        continue;
-                    }
-
-                    if (predicate.Invoke(tile))
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public IReadOnlyList<MapTile> GetNeighbours(MapTile start, Func<MapTile, bool>? predicate = null, int range = 1)
-    {
-        var list = new List<MapTile>();
-
-        var min = -range;
-
-        var position = start.Position.ToCube();
-
-        for (var q = min; q <= range; q++)
-        {
-            for (var r = min; r <= range; r++)
-            {
-                for (var s = min; s <= range; s++)
-                {
-                    // Sum of cube coordinates should equal 0
-                    if (q + r + s != 0)
-                    {
-                        continue;
-                    }
-
-                    var pos = new Hex(q, r, s);
-                    var tile = GetTile(pos + position);
-                    if (tile == null || tile == start)
-                    {
-                        continue;
-                    }
-
-                    if (predicate == null || predicate.Invoke(tile))
-                    {
-                        list.Add(tile);
-                    }
-                }
-            }
-        }
-
-        return list;
-    }
-
-    public override void OnRender(RenderContext context)
+    public override void OnRender(RenderContext context, float dT)
     {
         Map.Render(context);
     }

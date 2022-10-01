@@ -21,7 +21,7 @@ public class TextureSprite : Sprite
         _frame = frame;
     }
 
-    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha)
+    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha, int index)
     {
         var target = new SDL_FRect
         {

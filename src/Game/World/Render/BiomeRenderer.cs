@@ -1,5 +1,6 @@
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.HexMap;
 using Scorpia.Game.Utils;
 
 namespace Scorpia.Game.World.Render;
@@ -8,7 +9,7 @@ public class BiomeRenderer : TileRenderer
 {
     private readonly IndexHelper _counter = new(10);
 
-    public BiomeRenderer(TilemapLayer layer, AssetManager assetManager) : base(layer, assetManager)
+    public BiomeRenderer(HexMapLayer<MapTile> layer, AssetManager assetManager) : base(layer, assetManager)
     {
     }
 

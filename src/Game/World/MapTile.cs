@@ -1,17 +1,17 @@
-using System.Drawing;
-using Scorpia.Engine;
-using Scorpia.Engine.Maths;
+using Scorpia.Engine.HexMap;
 using Scorpia.Game.Nodes;
 
 namespace Scorpia.Game.World;
 
 public class MapTile : IEquatable<MapTile>
 {
-    public MapTile(Point position)
+    public MapTile(Hex position)
     {
         Position = position;
         _features = new HashSet<MapTileFeature>();
     }
+    
+    public Hex Position { get; set; }
 
     public Biome Biome { get; set; }
 
@@ -27,9 +27,7 @@ public class MapTile : IEquatable<MapTile>
 
     public Direction? River { get; set; }
 
-    public Point Position { get; }
-
-    public LocationNode Location { get; set; }
+    public LocationNode? Location { get; set; }
 
     public bool HasFeature(MapTileFeature feature) => _features.Contains(feature);
 
@@ -48,7 +46,7 @@ public class MapTile : IEquatable<MapTile>
             Direction.SouthWest
         };
 
-        var vector = to.Position.ToCube() - Position.ToCube();
+        var vector = to.Position - Position;
         var index = -1;
 
         for (var i = 0; i < vectors.Length; i++)
@@ -66,11 +64,6 @@ public class MapTile : IEquatable<MapTile>
         }
 
         return directions[index];
-    }
-
-    public double DistanceTo(MapTile other)
-    {
-        return Math.Sqrt((Math.Pow(Position.X - other.Position.X, 2) + Math.Pow(Position.Y - other.Position.Y, 2)));
     }
 
     public bool Equals(MapTile? other)

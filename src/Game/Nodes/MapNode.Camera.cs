@@ -1,25 +1,29 @@
 using System.Numerics;
+using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.Maths;
 using Scorpia.Engine.SceneManagement;
+using Scorpia.Game.Player;
 using Scorpia.Game.World;
 
 namespace Scorpia.Game.Nodes;
 
 public class MapNodeCamera : Component
 {
-    private MapTile _tile = null!;
+    private MapTile? _tile;
     private MapNode _map = null!;
     private MapTile _currentTile = null!;
     
     private Vector2? _dragOrigin;
     private bool _isDragging;
+    private CurrentPlayer _currentPlayer = null!;
     
     public static bool clickIsBlocked;
 
     public override void OnInit()
     {
         _map = (MapNode)Parent;
+        _currentPlayer = ServiceProvider.GetRequiredService<CurrentPlayer>();
     }
 
     public override void OnUpdate()
@@ -27,14 +31,21 @@ public class MapNodeCamera : Component
         ProcessHover();
         
         StartDragging();
-        
+        SelectTile();
         StopDragging();
     }
     
     private void ProcessHover()
     {
         var mousePos = Camera.ScreenToWorld(Input.MousePosition);
-        _tile = _map.GetTile(mousePos);
+        var hexPos = _map.Map.WorldToHex(mousePos);
+
+        if (!_map.Map.Contains(hexPos))
+        {
+            return;
+        }
+        
+        _tile = _map.Map.GetData(hexPos);
 
         if (_tile == _currentTile)
         {
@@ -42,7 +53,7 @@ public class MapNodeCamera : Component
         }
             
         _currentTile = _tile;
-        // Game.GetPlayerAction().Hover(_currentTile);
+        _currentPlayer.CurrentAction.Hover(_currentTile);
     }
     
     private void SelectTile()
@@ -50,14 +61,21 @@ public class MapNodeCamera : Component
         if (Input.IsButtonUp(MouseButton.Left) && !_isDragging && !clickIsBlocked)
         {
             var mousePos = Camera.ScreenToWorld(Input.MousePosition);
-            _tile = _map.GetTile(mousePos);
-            // Game.GetPlayerAction().LeftClick(tile);
+            var hexPos = _map.Map.WorldToHex(mousePos);
+            
+            if (!_map.Map.Contains(hexPos))
+            {
+                return;
+            }
+            
+            _tile = _map.Map.GetData(hexPos);
+            _currentPlayer.CurrentAction.LeftClick(_tile);
         }
 
         if(Input.IsButtonUp(MouseButton.Right) && _tile is not null && !clickIsBlocked)
         {
             _tile = null;
-            // Game.GetPlayerAction().RightClick(tile);
+            _currentPlayer.CurrentAction.RightClick(_tile);
         }
 
         if (clickIsBlocked)
@@ -99,7 +117,7 @@ public class MapNodeCamera : Component
     private Vector2 ClampCamera(Vector2 position)
     {
         var screenBounds = Camera.RenderContext.GetDrawSize();
-        var size = _map.Map.GetSize();
+        var size = _map.Map.Size;
 
         var start = new Vector2(0, 0);
         var end = new Vector2(size.Width - screenBounds.Width, size.Height - screenBounds.Height);

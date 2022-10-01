@@ -11,9 +11,10 @@ public class BiomeGenerator : IGenerator
 
     public void Generate(MapNode map, NoiseMap noiseMap)
     {
-        foreach (var tile in map.Tiles)
+        foreach (var position in map.Map)
         {
-            var noise = noiseMap.GetPosition(tile.Position.X, tile.Position.Y);
+            var tile = map.Map.GetData(position);
+            var noise = noiseMap.GetPosition(tile.Position.Q, tile.Position.R);
 
             tile.Biome = BiomeHelper.GetByNoise(noise);
 

@@ -11,18 +11,19 @@ public class FertilityGenerator : IGenerator
     
     public void Generate(MapNode map, NoiseMap noiseMap)
     {
-        foreach(var tile in map.Tiles)
+        foreach(var position in map.Map)
         {
+            var tile = map.Map.GetData(position);
             if(tile.Biome != Biome.Grass)
             {
                 continue;
             }
 
-            if(map.HasNeighbour(tile, x => x.River != null))
+            if(map.Map.HasNeighbour(position, x => x.River != null))
             {
                 tile.Fertility = Fertility.High;
             }
-            else if(map.HasNeighbour(tile, x => x.River != null || x.Biome == Biome.Water, 4))
+            else if(map.Map.HasNeighbour(position, x => x.River != null || x.Biome == Biome.Water, 4))
             {
                 tile.Fertility = HasChance(HighFertilityCloseWater, map) ? Fertility.High : Fertility.Normal;
             }

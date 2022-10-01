@@ -16,6 +16,7 @@ public class Game : Engine.Engine
 
         services.AddSingleton<GameState>();
         services.AddSingleton<PlayerManager>();
+        services.AddSingleton<CurrentPlayer>();
         
         networkedNodes.Add(typeof(LocationNode));
         AddNetworkPacketsFrom(GetType().Assembly);
