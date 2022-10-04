@@ -25,9 +25,9 @@ public class MapNode : Node
 
     private IReadOnlyList<IGenerator> _generators = null!;
     private IReadOnlyList<TileRenderer> _renderers = null!;
-    private HexMapLayer<MapTile>? _selectedLayer;
+    private HexMapLayer<MapTile> _selectedLayer = null!;
 
-    private Sprite _selectedTile;
+    private Sprite _selectedTile = null!;
 
     public override void OnInit()
     {
@@ -54,7 +54,9 @@ public class MapNode : Node
         
         _renderers = new TileRenderer[]
         {
-            new BiomeRenderer(biomeLayer, AssetManager)
+            new BiomeRenderer(biomeLayer, AssetManager),
+            new LocationsRenderer(locationsLayer, AssetManager),
+            new FlairTileRenderer(flairLayer, AssetManager)
         };
 
         var assetManager = ServiceProvider.GetService<AssetManager>();

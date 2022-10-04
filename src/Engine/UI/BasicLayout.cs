@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
+using Redzen.Sorting;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.UI.Style;
@@ -77,8 +79,10 @@ public class BasicLayout : UIElement
             
             renderContext.Draw(Background, backgroundRect, 0, Color.White, 255, -1, inWorld);
         }
-        
-        foreach (var element in Elements)
+
+        var span = CollectionsMarshal.AsSpan(Elements);
+        TimSort<UIElement>.Sort(span);
+        foreach (var element in span)
         {
             element.Render(renderContext, stylesheet, inWorld);
         }

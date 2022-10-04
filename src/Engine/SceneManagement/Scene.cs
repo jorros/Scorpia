@@ -23,17 +23,17 @@ public abstract class Scene : IDisposable
     
     public virtual Color BackgroundColor { get; } = Color.Firebrick;
 
-    protected T CreateNode<T>() where T : Node
+    protected T CreateNode<T>(Action<T> configure = null) where T : Node
     {
-        return (T)CreateNode(typeof(T));
+        return (T)CreateNode(typeof(T), obj => configure?.Invoke(obj as T));
     }
-
+    
     public Node FindNode<T>() where T : Node
     {
         return Nodes.FirstOrDefault(x => x.Value is T).Value;
     }
 
-    protected Node CreateNode(Type type)
+    protected Node CreateNode(Type type, Action<Node> configure = null)
     {
         if (!type.IsAssignableTo(typeof(Node)))
         {
@@ -41,6 +41,7 @@ public abstract class Scene : IDisposable
         }
         
         var node = (Node)Activator.CreateInstance(type);
+        configure?.Invoke(node);
         node?.Create(_nodeIdCounter, ServiceProvider, this);
 
         Nodes.Add(_nodeIdCounter, node);
@@ -52,8 +53,6 @@ public abstract class Scene : IDisposable
     
     internal void Render(RenderContext context)
     {
-        OnRender(context);
-
         var current = SDL_GetTicks64();
 
         foreach (var node in Nodes.Values)
@@ -71,6 +70,8 @@ public abstract class Scene : IDisposable
             node.OnRender(context, dT);
             node.lastRender = current;
         }
+        
+        OnRender(context);
     }
 
     internal virtual void Update()

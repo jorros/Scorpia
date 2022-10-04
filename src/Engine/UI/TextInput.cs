@@ -216,7 +216,7 @@ public class TextInput : UIElement
         renderContext.SetClipping(clippingRect);
 
         var startPos = position.Add(padding);
-        var textWidth = style.Text.Font.CalculateSize(Text[.._caret], textSettings).X;
+        var textWidth = style.Text.Font.CalculateSize(Text[.._caret], textSettings).Width;
         var textHeight = style.Text.Font.GetHeight(textSettings);
         var textCorrection = 0;
 

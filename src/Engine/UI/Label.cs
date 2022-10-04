@@ -35,8 +35,8 @@ public class Label : UIElement
         };
 
         var size = font.CalculateSize(Text, fontSettings);
-        Width = size.X;
-        Height = size.Y;
+        Width = size.Width;
+        Height = size.Height;
         
         if (!Show)
         {

@@ -126,6 +126,11 @@ public class Camera
         Position = position - new Vector2(_viewport.w / 2f, _viewport.h / 2f);
     }
 
+    public SizeF GetSize(SizeF size)
+    {
+        return new SizeF(size.Width * Zoom, size.Height * Zoom);
+    }
+
     public Vector2 WorldToScreen(Vector2 worldPosition)
     {
         var vector = Vector2.Transform(worldPosition + new Vector2(_viewport.x, _viewport.y), GetViewMatrix());

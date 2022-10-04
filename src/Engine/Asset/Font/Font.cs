@@ -90,24 +90,24 @@ public class Font : IAsset, IDisposable
         return TTF_FontHeight(font);
     }
 
-    public Point CalculateSize(string text, FontSettings settings)
+    public Size CalculateSize(string text, FontSettings settings)
     {
         if (string.IsNullOrEmpty(text))
         {
-            return Point.Empty;
+            return Size.Empty;
         }
         
         var startBlock = settings.ToTextBlock();
         var blocks = _fontMarkupReader.Read(text, startBlock);
 
         var cursor = new Point();
-        var size = new Point();
+        var size = new Size();
 
         foreach (var block in blocks)
         {
             if (block is NewLineBlock)
             {
-                size = new Point(Math.Max(cursor.X, size.X), size.Y + cursor.Y);
+                size = new Size(Math.Max(cursor.X, size.Width), size.Height + cursor.Y);
                 
                 continue;
             }
@@ -116,7 +116,7 @@ public class Font : IAsset, IDisposable
             renderer.CalculateSize(text, this, block, ref cursor);
         }
         
-        size = new Point(Math.Max(cursor.X, size.X), size.Y + cursor.Y);
+        size = new Size(Math.Max(cursor.X, size.Width), size.Height + cursor.Y);
 
         return size;
     }

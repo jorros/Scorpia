@@ -25,6 +25,28 @@ public static class ScorpiaStyle
         inputLabel.Size = 28;
         inputLabel.Color = Color.FromArgb(202, 178, 148);
 
+        var statLabel = Stylesheet.CreateLabelStyle("StatLabel", "UI:MYRIADPRO-BOLD");
+        statLabel.Size = 28;
+        statLabel.Color = Color.FromArgb(132, 111, 98);
+        
+        var infoNameLabel = Stylesheet.CreateLabelStyle("InfoNameLabel", "UI:MYRIADPRO-BOLD");
+        infoNameLabel.Size = 32;
+        infoNameLabel.Color = Color.FromArgb(163, 139, 92);
+        infoNameLabel.Outline = 2;
+        infoNameLabel.OutlineColor = Color.Black;
+
+        var tooltipHeader = Stylesheet.CreateLabelStyle("TooltipHeader", "UI:MYRIADPRO-REGULAR");
+        tooltipHeader.Size = 38;
+        tooltipHeader.Color = Color.FromArgb(179, 164, 151);
+        
+        var tooltipSubHeader = Stylesheet.CreateLabelStyle("TooltipSubHeader", "UI:MYRIADPRO-REGULAR");
+        tooltipSubHeader.Size = 30;
+        tooltipSubHeader.Color = Color.FromArgb(204, 147, 103);
+        
+        var tooltipContent = Stylesheet.CreateLabelStyle("TooltipContent", "UI:MYRIADPRO-REGULAR");
+        tooltipContent.Size = 34;
+        tooltipContent.Color = Color.FromArgb(168, 164, 156);
+
         var formLabel = Stylesheet.CreateLabelStyle("Form", "UI:MYRIADPRO-BOLD");
         formLabel.Size = 34;
         formLabel.Color = Color.FromArgb(107, 95, 82);

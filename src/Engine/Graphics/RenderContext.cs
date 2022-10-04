@@ -135,11 +135,8 @@ public class RenderContext
         if (inWorld)
         {
             var position = Camera.WorldToScreen(dest.Location.ToVector2());
-            var trans = Camera.WorldToScreen(dest.Size.ToVector2() + dest.Location.ToVector2());
-            
-            var size = trans - position;
-            
-            dest = new RectangleF(position.ToPointF(), size.ToSize());
+
+            dest = new RectangleF(position.ToPointF(), Camera.GetSize(dest.Size));
         }
 
         sprite.Render(_graphicsManager, src, dest, angle, color, alpha, index);

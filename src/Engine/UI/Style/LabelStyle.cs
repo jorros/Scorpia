@@ -20,7 +20,7 @@ public record LabelStyle
     
     public TextAlign TextAlign { get; set; }
 
-    internal FontSettings ToFontSettings()
+    public FontSettings ToFontSettings()
     {
         return new FontSettings
         {

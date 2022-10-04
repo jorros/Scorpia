@@ -77,8 +77,8 @@ public class Button : UIElement
         fontSettings = fontSettings with {Alignment = TextAlign.Center, Size = stylesheet.Scale(fontSettings.Size)};
 
         var textSize = style.LabelStyle.Font.CalculateSize(Text, fontSettings);
-        var paddedTextWidth = style.Padding.X * 2 + textSize.X;
-        var paddedTextHeight = style.Padding.Y * 2 + textSize.Y;
+        var paddedTextWidth = style.Padding.X * 2 + textSize.Width;
+        var paddedTextHeight = style.Padding.Y * 2 + textSize.Height;
 
         Width = Math.Max(style.MinWidth, paddedTextWidth);
         Height = Math.Max(style.MinHeight, paddedTextHeight);

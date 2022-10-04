@@ -36,11 +36,10 @@ public static class Input
     internal static void UpdateMouseState()
     {
         var state = SDL_GetMouseState(IntPtr.Zero, IntPtr.Zero);
-        var buttons = SDL_BUTTON(state);
 
         foreach (var mButton in _mButtons)
         {
-            if ((buttons & mButton.Item2) != 0)
+            if ((state & mButton.Item2) != 0)
             {
                 if (MouseState.ContainsKey(mButton.Item1))
                 {
@@ -55,7 +54,7 @@ public static class Input
             {
                 if (!MouseState.ContainsKey(mButton.Item1))
                 {
-                    return;
+                    continue;
                 }
 
                 if (MouseState[mButton.Item1] != State.Up)

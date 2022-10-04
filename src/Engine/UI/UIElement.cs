@@ -7,12 +7,13 @@ using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Engine.UI;
 
-public abstract class UIElement
+public abstract class UIElement : IComparable<UIElement>
 {
     public int Width { get; protected set; }
     public int Height { get; protected set; }
+    public int Depth { get; set; }
     public Point Position { get; set; } = Point.Empty;
-    public UIElement Parent { get; internal set; }
+    public UIElement Parent { get; set; }
     public UIAnchor Anchor { get; set; } = UIAnchor.TopLeft;
     
     private bool? _show;
@@ -46,7 +47,7 @@ public abstract class UIElement
         set => _show = value;
     }
 
-    protected Point GetPosition()
+    public Point GetPosition()
     {
         if (Parent is null)
         {
@@ -76,4 +77,8 @@ public abstract class UIElement
     }
 
     public abstract void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld);
+    public int CompareTo(UIElement other)
+    {
+        return other.Depth - Depth;
+    }
 }
