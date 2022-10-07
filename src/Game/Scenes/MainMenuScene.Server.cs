@@ -15,12 +15,12 @@ public partial class MainMenuScene
         NetworkManager.OnUserDisconnect += ServerOnUserDisconnect;
         NetworkManager.OnUserConnect += ServerOnUserConnect;
 
-        PlayerManager = ServiceProvider.GetRequiredService<PlayerManager>();
+        ServerPlayerManager = ServiceProvider.GetRequiredService<ServerPlayerManager>();
     }
 
     private void ServerOnUserDisconnect(object? sender, UserDisconnectedEventArgs e)
     {
-        PlayerManager.Remove(e.ClientId);
+        ServerPlayerManager.Remove(e.ClientId);
     }
     
     private void ServerOnUserConnect(object? sender, UserConnectedEventArgs e)
@@ -29,7 +29,7 @@ public partial class MainMenuScene
 
     private void ServerOnTick()
     {
-        if (PlayerManager.AllReady())
+        if (ServerPlayerManager.AllReady())
         {
             SceneManager.Switch(nameof(LoadingScene));
         }
@@ -38,7 +38,7 @@ public partial class MainMenuScene
     [ServerRpc]
     public void JoinServerRpc(JoinMatchPacket packet, SenderInfo sender)
     {
-        if (PlayerManager.Add(packet.DeviceId, packet.Name, sender.Id))
+        if (ServerPlayerManager.Add(packet.DeviceId, packet.Name, sender.Id))
         {
             Logger.LogInformation("New player {Name} joined with device id {DeviceId}", packet.Name, packet.DeviceId);
             Invoke(nameof(SetLobbyClientRpc), (byte)LobbyEnum.NotReady);
@@ -52,21 +52,21 @@ public partial class MainMenuScene
     [ServerRpc]
     public void LeaveServerRpc(SenderInfo sender)
     {
-        var playerDevice = PlayerManager.Get(sender.Id)?.DeviceId;
+        var playerDevice = ServerPlayerManager.Get(sender.Id)?.DeviceId;
 
         if (playerDevice is null)
         {
             return;
         }
         
-        PlayerManager.Remove(sender.Id);
+        ServerPlayerManager.Remove(sender.Id);
         Invoke(nameof(SetLobbyClientRpc), (byte)LobbyEnum.Outside);
     }
 
     [ServerRpc]
     public void ReadyServerRpc(byte color, SenderInfo sender)
     {
-        var player = PlayerManager.Get(sender.Id);
+        var player = ServerPlayerManager.Get(sender.Id);
 
         if (player is null)
         {
@@ -83,7 +83,7 @@ public partial class MainMenuScene
     [ServerRpc]
     public void NotReadyServerRpc(SenderInfo sender)
     {
-        var player = PlayerManager.Get(sender.Id);
+        var player = ServerPlayerManager.Get(sender.Id);
 
         if (player is null)
         {

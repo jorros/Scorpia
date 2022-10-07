@@ -1,7 +1,7 @@
+using Scorpia.Engine.HexMap;
 using Scorpia.Engine.Network.Protocol;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Blueprints;
-using Scorpia.Game.Location;
 using Scorpia.Game.Nodes.Entities;
 using Scorpia.Game.World;
 
@@ -9,7 +9,9 @@ namespace Scorpia.Game.Nodes;
 
 public class LocationNode : NetworkedNode
 {
+    public NetworkedVar<ushort> Player { get; } = new();
     public NetworkedVar<LocationType> Type { get; } = new();
+    public NetworkedVar<Hex> Position { get; } = new();
     public NetworkedVar<string> Name { get; } = new();
     public NetworkedVar<int> Population { get; } = new();
     public NetworkedVar<int> MaxPopulation { get; } = new();

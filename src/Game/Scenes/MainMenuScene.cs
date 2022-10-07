@@ -15,19 +15,21 @@ namespace Scorpia.Game.Scenes;
 public partial class MainMenuScene : NetworkedScene
 {
     private PlayerLobby _currentLobby;
-    public PlayerManager PlayerManager { get; private set; }
+    public ServerPlayerManager ServerPlayerManager { get; private set; }
+    private ScorpiaSettings _settings = null!;
 
-    private NetworkedList<Player.Player> Players { get; set; } = new();
+    private NetworkedList<Player.Player> Players { get; } = new();
 
     protected override void OnLoad(AssetManager assetManager)
     {
-        PlayerManager = ServiceProvider.GetRequiredService<PlayerManager>();
+        ServerPlayerManager = ServiceProvider.GetRequiredService<ServerPlayerManager>();
+        _settings = ServiceProvider.GetRequiredService<ScorpiaSettings>();
 
         assetManager.Load("UI");
         ScorpiaStyle.Setup(assetManager);
         SetupUI(assetManager);
 
-        _nameInput!.Text = UserDataManager.Get("player_name", string.Empty);
+        _nameInput!.Text = _settings.PlayerName;
 
         _currentLobby = new OutsidePlayerLobby(this);
         RefreshButtons();
@@ -81,8 +83,8 @@ public partial class MainMenuScene : NetworkedScene
 
     private void RefreshButtons()
     {
-        _quitButton!.Text = _currentLobby.CancelLabel;
-        _joinButton!.Text = _currentLobby.ConfirmLabel;
+        _quitButton!.Content = _currentLobby.CancelLabel;
+        _joinButton!.Content = _currentLobby.ConfirmLabel;
 
         _colourGroup!.Show = _currentLobby.ShowLobby;
         _divider.Show = _currentLobby.ShowLobby;
@@ -110,7 +112,7 @@ public partial class MainMenuScene : NetworkedScene
 
         if (!NetworkManager.IsConnected)
         {
-            NetworkManager.Connect("127.0.0.1", 1992, "1234");
+            NetworkManager.Connect("127.0.0.1", 1992, _settings.Identifier);
         }
     }
 

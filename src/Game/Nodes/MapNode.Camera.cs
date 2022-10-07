@@ -4,8 +4,8 @@ using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.Maths;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Player;
+using Scorpia.Game.Scenes;
 using Scorpia.Game.World;
-using SDL2;
 
 namespace Scorpia.Game.Nodes;
 
@@ -18,7 +18,7 @@ public class MapNodeCamera : Component
     private Vector2? _dragOrigin;
     private bool _isDragging;
     private CurrentPlayer _currentPlayer = null!;
-    
+
     public static bool clickIsBlocked;
 
     public override void OnInit()
@@ -29,11 +29,36 @@ public class MapNodeCamera : Component
 
     public override void OnUpdate()
     {
+        if (IsOverUI())
+        {
+            return;
+        }
+        
         ProcessHover();
         
         StartDragging();
         SelectTile();
         StopDragging();
+    }
+
+    private bool IsOverUI()
+    {
+        if (SceneManager.GetCurrentScene() is not GameScene scene)
+        {
+            return false;
+        }
+        
+        if (scene.topContainer.Boundaries.Contains(Input.MousePosition))
+        {
+            return true;
+        }
+
+        if (scene.infoContainer.Show && scene.infoContainer.Boundaries.Contains(Input.MousePosition))
+        {
+            return true;
+        }
+
+        return false;
     }
     
     private void ProcessHover()

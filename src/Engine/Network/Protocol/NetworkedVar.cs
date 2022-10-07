@@ -6,9 +6,10 @@ public class NetworkedVar<T>
 {
     public event EventHandler<VarChangedEventArgs<T>> OnChange;
 
-    public NetworkedVar(T value = default)
+    public NetworkedVar(Func<ushort, bool> shouldReceive = null, T value = default)
     {
         _value = value;
+        this.shouldReceive = shouldReceive;
     }
 
     public T Value
@@ -29,17 +30,20 @@ public class NetworkedVar<T>
 
     internal void Accept(T val)
     {
-        OnChange?.Invoke(this, new VarChangedEventArgs<T> {OldValue = _value, NewValue = val});
+        var oldVal = _value;
         _value = val;
+        OnChange?.Invoke(this, new VarChangedEventArgs<T> {OldValue = oldVal, NewValue = _value});
     }
 
     internal void Accept(object val)
     {
-        OnChange?.Invoke(this, new VarChangedEventArgs<T> {OldValue = _value, NewValue = (T) val});
+        var oldVal = _value;
         _value = (T) val;
+        OnChange?.Invoke(this, new VarChangedEventArgs<T> {OldValue = oldVal, NewValue = (T) val});
     }
 
     private T _value;
+    internal readonly Func<ushort, bool> shouldReceive;
     private T _proposedValue;
 
     internal bool IsDirty { get; private set; }

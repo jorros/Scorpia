@@ -1,7 +1,7 @@
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.HexMap;
-using Scorpia.Game.Location;
+using Scorpia.Game.Nodes.Entities;
 
 namespace Scorpia.Game.World.Render;
 

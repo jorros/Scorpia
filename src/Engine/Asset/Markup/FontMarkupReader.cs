@@ -22,6 +22,7 @@ internal class FontMarkupReader
     {
         IReadOnlyList<IBlock> CalculateTextBlocks()
         {
+            content = content.ReplaceLineEndings("<br/>");
             using var stringReader = new StringReader(content);
             using var reader = XmlReader.Create(stringReader, Settings);
 
@@ -36,6 +37,12 @@ internal class FontMarkupReader
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
+                        if (reader.Name == "br")
+                        {
+                            blocks.Add(new NewLineBlock {LineHeight = (int)Math.Round(current.Size * 1.1)});
+                            break;
+                        }
+
                         current = current with {Text = string.Empty};
                         blocks.Add(current);
 
@@ -52,7 +59,15 @@ internal class FontMarkupReader
                         break;
 
                     case XmlNodeType.EndElement:
-                        var previousBlock = (TextBlock)blocks[^2];
+                        TextBlock previousBlock = null;
+                        for (var i = blocks.Count - 1; i >= 0; i--)
+                        {
+                            if (blocks[i] is TextBlock tb)
+                            {
+                                previousBlock = tb;
+                            }
+                        }
+                        
                         current = previousBlock with {Text = string.Empty};
                         blocks.Add(current);
                         break;
@@ -65,6 +80,7 @@ internal class FontMarkupReader
                 {
                     return !string.IsNullOrEmpty(t.Text);
                 }
+
                 return true;
             }).ToArray();
         }
@@ -79,7 +95,7 @@ internal class FontMarkupReader
             case "text":
                 ProcessText(attribute, value, textBlock);
                 break;
-            
+
             case "outline":
                 ProcessOutline(attribute, value, textBlock);
                 break;
@@ -111,7 +127,7 @@ internal class FontMarkupReader
                 break;
         }
     }
-    
+
     private static void ProcessOutline(string attribute, string value, TextBlock textBlock)
     {
         switch (attribute)

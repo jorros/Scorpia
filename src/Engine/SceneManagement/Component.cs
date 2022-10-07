@@ -52,7 +52,7 @@ public abstract class Component : IDisposable
         ServiceProvider = serviceProvider;
         Parent = parent;
 
-        Camera = ServiceProvider.GetRequiredService<RenderContext>().Camera;
+        Camera = ServiceProvider.GetService<RenderContext>()?.Camera;
         UserDataManager = ServiceProvider.GetRequiredService<UserDataManager>();
         SceneManager = ServiceProvider.GetRequiredService<SceneManager>();
         AssetManager = ServiceProvider.GetService<AssetManager>();

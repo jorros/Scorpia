@@ -12,7 +12,7 @@ namespace Scorpia.Engine.SceneManagement;
 
 public abstract class Scene : IDisposable
 {
-    protected IServiceProvider ServiceProvider { get; private set; }
+    public IServiceProvider ServiceProvider { get; private set; }
     public SceneManager SceneManager { get; private set; }
     public UserDataManager UserDataManager { get; private set; }
     public Camera Camera { get; private set; }
@@ -28,9 +28,9 @@ public abstract class Scene : IDisposable
         return (T)CreateNode(typeof(T), obj => configure?.Invoke(obj as T));
     }
     
-    public Node FindNode<T>() where T : Node
+    public T FindNode<T>() where T : Node
     {
-        return Nodes.FirstOrDefault(x => x.Value is T).Value;
+        return Nodes.FirstOrDefault(x => x.Value is T).Value as T;
     }
 
     protected Node CreateNode(Type type, Action<Node> configure = null)

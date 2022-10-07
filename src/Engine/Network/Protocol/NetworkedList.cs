@@ -8,13 +8,15 @@ namespace Scorpia.Engine.Network.Protocol;
 
 public class NetworkedList<T> : IList<T>
 {
+    internal readonly Func<ushort, bool> shouldReceive;
     private readonly List<T> _list;
     internal readonly Queue<SyncListPacket> packets;
 
     public event EventHandler<ListChangedEventArgs<T>> OnChange;
 
-    public NetworkedList()
+    public NetworkedList(Func<ushort, bool> shouldReceive = null)
     {
+        this.shouldReceive = shouldReceive;
         packets = new Queue<SyncListPacket>();
         _list = new List<T>();
     }

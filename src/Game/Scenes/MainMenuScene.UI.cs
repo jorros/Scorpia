@@ -134,7 +134,7 @@ public partial class MainMenuScene
         _quitButton = new Button
         {
             Position = new Point(0, 0),
-            Text = "QUIT",
+            Content = "Quit",
             Type = "action_red"
         };
         window.AttachAction(_quitButton);
@@ -142,7 +142,7 @@ public partial class MainMenuScene
         _joinButton = new Button
         {
             Position = new Point(0, 0),
-            Text = "JOIN",
+            Content = "Join",
             Type = "action_green"
         };
         window.AttachAction(_joinButton);
@@ -150,7 +150,7 @@ public partial class MainMenuScene
         _settingsButton = new Button
         {
             Position = new Point(0, 0),
-            Text = "SETTINGS",
+            Content = "Settings",
             Type = "action_regular"
         };
         window.AttachAction(_settingsButton);

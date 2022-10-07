@@ -185,6 +185,8 @@ public abstract class NetworkedScene : Scene
 
         NetworkManager.OnPacketReceive += OnPacketReceive;
         NetworkManager.OnUserConnect += OnUserConnect;
+        
+        SyncNodes();
 
         base.Load(serviceProvider);
 
@@ -214,13 +216,22 @@ public abstract class NetworkedScene : Scene
 
             var change = field.GetProposedVal();
             field.Accept(change);
-            NetworkManager.Send(new SyncVarPacket
+
+            var packet = new SyncVarPacket
             {
                 Field = netVar.Key,
                 NodeId = 0,
                 Scene = GetType().Name,
                 Value = change
-            });
+            };
+            
+            foreach (var client in NetworkManager.ConnectedClients)
+            {
+                if (field.shouldReceive?.Invoke(client) != false)
+                {
+                    NetworkManager.Send(packet, client);
+                }
+            }
         }
 
         foreach (var netList in NetworkedLists)
@@ -236,7 +247,17 @@ public abstract class NetworkedScene : Scene
             while (queue.Count > 0)
             {
                 var packet = queue.Dequeue();
-                NetworkManager.Send(packet with {Field = netList.Key, NodeId = 0, Scene = GetType().Name});
+
+                var toBeSend = packet with {Field = netList.Key, NodeId = 0, Scene = GetType().Name};
+                
+                foreach (var client in NetworkManager.ConnectedClients)
+                {
+                    if (field.shouldReceive?.Invoke(client) != false)
+                    {
+                        NetworkManager.Send(toBeSend, client);
+                    }
+                }
+
                 field.Commit(packet);
             }
         }

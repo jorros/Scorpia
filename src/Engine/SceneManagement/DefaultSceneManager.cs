@@ -47,6 +47,11 @@ public class DefaultSceneManager : SceneManager
         currentScene = loadedScenes[scene];
     }
 
+    public override bool IsLoaded(string scene)
+    {
+        return loadedScenes.ContainsKey(scene);
+    }
+
     public override void Quit()
     {
         _cancellationTokenSource?.Cancel();

@@ -21,12 +21,12 @@ public class OutsidePlayerLobby : PlayerLobby
     {
         if (!string.IsNullOrWhiteSpace(_scene._nameInput!.Text))
         {
-            _scene.UserDataManager.Set("player_name", _scene._nameInput!.Text);
+            Game.ScorpiaSettings.PlayerName = _scene._nameInput!.Text;
             
             _scene.Invoke(nameof(MainMenuScene.JoinServerRpc), new JoinMatchPacket
             {
                 Name = _scene._nameInput!.Text,
-                DeviceId = _scene.PlayerManager.GetDeviceId()
+                DeviceId = Game.ServerPlayerManager.GetDeviceId()
             });
         }
     }

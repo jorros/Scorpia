@@ -220,12 +220,11 @@ public class Stylesheet
     #endregion
 
     #region Button
-    public ButtonStyle CreateButtonStyle(string? name, string spriteAsset, string? labelStyle)
+    public ButtonStyle CreateButtonStyle(string? name, string spriteAsset)
     {
         var style = new ButtonStyle
         {
             Button = _assetManager.Get<Sprite>(spriteAsset),
-            LabelStyle = GetLabel(labelStyle)
         };
 
         if (name is null)

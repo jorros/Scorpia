@@ -1,5 +1,5 @@
-using Scorpia.Game.Location;
 using Scorpia.Game.Nodes;
+using Scorpia.Game.Nodes.Entities;
 
 namespace Scorpia.Game.Blueprints;
 

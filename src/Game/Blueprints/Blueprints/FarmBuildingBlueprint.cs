@@ -1,6 +1,5 @@
 using Scorpia.Game.Blueprints.Production;
 using Scorpia.Game.Blueprints.Requirements;
-using Scorpia.Game.Location;
 using Scorpia.Game.Nodes.Entities;
 using Scorpia.Game.World;
 

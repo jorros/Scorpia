@@ -1,8 +1,10 @@
 using System.Drawing;
+using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Engine.UI;
 using Scorpia.Game.HUD.Tooltip;
+using Scorpia.Game.Player;
 using Scorpia.Game.World;
 
 namespace Scorpia.Game.HUD.TileInfo;
@@ -18,6 +20,8 @@ public class TileInfoNode : Node
     private Image[] _statIcons = null!;
     private Label[] _statTexts = null!;
     private Label _nameText = null!;
+
+    public CurrentPlayer? CurrentPlayer => ServiceProvider.GetService<CurrentPlayer>();
 
     public BasicLayout InfoBox { get; set; } = null!;
 

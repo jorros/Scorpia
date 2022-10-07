@@ -11,7 +11,7 @@ namespace Scorpia.Engine.UI;
 public class Button : UIElement
 {
     public string Type { get; set; }
-    public string Text { get; set; }
+    public Content Content { get; set; }
 
     public delegate void ClickedEventHandler(object sender, MouseButtonEventArgs e);
 
@@ -73,15 +73,12 @@ public class Button : UIElement
     {
         var style = stylesheet.GetButton(Type);
 
-        var fontSettings = style.LabelStyle.ToFontSettings();
-        fontSettings = fontSettings with {Alignment = TextAlign.Center, Size = stylesheet.Scale(fontSettings.Size)};
+        var content = Content.Value;
+        var paddedTextWidth = style.Padding.X * 2 + content.Width;
+        var paddedTextHeight = style.Padding.Y * 2 + content.Height;
 
-        var textSize = style.LabelStyle.Font.CalculateSize(Text, fontSettings);
-        var paddedTextWidth = style.Padding.X * 2 + textSize.Width;
-        var paddedTextHeight = style.Padding.Y * 2 + textSize.Height;
-
-        Width = Math.Max(style.MinWidth, paddedTextWidth);
-        Height = Math.Max(style.MinHeight, paddedTextHeight);
+        Width = style.MinWidth is not null ? Math.Max(style.MinWidth.Value, paddedTextWidth) : style.FixedWidth;
+        Height = style.MinHeight is not null ? Math.Max(style.MinHeight.Value, paddedTextHeight) : style.FixedHeight;
 
         var position = GetPosition();
 
@@ -95,12 +92,12 @@ public class Button : UIElement
 
         var tint = Color.White;
 
-        if (style.HoveredTint is not null && Enabled != false && IsInButton(Input.MousePosition))
+        if (style.HoveredTint is not null && Enabled && IsInButton(Input.MousePosition))
         {
             tint = style.HoveredTint.Value;
         }
 
-        if (style.PressedTint is not null && Enabled != false && _isPressed)
+        if (style.PressedTint is not null && Enabled && _isPressed)
         {
             tint = style.PressedTint.Value;
         }
@@ -112,11 +109,7 @@ public class Button : UIElement
 
         renderContext.Draw(style.Button, _bounds.Value, 0, tint, 255, -1, inWorld);
 
-        var textPosition = new Point(Width / 2, Height / 2).Add(position).Add(style.TextPosition);
-        renderContext.DrawText(style.LabelStyle.Font,
-            stylesheet.Scale(textPosition),
-            Text,
-            fontSettings,
-            inWorld);
+        content.Position = new Point(Width / 2, Height / 2).Add(position).Add(style.ContentPosition);
+        content.Render(renderContext, stylesheet, inWorld);
     }
 }

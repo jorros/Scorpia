@@ -42,7 +42,7 @@ public partial class LoadingScene : NetworkedScene
         }
         
         var game = SceneManager.Load<GameScene>();
-        game.InitMap(Seed.Value);
+        game.InitMap(Seed.Value, true);
         SetProgress(100);
     }
 

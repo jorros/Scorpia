@@ -5,6 +5,7 @@ using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.HUD.TileInfo;
+using Scorpia.Game.HUD.Top;
 using Scorpia.Game.Nodes;
 
 namespace Scorpia.Game.Scenes;
@@ -22,9 +23,13 @@ public partial class GameScene : NetworkedScene
         
         _map = CreateNode<MapNode>();
 
-        var tileInfo = CreateNode<TileInfoNode>(node =>
+        CreateNode<TileInfoNode>(node =>
         {
-            node.InfoBox = _infoContainer;
+            node.InfoBox = infoContainer;
+        });
+        CreateNode<TopNode>(node =>
+        {
+            node.TopBar = topContainer;
         });
     }
 
@@ -42,9 +47,14 @@ public partial class GameScene : NetworkedScene
         }
     }
 
-    public void InitMap(int seed)
+    public void InitMap(int seed, bool graphics)
     {
         _map.Generate(seed);
+
+        if (graphics)
+        {
+            _map.RefreshTilemap();
+        }
     }
 
     protected override void OnTick()

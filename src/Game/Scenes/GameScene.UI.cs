@@ -7,8 +7,9 @@ namespace Scorpia.Game.Scenes;
 public partial class GameScene
 {
     private BasicLayout _layout = null!;
-    private BasicLayout _infoContainer = null!;
+    public BasicLayout infoContainer = null!;
     private Label _fpsLabel = null!;
+    public BasicLayout topContainer = null!;
 
     private void SetupUI(AssetManager assetManager)
     {
@@ -22,17 +23,19 @@ public partial class GameScene
         // };
         // actionBarContainer.SetHeight(194);
         // _layout.Attach(actionBarContainer);
+        
+        ScorpiaStyle.SetupInGame(assetManager);
 
-        _infoContainer = new BasicLayout
+        infoContainer = new BasicLayout
         {
             Anchor = UIAnchor.BottomRight,
             Background = assetManager.Get<Sprite>("Game:HUD/info"),
             Show = false
         };
-        _infoContainer.SetSize(1085, 425);
-        _layout.Attach(_infoContainer);
+        infoContainer.SetSize(1085, 425);
+        _layout.Attach(infoContainer);
         
-        var topContainer = new BasicLayout
+        topContainer = new BasicLayout
         {
             Anchor = UIAnchor.Top,
             Background = assetManager.Get<Sprite>("Game:HUD/top_bar")

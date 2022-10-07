@@ -63,7 +63,7 @@ public static class TextFormatting
             {
                 > 0 => inverse ? $"<text color='#{Colors.Red}'>" : $"<text color=#{Colors.Green}>",
                 < 0 => inverse ? $"<text color='#{Colors.Green}'>" : $"<text color='#{Colors.Red}'>",
-                _ => ""
+                _ => "<text>"
             };
 
             return colour;

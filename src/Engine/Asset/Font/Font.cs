@@ -22,9 +22,10 @@ public class Font : IAsset, IDisposable
         _sdlRw = sdlRw;
         _fontMarkupReader = fontMarkupReader;
         _graphicsManager = graphicsManager;
-        _renderers = new []
+        _renderers = new IFontRenderer[]
         {
-            new TextBlockRenderer(graphicsManager)
+            new TextBlockRenderer(graphicsManager),
+            new NewLineRenderer()
         };
         _cache = new Dictionary<CachedTextOptions, IntPtr>();
     }
@@ -103,20 +104,17 @@ public class Font : IAsset, IDisposable
         var cursor = new Point();
         var size = new Size();
 
+        var maxWidth = 0;
+
         foreach (var block in blocks)
         {
-            if (block is NewLineBlock)
-            {
-                size = new Size(Math.Max(cursor.X, size.Width), size.Height + cursor.Y);
-                
-                continue;
-            }
-            
             var renderer = _renderers.First(x => x.Type == block.GetType());
             renderer.CalculateSize(text, this, block, ref cursor);
+            
+            maxWidth = Math.Max(maxWidth, cursor.X);
         }
         
-        size = new Size(Math.Max(cursor.X, size.Width), size.Height + cursor.Y);
+        size = new Size(maxWidth, cursor.Y);
 
         return size;
     }

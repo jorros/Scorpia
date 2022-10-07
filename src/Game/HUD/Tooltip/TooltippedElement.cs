@@ -78,9 +78,11 @@ public class TooltippedElement<T> : UIElement where T : UIElement
                 }
                 actualY = pos.Y + offset;
                 break;
+            
+            case TooltipPosition.Top:
+                actualY = 120;
+                break;
         }
-        
-        
 
         var actualX = pos.X;
         if (actualX + actualWidth > screenSize.Width)

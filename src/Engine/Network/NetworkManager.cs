@@ -184,6 +184,8 @@ public class NetworkManager
         }
     }
 
+    public IEnumerable<ushort> ConnectedClients => _connectedClients.Keys;
+
     public void Send<T>(T packet, ushort client = 0)
     {
         using var buffer = new NetworkBuffer(null);

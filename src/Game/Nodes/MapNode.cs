@@ -51,6 +51,13 @@ public class MapNode : Node
         var flairLayer = Map.AddLayer();
         var tempLayer = Map.AddLayer();
         _selectedLayer = Map.AddLayer();
+
+        var assetManager = ServiceProvider.GetService<AssetManager>();
+
+        if (assetManager is null)
+        {
+            return;
+        }
         
         _renderers = new TileRenderer[]
         {
@@ -58,14 +65,9 @@ public class MapNode : Node
             new LocationsRenderer(locationsLayer, AssetManager),
             new FlairTileRenderer(flairLayer, AssetManager)
         };
-
-        var assetManager = ServiceProvider.GetService<AssetManager>();
-
-        if (assetManager is not null)
-        {
-            _selectedTile = assetManager.Get<Sprite>("Game:selected_tile");
-        }
         
+        _selectedTile = assetManager.Get<Sprite>("Game:selected_tile");
+            
         AttachComponent(new MapNodeCamera());
     }
 
@@ -85,8 +87,6 @@ public class MapNode : Node
         {
             generator.Generate(this, noiseMap);
         }
-        
-        RefreshTilemap();
     }
 
     public void RefreshTilemap()

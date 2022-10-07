@@ -121,13 +121,22 @@ public abstract class NetworkedNode : Node
 
             var change = field.GetProposedVal();
             field.Accept(change);
-            NetworkManager.Send(new SyncVarPacket
+
+            var toBeSent = new SyncVarPacket
             {
                 Field = netVar.Key,
-                NodeId = 0,
-                Scene = GetType().Name,
+                NodeId = NetworkId,
+                Scene = Scene.GetType().Name,
                 Value = change
-            });
+            };
+            
+            foreach (var client in NetworkManager.ConnectedClients)
+            {
+                if (field.shouldReceive?.Invoke(client) != false)
+                {
+                    NetworkManager.Send(toBeSent, client);
+                }
+            }
         }
 
         foreach (var netList in NetworkedLists)

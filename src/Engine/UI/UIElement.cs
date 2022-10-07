@@ -15,6 +15,7 @@ public abstract class UIElement : IComparable<UIElement>
     public Point Position { get; set; } = Point.Empty;
     public UIElement Parent { get; set; }
     public UIAnchor Anchor { get; set; } = UIAnchor.TopLeft;
+    public Rectangle Boundaries => new(GetPosition(), new Size(Width, Height));
     
     private bool? _show;
     private bool? _enabled;
@@ -75,7 +76,7 @@ public abstract class UIElement : IComparable<UIElement>
             _ => relativePos
         };
     }
-
+    
     public abstract void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld);
     public int CompareTo(UIElement other)
     {
