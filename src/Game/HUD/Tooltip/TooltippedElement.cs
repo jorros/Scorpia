@@ -16,12 +16,12 @@ public class TooltippedElement<T> : UIElement where T : UIElement
     private const int Offset = 20;
     private const int MaxWidth = 600;
     private const int MinWidth = 200;
-    private const int Margin = 35;
+    private const int Margin = 15;
 
     public TooltippedElement(T value, AssetManager assetManager)
     {
         Value = value;
-        _tooltipBackground = assetManager.Get<Sprite>("Game:HUD/tooltip");
+        _tooltipBackground = assetManager.Get<Sprite>("UI:tooltip");
         Depth = -100;
     }
     
@@ -32,6 +32,11 @@ public class TooltippedElement<T> : UIElement where T : UIElement
             layout.Attach(Value);
         }
         
+        if (Value.Parent is null && Parent is HorizontalGridLayout horizontalGridLayout)
+        {
+            horizontalGridLayout.Attach(Value);
+        }
+
         if (Description is null || (string.IsNullOrWhiteSpace(Description.Header) && string.IsNullOrWhiteSpace(Description.Content)))
         {
             return;
@@ -45,9 +50,9 @@ public class TooltippedElement<T> : UIElement where T : UIElement
             return;
         }
 
-        var headerStyle = stylesheet.GetLabel("TooltipHeader");
-        var subHeaderStyle = stylesheet.GetLabel("TooltipSubHeader");
-        var contentStyle = stylesheet.GetLabel("TooltipContent");
+        var headerStyle = stylesheet.GetLabel("tooltip-header");
+        var subHeaderStyle = stylesheet.GetLabel("tooltip-subheader");
+        var contentStyle = stylesheet.GetLabel("tooltip-content");
 
         var headerSize = headerStyle.Font.CalculateSize(Description.Header, headerStyle.ToFontSettings());
         var subHeaderSize = subHeaderStyle.Font.CalculateSize(Description.SubHeader, subHeaderStyle.ToFontSettings());

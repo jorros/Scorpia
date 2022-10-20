@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,6 +41,8 @@ public class PacketManager
     public object Read(Stream stream)
     {
         var firstByte = (Mapping) stream.ReadByte();
+        
+        // _logger.LogDebug("Receiving {Type}", firstByte.ToString());
 
         switch (firstByte)
         {
@@ -80,6 +81,8 @@ public class PacketManager
                 }
 
                 var packetType = _settings.NetworkPackets[id];
+                
+                _logger.LogDebug("Packet is {PacketType}", packetType.Name);
 
                 var packet = Activator.CreateInstance(packetType) as INetworkPacket;
                 packet?.Read(stream, this);
@@ -99,7 +102,9 @@ public class PacketManager
                 return array;
             }
             default:
-                throw new ArgumentOutOfRangeException();
+                _logger.LogError("Received unknown first byte {FirstByte}", firstByte);
+
+                return null;
         }
     }
 

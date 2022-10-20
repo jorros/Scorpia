@@ -14,6 +14,8 @@ public class Game : Engine.Engine
     public static ServerPlayerManager ServerPlayerManager { get; private set; } = null!;
     public static ScorpiaSettings ScorpiaSettings { get; private set; } = null!;
     public static EventManager EventManager { get; private set; } = null!;
+
+    public static bool AutoConnect = false;
     
     protected override void Init(IServiceCollection services, List<Type> networkedNodes)
     {

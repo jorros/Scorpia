@@ -20,11 +20,11 @@ public abstract class TileRenderer
 
     protected Sprite GetSprite(string name, int index)
     {
-        return _assetManager.Get<Sprite>($"Game:{name}_{index}");
+        return _assetManager.Get<Sprite>($"Game:MAP/{name}_{index}");
     }
     
     protected Sprite GetSprite(string name)
     {
-        return _assetManager.Get<Sprite>($"Game:{name}");
+        return _assetManager.Get<Sprite>($"Game:MAP/{name}");
     }
 }

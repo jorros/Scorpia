@@ -25,7 +25,7 @@ public partial class GameScene : NetworkedScene
 
         CreateNode<TileInfoNode>(node =>
         {
-            node.InfoBox = infoContainer;
+            node.Window = infoWindow;
         });
         CreateNode<TopNode>(node =>
         {

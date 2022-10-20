@@ -12,4 +12,12 @@ var settings = new EngineSettings
 };
 
 var game = new Game();
+
+#if DEBUG
+if (args.Contains("autoconnect"))
+{
+    Game.AutoConnect = true;
+}
+#endif
+
 game.Run(settings);

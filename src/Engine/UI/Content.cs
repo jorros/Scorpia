@@ -6,7 +6,7 @@ public class Content
 {
     public UIElement Value { get; }
     
-    private Content(UIElement element)
+    public Content(UIElement element)
     {
         Value = element;
     }

@@ -61,8 +61,8 @@ public static class TextFormatting
         {
             var colour = amount switch
             {
-                > 0 => inverse ? $"<text color='#{Colors.Red}'>" : $"<text color=#{Colors.Green}>",
-                < 0 => inverse ? $"<text color='#{Colors.Green}'>" : $"<text color='#{Colors.Red}'>",
+                > 0 => inverse ? $"<text color='#{Colors.Red}'>-" : $"<text color=#{Colors.Green}>+",
+                < 0 => inverse ? $"<text color='#{Colors.Green}'>+" : $"<text color='#{Colors.Red}'>-",
                 _ => "<text>"
             };
 

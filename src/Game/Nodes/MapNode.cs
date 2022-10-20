@@ -66,7 +66,7 @@ public class MapNode : Node
             new FlairTileRenderer(flairLayer, AssetManager)
         };
         
-        _selectedTile = assetManager.Get<Sprite>("Game:selected_tile");
+        _selectedTile = assetManager.Get<Sprite>("Game:MAP/selected_tile");
             
         AttachComponent(new MapNodeCamera());
     }

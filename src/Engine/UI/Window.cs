@@ -17,7 +17,7 @@ public class Window : UIElement
 
     private List<UIElement> _tempList = new();
     private List<Button> _tempActionList = new();
-    private List<Content> _tempTitleList = new();
+    private List<UIElement> _tempTitleList = new();
 
     public void SetSize(int width, int height)
     {
@@ -51,7 +51,7 @@ public class Window : UIElement
     {
         if (Title is null)
         {
-            _tempTitleList.Add(content);
+            _tempTitleList.Add(content.Value);
             return;
         }
         
@@ -124,7 +124,7 @@ public class Window : UIElement
 
             foreach (var element in _tempTitleList)
             {
-                Title.Attach(element.Value);
+                Title.Attach(element);
             }
 
             if (style.TitleLabelStyle is not null)

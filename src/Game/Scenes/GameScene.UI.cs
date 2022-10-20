@@ -7,7 +7,7 @@ namespace Scorpia.Game.Scenes;
 public partial class GameScene
 {
     private BasicLayout _layout = null!;
-    public BasicLayout infoContainer = null!;
+    public Window infoWindow = null!;
     private Label _fpsLabel = null!;
     public BasicLayout topContainer = null!;
 
@@ -15,41 +15,32 @@ public partial class GameScene
     {
         _layout = new BasicLayout(ScorpiaStyle.Stylesheet);
 
-        // var actionBarContainer = new HorizontalGridLayout
-        // {
-        //     Anchor = UIAnchor.Bottom,
-        //     Background = assetManager.Get<Sprite>("Game:HUD/action_bar"),
-        //     MinWidth = 600
-        // };
-        // actionBarContainer.SetHeight(194);
-        // _layout.Attach(actionBarContainer);
-        
         ScorpiaStyle.SetupInGame(assetManager);
 
-        infoContainer = new BasicLayout
+        infoWindow = new Window
         {
             Anchor = UIAnchor.BottomRight,
-            Background = assetManager.Get<Sprite>("Game:HUD/info"),
-            Show = false
+            Show = false,
+            Position = new Point(20, 20),
+            Type = "info"
         };
-        infoContainer.SetSize(1085, 425);
-        _layout.Attach(infoContainer);
+        infoWindow.SetSize(1120, 575);
+        _layout.Attach(infoWindow);
         
         topContainer = new BasicLayout
         {
-            Anchor = UIAnchor.Top,
+            Anchor = UIAnchor.TopLeft,
             Background = assetManager.Get<Sprite>("Game:HUD/top_bar")
         };
-        topContainer.SetSize(2268, 237);
+        topContainer.SetSize(1220, 59);
         _layout.Attach(topContainer);
         
         _fpsLabel = new Label
         {
             Text = "0",
-            Anchor = UIAnchor.TopLeft,
-            Color = Color.White,
-            Size = 36,
-            Position = new Point(20, 20)
+            Anchor = UIAnchor.BottomLeft,
+            Position = new Point(20, 20),
+            Type = "debug"
         };
         _layout.Attach(_fpsLabel);
     }

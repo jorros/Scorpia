@@ -100,6 +100,11 @@ public partial class MainMenuScene : NetworkedScene
             _ => _currentLobby
         };
         RefreshButtons();
+        
+        if (Game.AutoConnect)
+        {
+            Invoke(nameof(ReadyServerRpc), new ReadyPacket {Color = PlayerColor.Blue, Faction = PlayerFaction.FreeCity});
+        }
     }
 
     private void OnJoinBtnClick(object sender, MouseButtonEventArgs e)
@@ -154,6 +159,15 @@ public partial class MainMenuScene : NetworkedScene
     {
         _serverStatus.Text = "online";
         _serverStatus.Color = Color.FromArgb(29, 247, 0);
+
+        if (Game.AutoConnect)
+        {
+            Invoke(nameof(JoinServerRpc), new JoinMatchPacket
+            {
+                Name = "debug",
+                DeviceId = Game.ServerPlayerManager.GetDeviceId()
+            });
+        }
     }
 
     private void OnUserDisconnect(object? sender, UserDisconnectedEventArgs e)

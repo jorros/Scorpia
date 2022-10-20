@@ -59,19 +59,19 @@ public static class ScorpiaStyle
         infoNameLabel.Outline = 2;
         infoNameLabel.OutlineColor = Color.Black;
 
-        var tooltipHeader = Stylesheet.CreateLabelStyle("TooltipHeader", "UI:Montserrat");
+        var tooltipHeader = Stylesheet.CreateLabelStyle("tooltip-header", "UI:Montserrat-SemiBold");
         tooltipHeader.Size = 34;
-        tooltipHeader.Color = Color.FromArgb(179, 164, 151);
+        tooltipHeader.Color = Color.White;
         
-        var tooltipSubHeader = Stylesheet.CreateLabelStyle("TooltipSubHeader", "UI:Montserrat");
+        var tooltipSubHeader = Stylesheet.CreateLabelStyle("tooltip-subheader", "UI:Montserrat");
         tooltipSubHeader.Size = 26;
-        tooltipSubHeader.Color = Color.FromArgb(204, 147, 103);
+        tooltipSubHeader.Color = Color.FromArgb(138, 138, 138);
         
-        var tooltipContent = Stylesheet.CreateLabelStyle("TooltipContent", "UI:Montserrat");
+        var tooltipContent = Stylesheet.CreateLabelStyle("tooltip-content", "UI:Montserrat");
         tooltipContent.Size = 28;
-        tooltipContent.Color = Color.FromArgb(168, 164, 156);
+        tooltipContent.Color = Color.White;
         
-        var topStats = Stylesheet.CreateLabelStyle("TopStats", "UI:Montserrat");
+        var topStats = Stylesheet.CreateLabelStyle("top", "UI:Montserrat-Medium");
         topStats.Size = 28;
         topStats.Color = Color.White;
 
@@ -185,16 +185,12 @@ public static class ScorpiaStyle
 
     public static void SetupInGame(AssetManager assetManager)
     {
-        var topCornerButton = Stylesheet!.CreateButtonStyle("top_button_corner", "Game:HUD/top_button_corner");
-        topCornerButton.PressedTint = Color.Gray;
-        topCornerButton.FixedHeight = 109;
-        topCornerButton.FixedWidth = 123;
-        topCornerButton.ContentPosition = new Point(-44, -35);
-        
-        var topButton = Stylesheet!.CreateButtonStyle("top_button", "Game:HUD/top_button");
-        topButton.PressedTint = Color.Gray;
-        topButton.FixedHeight = 109;
-        topButton.FixedWidth = 109;
-        topButton.ContentPosition = new Point(-37, -37);
+        var infoWindow = Stylesheet!.CreateWindowStyle("info", "Game:HUD/info_box");
+        infoWindow.Padding = new Point(20, 20);
+        infoWindow.HasTitle = true;
+        infoWindow.TitleHeight = 114;
+        infoWindow.TitlePadding = new Rectangle(40, 25, 40, 0);
+        infoWindow.TitleSpaceBetween = 30;
+        infoWindow.TitleLabelStyle = "header";
     }
 }

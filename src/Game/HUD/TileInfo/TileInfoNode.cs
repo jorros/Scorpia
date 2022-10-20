@@ -16,14 +16,12 @@ public class TileInfoNode : Node
     private int _infoCounter, _statCounter;
 
     private Image _avatar = null!;
-    private TooltippedElement<Image>[] _infoIcons = null!;
-    private Image[] _statIcons = null!;
-    private Label[] _statTexts = null!;
+    // private Label[] _statTexts = null!;
     private Label _nameText = null!;
 
     public CurrentPlayer? CurrentPlayer => ServiceProvider.GetService<CurrentPlayer>();
 
-    public BasicLayout InfoBox { get; set; } = null!;
+    public Window Window { get; set; } = null!;
 
     public override void OnInit()
     {
@@ -35,185 +33,41 @@ public class TileInfoNode : Node
 
         _avatar = new Image
         {
-            Position = new Point(25, 128),
-            Anchor = UIAnchor.BottomRight,
             Sprite = AssetManager.Get<Sprite>("Game:HUD/info_avatar_grass"),
-            Height = 156,
-            Width = 190
+            Height = 102,
+            Width = 127
         };
-        InfoBox.Attach(_avatar);
-
-        _infoIcons = new[]
-        {
-            new TooltippedElement<Image>(new Image
-            {
-                Anchor = UIAnchor.Right,
-                Position = new Point(409, -41),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_icon_fertile"),
-                Height = 77,
-                Width = 77
-            }, AssetManager),
-            new TooltippedElement<Image>(new Image
-            {
-                Anchor = UIAnchor.Right,
-                Position = new Point(317, -41),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_icon_fertile"),
-                Height = 77,
-                Width = 77
-            }, AssetManager),
-            new TooltippedElement<Image>(new Image
-            {
-                Anchor = UIAnchor.Right,
-                Position = new Point(225, -41),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_icon_fertile"),
-                Height = 77,
-                Width = 77
-            }, AssetManager),
-            new TooltippedElement<Image>(new Image
-            {
-                Anchor = UIAnchor.Right,
-                Position = new Point(409, 51),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_icon_fertile"),
-                Height = 77,
-                Width = 77
-            }, AssetManager),
-            new TooltippedElement<Image>(new Image
-            {
-                Anchor = UIAnchor.Right,
-                Position = new Point(317, 51),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_icon_fertile"),
-                Height = 77,
-                Width = 77
-            }, AssetManager),
-            new TooltippedElement<Image>(new Image
-            {
-                Anchor = UIAnchor.Right,
-                Position = new Point(225, 51),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_icon_fertile"),
-                Height = 77,
-                Width = 77
-            }, AssetManager),
-        };
-        foreach (var icon in _infoIcons)
-        {
-            InfoBox.Attach(icon);
-        }
-
-        _statIcons = new[]
-        {
-            new Image
-            {
-                Anchor = UIAnchor.Left,
-                Position = new Point(270, -134),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_stat_icons_balance"),
-                Height = 36,
-                Width = 36
-            },
-            new Image
-            {
-                Anchor = UIAnchor.Left,
-                Position = new Point(270, -93),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_stat_icons_balance"),
-                Height = 36,
-                Width = 36
-            },
-            new Image
-            {
-                Anchor = UIAnchor.Left,
-                Position = new Point(270, -51),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_stat_icons_balance"),
-                Height = 36,
-                Width = 36
-            },
-            new Image
-            {
-                Anchor = UIAnchor.Left,
-                Position = new Point(270, -7),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_stat_icons_balance"),
-                Height = 36,
-                Width = 36
-            },
-            new Image
-            {
-                Anchor = UIAnchor.Left,
-                Position = new Point(270, 38),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_stat_icons_balance"),
-                Height = 36,
-                Width = 36
-            },
-            new Image
-            {
-                Anchor = UIAnchor.Left,
-                Position = new Point(270, 84),
-                Sprite = AssetManager.Get<Sprite>("Game:HUD/info_stat_icons_balance"),
-                Height = 36,
-                Width = 36
-            },
-        };
-        foreach (var icon in _statIcons)
-        {
-            InfoBox.Attach(icon);
-        }
-
-        _statTexts = new[]
-        {
-            new Label
-            {
-                Anchor = UIAnchor.Left,
-                Type = "StatLabel",
-                Position = new Point(310, -132),
-                Text = "12345"
-            },
-            new Label
-            {
-                Anchor = UIAnchor.Left,
-                Type = "StatLabel",
-                Position = new Point(310, -91),
-                Text = "12345"
-            },
-            new Label
-            {
-                Anchor = UIAnchor.Left,
-                Type = "StatLabel",
-                Position = new Point(310, -49),
-                Text = "12345"
-            },
-            new Label
-            {
-                Anchor = UIAnchor.Left,
-                Type = "StatLabel",
-                Position = new Point(310, -5),
-                Text = "12345"
-            },
-            new Label
-            {
-                Anchor = UIAnchor.Left,
-                Type = "StatLabel",
-                Position = new Point(310, 40),
-                Text = "12345"
-            },
-            new Label
-            {
-                Anchor = UIAnchor.Left,
-                Type = "StatLabel",
-                Position = new Point(310, 86),
-                Text = "12345"
-            }
-        };
-        foreach (var text in _statTexts)
-        {
-            InfoBox.Attach(text);
-        }
-
+        Window.AttachTitle(_avatar);
+        
         _nameText = new Label
         {
-            Anchor = UIAnchor.Top,
-            Position = new Point(330, 63),
-            Type = "InfoNameLabel",
-            Text = "",
-            TextAlign = TextAlign.Center
+            Type = "header",
+            Text = "Test"
         };
-        InfoBox.Attach(_nameText);
+        Window.AttachTitle(_nameText);
+
+        var test = new TooltippedElement<Image>(new Image
+        {
+            Sprite = AssetManager.Get<Sprite>("Game:HUD/info_icon_fertile"),
+            Height = 60,
+            Width = 60
+        }, AssetManager);
+        Window.AttachTitle(new Content(test));
+
+        // _statTexts = new[]
+        // {
+        //     new Label
+        //     {
+        //         Anchor = UIAnchor.Left,
+        //         Type = "StatLabel",
+        //         Position = new Point(310, -132),
+        //         Text = "12345"
+        //     },
+        // };
+        // foreach (var text in _statTexts)
+        // {
+        //     Window.Attach(text);
+        // }
     }
 
     public override void OnUpdate()
@@ -237,36 +91,35 @@ public class TileInfoNode : Node
             break;
         }
 
-        for (var i = _infoCounter; i < 6; i++)
-        {
-            AddInfoIcon("empty", TooltipDescription.Empty);
-        }
+        // for (var i = _infoCounter; i < 6; i++)
+        // {
+        //     AddInfoIcon("empty", TooltipDescription.Empty);
+        // }
                 
-        for(var i = _statCounter; i < 6; i++)
-        {
-            _statIcons[i].Show = false;
-            _statTexts[i].Text = string.Empty;
-        }
+        // for(var i = _statCounter; i < 6; i++)
+        // {
+        //     _statTexts[i].Text = string.Empty;
+        // }
     }
 
     [Event(nameof(SelectTile))]
     private void SelectTile(MapTile tile)
     {
         _selected = tile;
-        InfoBox.Show = true;
+        Window.Show = true;
     }
 
     [Event(nameof(DeselectTile))]
     private void DeselectTile()
     {
         _selected = null;
-        InfoBox.Show = false;
+        Window.Show = false;
     }
 
     public void AddInfoIcon(string icon, TooltipDescription tooltipDesc)
     {
-        _infoIcons[_infoCounter].Value.Sprite = AssetManager.Get<Sprite>($"Game:HUD/info_icon_{icon}");
-        _infoIcons[_infoCounter].Description = tooltipDesc;
+        // _infoIcons[_infoCounter].Value.Sprite = AssetManager.Get<Sprite>($"Game:HUD/info_icon_{icon}");
+        // _infoIcons[_infoCounter].Description = tooltipDesc;
 
         _infoCounter++;
     }
@@ -281,16 +134,13 @@ public class TileInfoNode : Node
         _avatar.Sprite = AssetManager.Get<Sprite>($"Game:HUD/info_avatar_{avatar}");
     }
 
-    public void AddStat(string icon, string value, TooltipDescription tooltipDesc, Color? colour = null)
+    public void AddStat(string name, string value, TooltipDescription tooltipDesc, Color? colour = null)
     {
-        _statIcons[_statCounter].Show = true;
-        _statIcons[_statCounter].Sprite = AssetManager.Get<Sprite>($"Game:HUD/info_stat_icons_{icon}");
-        
-        _statTexts[_statCounter].Text = value;
-        if (colour != null)
-        {
-            _statTexts[_statCounter].Color = colour.Value;
-        }
+        // _statTexts[_statCounter].Text = value;
+        // if (colour != null)
+        // {
+        //     _statTexts[_statCounter].Color = colour.Value;
+        // }
         
         // var tooltip = statTooltip[statCounter];
         // tooltip.header = tooltipDesc.Header;
