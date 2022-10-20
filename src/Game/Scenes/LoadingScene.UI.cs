@@ -18,7 +18,7 @@ public partial class LoadingScene
         
         _layout = new BasicLayout(ScorpiaStyle.Stylesheet)
         {
-            Background = assetManager.Get<Sprite>("UI:loading")
+            Background = assetManager.Get<Sprite>("UI:loading_background")
         };
 
         _loadingBar = new ProgressBar

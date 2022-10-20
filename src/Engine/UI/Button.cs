@@ -90,7 +90,7 @@ public class Button : UIElement
             return;
         }
 
-        var tint = Color.White;
+        var tint = style.Tint ?? Color.White;
 
         if (style.HoveredTint is not null && Enabled && IsInButton(Input.MousePosition))
         {
@@ -107,7 +107,20 @@ public class Button : UIElement
             tint = Color.DarkGray;
         }
 
-        renderContext.Draw(style.Button, _bounds.Value, 0, tint, 255, -1, inWorld);
+        if (style.Button is not null)
+        {
+            renderContext.Draw(style.Button, _bounds.Value, 0, tint, 255, -1, inWorld);
+        }
+
+        switch (Content.Value)
+        {
+            case Label {Type:null} label when style.DefaultLabelStyle is not null:
+                label.Type = style.DefaultLabelStyle;
+                break;
+            case Image img:
+                img.Color = tint;
+                break;
+        }
 
         content.Position = new Point(Width / 2, Height / 2).Add(position).Add(style.ContentPosition);
         content.Render(renderContext, stylesheet, inWorld);

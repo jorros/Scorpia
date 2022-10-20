@@ -3,6 +3,7 @@ using Scorpia.Engine;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.UI;
 using Scorpia.Game.Player;
+using Scorpia.Game.Utils;
 
 namespace Scorpia.Game.Lobby;
 
@@ -10,27 +11,40 @@ public class PlayerPreviewUI : BasicLayout
 {
     public string Name { get; }
     
-    public PlayerPreviewUI(AssetManager assetManager, string name, PlayerColor color)
+    public PlayerPreviewUI(AssetManager assetManager, string name, PlayerColor color, PlayerFaction faction)
     {
         Name = name;
-        
-        SetSize(250, 400);
+        Background = assetManager.Get<Sprite>("UI:list");
+        SetSize(560, 80);
         
         var playerImage = new Image
         {
             Sprite = assetManager.Get<Sprite>($"UI:player_icon_{color.ToString().ToLower()}"),
-            Width = 250,
-            Height = 250
+            Width = 60,
+            Height = 60,
+            Anchor = UIAnchor.Left,
+            Position = new Point(10, 0)
         };
         Attach(playerImage);
 
         var playerLabel = new Label
         {
             Text = name,
-            TextAlign = TextAlign.Center,
-            Type = "PlayerPreview",
-            Position = new Point(125, 270)
+            Type = "form",
+            Position = new Point(100, -15),
+            Anchor = UIAnchor.Left,
+            Font = "SemiBold"
         };
         Attach(playerLabel);
+        
+        var factionLabel = new Label
+        {
+            Text = faction.GetDescription(),
+            Type = "form",
+            Position = new Point(100, 15),
+            Anchor = UIAnchor.Left,
+            Style = FontStyle.Italic
+        };
+        Attach(factionLabel);
     }
 }

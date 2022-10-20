@@ -15,9 +15,7 @@ public class Content
     {
         return new Content(new Label
         {
-            Text = text,
-            TextAlign = TextAlign.Center,
-            Type = "Button"
+            Text = text
         });
     }
     

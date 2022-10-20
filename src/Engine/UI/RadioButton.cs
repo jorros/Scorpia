@@ -11,6 +11,8 @@ public class RadioButton : UIElement
     public string Type { get; set; }
 
     public object Value { get; set; }
+    
+    public RadioGroup RadioGroup { get; set; } 
 
     public Content Content
     {
@@ -49,7 +51,7 @@ public class RadioButton : UIElement
             _isPressed = false;
         }
 
-        if (_bounds is null || Parent is not RadioGroup group)
+        if (_bounds is null || RadioGroup is null)
         {
             return;
         }
@@ -62,7 +64,7 @@ public class RadioButton : UIElement
                     _isPressed = true;
                     break;
                 case MouseEventType.ButtonUp:
-                    group.Select(this);
+                    RadioGroup.Select(this);
                     break;
             }
 
@@ -117,12 +119,25 @@ public class RadioButton : UIElement
         if (IsSelected)
         {
             sprite = style.CheckedButton;
+
+            if (style.SelectedTint is not null)
+            {
+                tint = style.SelectedTint.Value;
+            }
         }
 
-        renderContext.Draw(sprite, _bounds.Value, 0, tint, 255, -1, inWorld);
+        if (sprite is not null)
+        {
+            renderContext.Draw(sprite, _bounds.Value, 0, tint, 255, -1, inWorld);
+        }
 
         if (Content is not null)
         {
+            if (Content.Value is Image img)
+            {
+                img.Color = tint;
+            }
+            
             Content.Value.Position = new Point(style.Padding.X, style.Padding.Y);
             Content.Value.Render(renderContext, stylesheet, inWorld);
         }

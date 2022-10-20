@@ -10,29 +10,18 @@ public class OutsidePlayerLobby : PlayerLobby
     {
         _scene = scene;
     }
-    
-    public override string ConfirmLabel => "Join";
-    public override string CancelLabel => "Quit";
+
+    public override string ConfirmLabel => string.Empty;
+    public override string CancelLabel => string.Empty;
     public override bool ShowLobby => false;
-    public override bool EnableNameInput => true;
-    public override bool EnableColorSelect => false;
+    public override bool ShowLogin => true;
+    public override bool EnablePlayerSettings => false;
 
     public override void ConfirmAction()
     {
-        if (!string.IsNullOrWhiteSpace(_scene._nameInput!.Text))
-        {
-            Game.ScorpiaSettings.PlayerName = _scene._nameInput!.Text;
-            
-            _scene.Invoke(nameof(MainMenuScene.JoinServerRpc), new JoinMatchPacket
-            {
-                Name = _scene._nameInput!.Text,
-                DeviceId = Game.ServerPlayerManager.GetDeviceId()
-            });
-        }
     }
 
     public override void CancelAction()
     {
-        _scene.SceneManager.Quit();
     }
 }

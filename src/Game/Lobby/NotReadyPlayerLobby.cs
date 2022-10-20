@@ -9,8 +9,8 @@ public class NotReadyPlayerLobby : PlayerLobby
     public override string ConfirmLabel => "Rotob?";
     public override string CancelLabel => "Leave";
     public override bool ShowLobby => true;
-    public override bool EnableNameInput => false;
-    public override bool EnableColorSelect => true;
+    public override bool ShowLogin => false;
+    public override bool EnablePlayerSettings => true;
 
     public NotReadyPlayerLobby(MainMenuScene scene)
     {
@@ -19,9 +19,10 @@ public class NotReadyPlayerLobby : PlayerLobby
 
     public override void ConfirmAction()
     {
-        if (_scene._colourGroup!.GetValue() is PlayerColor selected)
+        if (_scene.colorGroup.GetValue() is PlayerColor selected &&
+            _scene.factionSelection.GetValue() is PlayerFaction faction)
         {
-            _scene.Invoke(nameof(MainMenuScene.ReadyServerRpc), (byte) selected);
+            _scene.Invoke(nameof(MainMenuScene.ReadyServerRpc), new ReadyPacket {Color = selected, Faction = faction});
         }
     }
 

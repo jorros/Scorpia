@@ -59,24 +59,34 @@ public class BasicLayout : UIElement
 
         if (Background is not null && Show)
         {
+            Rectangle backgroundRect;
             var position = GetPosition();
-            var backgroundRect = new Rectangle(position.X + Width / 2, position.Y + Height / 2, Background.Size.Width, Background.Size.Height);
-            var ratio = Background.Size.Width / (double)Background.Size.Height;
-            switch (ratio)
+
+            if (Background is NinePatchSprite)
             {
-                case > 1:
-                    backgroundRect.Height = (int)(Width / ratio);
-                    backgroundRect.Width = Width;
-                    break;
-                case < 1:
-                    backgroundRect.Height = Height;
-                    backgroundRect.Width = (int)(Height * ratio);
-                    break;
+                backgroundRect = new Rectangle(position.X, position.Y, Width, Height);
             }
-            
-            backgroundRect.X = position.X + Width / 2 - backgroundRect.Width / 2;
-            backgroundRect.Y = position.Y + Height / 2 - backgroundRect.Height / 2;
-            
+            else
+            {
+                backgroundRect = new Rectangle(position.X + Width / 2, position.Y + Height / 2, Background.Size.Width,
+                    Background.Size.Height);
+                var ratio = Background.Size.Width / (double) Background.Size.Height;
+                switch (ratio)
+                {
+                    case > 1:
+                        backgroundRect.Height = (int) (Width / ratio);
+                        backgroundRect.Width = Width;
+                        break;
+                    case < 1:
+                        backgroundRect.Height = Height;
+                        backgroundRect.Width = (int) (Height * ratio);
+                        break;
+                }
+
+                backgroundRect.X = position.X + Width / 2 - backgroundRect.Width / 2;
+                backgroundRect.Y = position.Y + Height / 2 - backgroundRect.Height / 2;
+            }
+
             renderContext.Draw(Background, backgroundRect, 0, Color.White, 255, -1, inWorld);
         }
 

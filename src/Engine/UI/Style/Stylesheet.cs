@@ -185,12 +185,12 @@ public class Stylesheet
     #endregion
     
     #region RadioButton
-    public RadioButtonStyle CreateRadioButtonStyle(string? name, string checkedSpriteAsset, string uncheckedSpriteAsset)
+    public RadioButtonStyle CreateRadioButtonStyle(string? name, string? checkedSpriteAsset, string? uncheckedSpriteAsset)
     {
         var style = new RadioButtonStyle
         {
-            CheckedButton = _assetManager.Get<Sprite>(checkedSpriteAsset),
-            UncheckedButton = _assetManager.Get<Sprite>(uncheckedSpriteAsset)
+            CheckedButton = checkedSpriteAsset is null ? null : _assetManager.Get<Sprite>(checkedSpriteAsset),
+            UncheckedButton = uncheckedSpriteAsset is null ? null : _assetManager.Get<Sprite>(uncheckedSpriteAsset)
         };
 
         if (name is null)
@@ -220,11 +220,11 @@ public class Stylesheet
     #endregion
 
     #region Button
-    public ButtonStyle CreateButtonStyle(string? name, string spriteAsset)
+    public ButtonStyle CreateButtonStyle(string? name, string? spriteAsset)
     {
         var style = new ButtonStyle
         {
-            Button = _assetManager.Get<Sprite>(spriteAsset),
+            Button = spriteAsset is not null ? _assetManager.Get<Sprite>(spriteAsset) : null,
         };
 
         if (name is null)
@@ -262,12 +262,11 @@ public class Stylesheet
     #endregion
     
     #region Window
-    public WindowStyle CreateWindowStyle(string? name, string backgroundAsset, string actionBarAsset)
+    public WindowStyle CreateWindowStyle(string? name, string backgroundAsset)
     {
         var style = new WindowStyle
         {
-            Background = _assetManager.Get<Sprite>(backgroundAsset),
-            ActionBarBackground = _assetManager.Get<Sprite>(actionBarAsset)
+            Background = _assetManager.Get<Sprite>(backgroundAsset)
         };
 
         if (name is null)

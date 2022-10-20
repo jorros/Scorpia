@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.Maths;
 using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Engine.UI;
@@ -12,9 +13,17 @@ public class Window : UIElement
     private BasicLayout Content { get; set; }
     
     private HorizontalGridLayout ActionBar { get; set; }
+    private HorizontalGridLayout Title { get; set; }
 
     private List<UIElement> _tempList = new();
     private List<Button> _tempActionList = new();
+    private List<Content> _tempTitleList = new();
+
+    public void SetSize(int width, int height)
+    {
+        Width = width;
+        Height = height;
+    }
     
     public void Attach(UIElement element)
     {
@@ -38,6 +47,17 @@ public class Window : UIElement
         ActionBar.Attach(button);
     }
 
+    public void AttachTitle(Content content)
+    {
+        if (Title is null)
+        {
+            _tempTitleList.Add(content);
+            return;
+        }
+        
+        Title.Attach(content.Value);
+    }
+
     public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
         var style = stylesheet.GetWindow(Type);
@@ -57,7 +77,7 @@ public class Window : UIElement
             Content = new BasicLayout(stylesheet)
             {
                 Parent = this,
-                Position = style.Padding
+                Position = style.Padding.Add(new Point(0, style.HasTitle ? style.TitleHeight : 0))
             };
             Content.SetSize(Width - style.Padding.X * 2, Height - style.Padding.Y * 2 - style.ActionBarHeight);
 
@@ -71,18 +91,15 @@ public class Window : UIElement
 
         var pos = GetPosition();
 
-        if (ActionBar is null)
+        if (ActionBar is null && style.HasActionBar)
         {
             ActionBar = new HorizontalGridLayout
             {
-                Background = style.ActionBarBackground,
                 Parent = this,
                 Padding = style.ActionBarPadding,
                 Position = new Point(0, Height / 2 - style.ActionBarHeight),
                 SpaceBetween = style.ActionBarSpaceBetween,
-                MinWidth = style.ActionBarMinWidth,
-                Anchor = UIAnchor.Center,
-                Margin = style.ActionBarMargin
+                Anchor = style.ActionBarAnchor
             };
             ActionBar.SetHeight(style.ActionBarHeight);
 
@@ -92,6 +109,36 @@ public class Window : UIElement
             }
 
             _tempActionList = null;
+        }
+        
+        if (Title is null && style.HasTitle)
+        {
+            Title = new HorizontalGridLayout
+            {
+                Parent = this,
+                Padding = style.TitlePadding,
+                SpaceBetween = style.TitleSpaceBetween,
+                Anchor = UIAnchor.TopLeft
+            };
+            Title.SetHeight(style.TitleHeight);
+
+            foreach (var element in _tempTitleList)
+            {
+                Title.Attach(element.Value);
+            }
+
+            if (style.TitleLabelStyle is not null)
+            {
+                foreach (var element in Title.Elements)
+                {
+                    if (element is Label {Type: null} label)
+                    {
+                        label.Type = style.TitleLabelStyle;
+                    }
+                }
+            }
+
+            _tempTitleList = null;
         }
         
         if (!Show)
@@ -105,6 +152,7 @@ public class Window : UIElement
         renderContext.Draw(style.Background, rect, 0, Color.White, 255, -1, inWorld);
         Content.Render(renderContext, inWorld);
         
-        ActionBar.Render(renderContext, stylesheet, inWorld);
+        Title?.Render(renderContext, stylesheet, inWorld);
+        ActionBar?.Render(renderContext, stylesheet, inWorld);
     }
 }

@@ -16,7 +16,11 @@ public record ButtonStyle
     
     public Point ContentPosition { get; set; } = Point.Empty;
     
+    public string DefaultLabelStyle { get; set; }
+    
     public Point Padding { get; set; } = Point.Empty;
+    
+    public Color? Tint { get; set; }
     
     public Color? PressedTint { get; set; }
     

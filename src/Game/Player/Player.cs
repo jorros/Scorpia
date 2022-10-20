@@ -9,6 +9,8 @@ public record Player : INetworkPacket
     public string Name { get; set; }
 
     public PlayerColor? Color { get; set; }
+    
+    public PlayerFaction? Faction { get; set; }
 
     public ushort NetworkId { get; set; }
 
@@ -22,6 +24,12 @@ public record Player : INetworkPacket
         {
             stream.Write((byte) Color);
         }
+        
+        stream.Write(Faction is not null);
+        if (Faction is not null)
+        {
+            stream.Write((byte) Faction);
+        }
     }
 
     public virtual void Read(Stream stream, PacketManager packetManager)
@@ -30,6 +38,11 @@ public record Player : INetworkPacket
         if (stream.Read<bool>())
         {
             Color = (PlayerColor) stream.ReadByte();
+        }
+        
+        if (stream.Read<bool>())
+        {
+            Faction = (PlayerFaction) stream.ReadByte();
         }
     }
 }

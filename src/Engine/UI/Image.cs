@@ -30,6 +30,8 @@ public class Image : UIElement
             base.Height = value;
         }
     }
+    
+    public Color Color { get; set; } = Color.White;
 
     public Sprite Sprite
     {
@@ -59,6 +61,6 @@ public class Image : UIElement
         var position = stylesheet.Scale(GetPosition());
         var bounds = new Rectangle(position.X, position.Y, stylesheet.Scale(base.Width), stylesheet.Scale(base.Height));
 
-        renderContext.Draw(Sprite, bounds, 0, Color.White, 255, -1, inWorld);
+        renderContext.Draw(Sprite, bounds, 0, Color, 255, -1, inWorld);
     }
 }

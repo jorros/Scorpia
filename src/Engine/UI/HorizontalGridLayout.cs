@@ -11,7 +11,7 @@ namespace Scorpia.Engine.UI;
 
 public class HorizontalGridLayout : UIElement
 {
-    protected List<UIElement> Elements { get; } = new();
+    public List<UIElement> Elements { get; } = new();
     public Sprite Background { get; set; }
     
     public int MinWidth { get; set; }
@@ -38,7 +38,7 @@ public class HorizontalGridLayout : UIElement
     {
         Height = height;
     }
-    
+
     public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
         var scaledHeight = stylesheet.Scale(Height);

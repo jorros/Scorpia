@@ -5,13 +5,13 @@ using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Engine.UI;
 
-public class RadioGroup : UIElement
+public class RadioGroup
 {
     private readonly List<RadioButton> _radioButtons = new();
 
     public void Attach(RadioButton button)
     {
-        button.Parent = this;
+        button.RadioGroup = this;
         _radioButtons.Add(button);
     }
 
@@ -42,13 +42,5 @@ public class RadioGroup : UIElement
     public object? GetValue()
     {
         return GetSelected()?.Value;
-    }
-    
-    public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
-    {
-        foreach (var button in _radioButtons)
-        {
-            button.Render(renderContext, stylesheet, inWorld);
-        }
     }
 }

@@ -64,7 +64,7 @@ public partial class MainMenuScene
     }
 
     [ServerRpc]
-    public void ReadyServerRpc(byte color, SenderInfo sender)
+    public void ReadyServerRpc(ReadyPacket packet, SenderInfo sender)
     {
         var player = ServerPlayerManager.Get(sender.Id);
 
@@ -73,7 +73,8 @@ public partial class MainMenuScene
             return;
         }
 
-        player.Color = (PlayerColor) color;
+        player.Color = packet.Color;
+        player.Faction = packet.Faction;
         
         Players.Add(player);
         
@@ -91,6 +92,7 @@ public partial class MainMenuScene
         }
 
         player.Color = null;
+        player.Faction = null;
 
         Players.Remove(player);
         

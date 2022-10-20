@@ -10,8 +10,10 @@ public record WindowStyle
     public int Height { get; set; }
     
     public Sprite Background { get; set; }
+
+    public Point Padding { get; set; }
     
-    public Sprite ActionBarBackground { get; set; }
+    public bool HasActionBar { get; set; }
     
     public Rectangle ActionBarPadding { get; set; }
     
@@ -19,9 +21,15 @@ public record WindowStyle
     
     public int ActionBarHeight { get; set; }
     
-    public int ActionBarMinWidth { get; set; }
+    public UIAnchor ActionBarAnchor { get; set; }
     
-    public Point Padding { get; set; }
+    public bool HasTitle { get; set; }
     
-    public Point ActionBarMargin { get; set; }
+    public Rectangle TitlePadding { get; set; }
+    
+    public int TitleSpaceBetween { get; set; }
+    
+    public int TitleHeight { get; set; }
+    
+    public string TitleLabelStyle { get; set; }
 }

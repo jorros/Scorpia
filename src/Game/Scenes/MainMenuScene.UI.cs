@@ -1,27 +1,32 @@
 using System.Drawing;
-using Scorpia.Engine;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.UI;
-using Scorpia.Game.Lobby;
 using Scorpia.Game.Player;
 
 namespace Scorpia.Game.Scenes;
 
 public partial class MainMenuScene
 {
-    private BasicLayout? _layout;
-    private Label? _fpsLabel;
-    public TextInput? _nameInput;
-    public RadioGroup? _colourGroup;
-    private Button? _quitButton;
-    private Button? _joinButton;
-    private Button? _settingsButton;
-    private Label? _serverStatus;
-    private HorizontalDivider _divider;
-    private Label _colorLabel;
-    private HorizontalGridLayout _playerList;
+    private BasicLayout _layout = null!;
+    private TextInput _nameInput = null!;
+    private Button _loginButton = null!;
+    
+    private Label _fpsLabel = null!;
+    private Label _serverStatus = null!;
+    
+    public RadioGroup colorGroup = null!;
+    private Button _leaveButton = null!;
+    private Button _joinButton = null!;
 
-    private AssetManager _assetManager;
+    private AssetManager _assetManager = null!;
+    private Window _loginWindow = null!;
+    public RadioGroup factionSelection = null!;
+    private HorizontalGridLayout _lobbyContainer = null!;
+    private VerticalGridLayout _playerList = null!;
+    private HorizontalGridLayout _factionSelectionContainer = null!;
+    private GridLayout _colorContainer = null!;
+    private Button _quitButton = null!;
+    private Button _settingsButton = null!;
 
     private void SetupUI(AssetManager assetManager)
     {
@@ -29,16 +34,15 @@ public partial class MainMenuScene
         
         _layout = new BasicLayout(ScorpiaStyle.Stylesheet)
         {
-            Background = assetManager.Get<Sprite>("UI:background")
+            Background = assetManager.Get<Sprite>("UI:menu_background")
         };
 
         var versionLabel = new Label
         {
-            Text = "<outline color=\"#000\" size=\"2\">Version 0.1 Pre-Alpha</outline>",
+            Text = "playtest20221019",
             Anchor = UIAnchor.BottomRight,
-            Color = Color.White,
-            Size = 42,
-            Position = new Point(20, 20)
+            Type = "debug",
+            Position = new Point(20, 20),
         };
         _layout.Attach(versionLabel);
         
@@ -46,113 +50,234 @@ public partial class MainMenuScene
         {
             Text = "0",
             Anchor = UIAnchor.TopLeft,
-            Color = Color.White,
-            Size = 36,
+            Type = "debug",
             Position = new Point(20, 20)
         };
         _layout.Attach(_fpsLabel);
+        
+        var statusTextContainer = new HorizontalGridLayout
+        {
+            Anchor = UIAnchor.TopRight,
+            Position = new Point(20, 20)
+        };
+        statusTextContainer.SetHeight(60);
+        _layout.Attach(statusTextContainer);
 
-        var window = new Window
+        var statusText = new Label
+        {
+            Type = "corner",
+            Text = "Server ",
+        };
+        statusTextContainer.Attach(statusText);
+        
+        _serverStatus = new Label
+        {
+            Text = "unknown",
+            Color = Color.FromArgb(154, 154, 154),
+            Type = "corner",
+            Font = "Medium"
+        };
+        statusTextContainer.Attach(_serverStatus);
+        
+        
+
+        _loginWindow = new Window
         {
             Anchor = UIAnchor.Center
         };
-        _layout.Attach(window);
+        _loginWindow.SetSize(680, 480);
+        _layout.Attach(_loginWindow);
         
-        var nameLabel = new Label
+        var loginLabel = new Label
         {
-            Position = new Point(0, 40),
-            Type = "Form",
-            Text = "Your name:"
+            Position = new Point(0, 0),
+            Type = "header",
+            Text = "LOGIN"
         };
-        window.Attach(nameLabel);
+        _loginWindow.Attach(loginLabel);
         
         _nameInput = new TextInput
         {
-            Position = new Point(180, 10)
+            Position = new Point(0, 140)
         };
-        window.Attach(_nameInput);
+        _loginWindow.Attach(_nameInput);
 
-        _serverStatus = new Label
+        _loginButton = new Button
         {
-            Position = new Point(0, 20),
-            Type = "Header",
-            Text = "Server <text color='red' size='70'>OFFLINE</text>",
-            Anchor = UIAnchor.TopRight
+            Content = "LOG IN",
+            Type = "action_login",
+            Position = new Point(0, 280)
         };
-        window.Attach(_serverStatus);
+        _loginWindow.Attach(_loginButton);
+
+        _loginWindow.Show = false;
+
+
+        _lobbyContainer = new HorizontalGridLayout
+        {
+            Anchor = UIAnchor.Center,
+            SpaceBetween = 30
+        };
+        _lobbyContainer.SetHeight(900);
+        _layout.Attach(_lobbyContainer);
+
+        var playerSettingsWindow = new Window
+        {
+            Type = "full"
+        };
+        playerSettingsWindow.SetSize(1200, 1050);
+        playerSettingsWindow.AttachTitle("Lobby");
+        _lobbyContainer.Attach(playerSettingsWindow);
         
-        _colorLabel = new Label
-        {
-            Position = new Point(0, 140),
-            Type = "Form",
-            Text = "Your colour:"
-        };
-        window.Attach(_colorLabel);
-
-        _colourGroup = new RadioGroup();
-        window.Attach(_colourGroup);
-        
-        var colours = Enum.GetValues<PlayerColor>();
-
-        for (var i = 0; i < colours.Length; i++)
-        {
-            var colour = colours[i];
-            var radioButton = new RadioButton
-            {
-                Type = "content",
-                Value = colour,
-                Position = new Point(-20 + 240 * i, 180),
-                Content = new Image
-                {
-                    Sprite = assetManager.Get<Sprite>($"UI:player_icon_{colour.ToString().ToLower()}"),
-                    Width = 150,
-                    Height = 150,
-                    Anchor = UIAnchor.Center
-                }
-            };
-            _colourGroup.Attach(radioButton);
-        }
-
-        _divider = new HorizontalDivider
-        {
-            Position = new Point(0, 450),
-            Width = 1900,
-            Show = false
-        };
-        window.Attach(_divider);
-
-        _playerList = new HorizontalGridLayout
-        {
-            Position = new Point(0, 500),
-            MinWidth = 1900,
-            SpaceBetween = 80,
-            Margin = new Point(20, 20)
-        };
-        _playerList.SetHeight(400);
-        window.Attach(_playerList);
-
-        _quitButton = new Button
+        _leaveButton = new Button
         {
             Position = new Point(0, 0),
-            Content = "Quit",
+            Content = "LEAVE",
             Type = "action_red"
         };
-        window.AttachAction(_quitButton);
-
+        playerSettingsWindow.AttachAction(_leaveButton);
+        
         _joinButton = new Button
         {
             Position = new Point(0, 0),
-            Content = "Join",
+            Content = "JOIN",
             Type = "action_green"
         };
-        window.AttachAction(_joinButton);
+        playerSettingsWindow.AttachAction(_joinButton);
 
+        var factionSelectionLabel = new Label
+        {
+            Type = "form",
+            Text = "Choose your faction:",
+            Position = new Point(0, 0)
+        };
+        playerSettingsWindow.Attach(factionSelectionLabel);
+
+        factionSelection = new RadioGroup();
+
+        _factionSelectionContainer = new HorizontalGridLayout
+        {
+            Position = new Point(0, 60),
+            SpaceBetween = 40
+        };
+        _factionSelectionContainer.SetHeight(164);
+        playerSettingsWindow.Attach(_factionSelectionContainer);
+
+        var freeCityFaction = new RadioButton
+        {
+            Content = new Image
+            {
+                Sprite = assetManager.Get<Sprite>("UI:player_faction_freecity"),
+                Width = 164,
+                Height = 164,
+                Anchor = UIAnchor.Center
+            },
+            Type = "empty",
+            Value = PlayerFaction.FreeCity
+        };
+        factionSelection.Attach(freeCityFaction);
+        _factionSelectionContainer.Attach(freeCityFaction);
+        
+        var imperialFaction = new RadioButton
+        {
+            Content = new Image
+            {
+                Sprite = assetManager.Get<Sprite>("UI:player_faction_dragonlord"),
+                Width = 164,
+                Height = 164,
+                Anchor = UIAnchor.Center
+            },
+            Type = "empty",
+            Value = PlayerFaction.Imperial
+        };
+        factionSelection.Attach(imperialFaction);
+        _factionSelectionContainer.Attach(imperialFaction);
+
+        var divider = new HorizontalDivider
+        {
+            Position = new Point(0, 250),
+            Width = 1120
+        };
+        playerSettingsWindow.Attach(divider);
+        
+        var colorLabel = new Label
+        {
+            Position = new Point(0, 280),
+            Type = "form",
+            Text = "Choose your colour:"
+        };
+        playerSettingsWindow.Attach(colorLabel);
+        
+        colorGroup = new RadioGroup();
+
+        _colorContainer = new GridLayout
+        {
+            GridSize = new Size(5, 2),
+            Position = new Point(0, 330)
+        };
+        _colorContainer.SetSize(1120, 400);
+        playerSettingsWindow.Attach(_colorContainer);
+
+        var colors = Enum.GetValues<PlayerColor>();
+        
+        for (var i = 0; i < colors.Length; i++)
+        {
+            var color = colors[i];
+            var radioButton = new RadioButton
+            {
+                Type = "empty",
+                Value = color,
+                Content = new Image
+                {
+                    Sprite = assetManager.Get<Sprite>($"UI:player_icon_{color.ToString().ToLower()}"),
+                    Width = 160,
+                    Height = 160,
+                    Anchor = UIAnchor.Center
+                }
+            };
+            _colorContainer.Attach(radioButton);
+            colorGroup.Attach(radioButton);
+        }
+
+        var playerListWindow = new Window
+        {
+            Type = "light"
+        };
+        playerListWindow.SetSize(600, 960);
+        playerListWindow.AttachTitle("Players");
+        _lobbyContainer.Attach(playerListWindow);
+
+        _playerList = new VerticalGridLayout
+        {
+            SpaceBetween = 15
+        };
+        _playerList.SetWidth(560);
+        playerListWindow.Attach(_playerList);
+
+
+
+        _quitButton = new Button
+        {
+            Anchor = UIAnchor.BottomLeft,
+            Position = new Point(20, 20),
+            Content = new Image
+            {
+                Sprite = assetManager.Get<Sprite>("UI:button_exit")
+            },
+            Type = "corner",
+        };
+        _layout.Attach(_quitButton);
+        
         _settingsButton = new Button
         {
-            Position = new Point(0, 0),
-            Content = "Settings",
-            Type = "action_regular"
+            Anchor = UIAnchor.BottomLeft,
+            Position = new Point(150, 20),
+            Content = new Image
+            {
+                Sprite = assetManager.Get<Sprite>("UI:button_settings")
+            },
+            Type = "corner"
         };
-        window.AttachAction(_settingsButton);
+        _layout.Attach(_settingsButton);
     }
 }

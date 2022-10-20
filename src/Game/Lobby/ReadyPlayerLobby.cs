@@ -9,8 +9,8 @@ public class ReadyPlayerLobby : PlayerLobby
     public override string ConfirmLabel => "Ackshually";
     public override string CancelLabel => "Leave";
     public override bool ShowLobby => true;
-    public override bool EnableNameInput => false;
-    public override bool EnableColorSelect => false;
+    public override bool ShowLogin => false;
+    public override bool EnablePlayerSettings => false;
 
     public ReadyPlayerLobby(MainMenuScene scene)
     {
