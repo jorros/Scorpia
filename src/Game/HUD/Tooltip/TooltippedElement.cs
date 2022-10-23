@@ -12,11 +12,22 @@ public class TooltippedElement<T> : UIElement where T : UIElement
     public T Value { get; }
     public TooltipDescription? Description { get; set; }
 
-    private Sprite _tooltipBackground;
+    private readonly Sprite _tooltipBackground;
     private const int Offset = 20;
     private const int MaxWidth = 600;
     private const int MinWidth = 200;
     private const int Margin = 15;
+
+    public new Point Position
+    {
+        get => Value.Position;
+        set => Value.Position = value;
+    }
+
+    public new Point GetPosition()
+    {
+        return Value.GetPosition();
+    }
 
     public TooltippedElement(T value, AssetManager assetManager)
     {
@@ -24,19 +35,17 @@ public class TooltippedElement<T> : UIElement where T : UIElement
         _tooltipBackground = assetManager.Get<Sprite>("UI:tooltip");
         Depth = -100;
     }
-    
-    public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
-    {
-        if (Value.Parent is null && Parent is BasicLayout layout)
-        {
-            layout.Attach(Value);
-        }
-        
-        if (Value.Parent is null && Parent is HorizontalGridLayout horizontalGridLayout)
-        {
-            horizontalGridLayout.Attach(Value);
-        }
 
+    protected override void OnInit(RenderContext renderContext, Stylesheet stylesheet)
+    {
+        if (Value.Parent is null && Parent is Container container)
+        {
+            container.Attach(Value);
+        }
+    }
+
+    protected override void OnRender(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+    {
         if (Description is null || (string.IsNullOrWhiteSpace(Description.Header) && string.IsNullOrWhiteSpace(Description.Content)))
         {
             return;
@@ -70,7 +79,7 @@ public class TooltippedElement<T> : UIElement where T : UIElement
         switch (Description.Position)
         {
             case TooltipPosition.Info:
-                actualY = screenSize.Height - 400 - actualHeight;
+                actualY = screenSize.Height - 575 - actualHeight;
                 break;
             
             case TooltipPosition.None:

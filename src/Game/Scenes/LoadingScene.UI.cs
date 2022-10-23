@@ -16,7 +16,7 @@ public partial class LoadingScene
     {
         _assetManager = assetManager;
         
-        _layout = new BasicLayout(ScorpiaStyle.Stylesheet)
+        _layout = new BasicLayout
         {
             Background = assetManager.Get<Sprite>("UI:loading_background")
         };

@@ -13,15 +13,16 @@ public class TileInfoNode : Node
 {
     private IReadOnlyList<ITileInfo> _tileInfos = null!;
     private MapTile? _selected;
-    private int _infoCounter, _statCounter;
 
     private Image _avatar = null!;
-    // private Label[] _statTexts = null!;
     private Label _nameText = null!;
+    private HorizontalGridLayout _infoIcons = null!;
 
     public CurrentPlayer? CurrentPlayer => ServiceProvider.GetService<CurrentPlayer>();
 
     public Window Window { get; set; } = null!;
+
+    private int _lastTileInfo = -1;
 
     public override void OnInit()
     {
@@ -42,32 +43,17 @@ public class TileInfoNode : Node
         _nameText = new Label
         {
             Type = "header",
-            Text = "Test"
+            Text = "Test",
+            Margin = new Point(0, 23)
         };
         Window.AttachTitle(_nameText);
 
-        var test = new TooltippedElement<Image>(new Image
+        _infoIcons = new HorizontalGridLayout
         {
-            Sprite = AssetManager.Get<Sprite>("Game:HUD/info_icon_fertile"),
-            Height = 60,
-            Width = 60
-        }, AssetManager);
-        Window.AttachTitle(new Content(test));
-
-        // _statTexts = new[]
-        // {
-        //     new Label
-        //     {
-        //         Anchor = UIAnchor.Left,
-        //         Type = "StatLabel",
-        //         Position = new Point(310, -132),
-        //         Text = "12345"
-        //     },
-        // };
-        // foreach (var text in _statTexts)
-        // {
-        //     Window.Attach(text);
-        // }
+            SpaceBetween = 15,
+            Margin = new Point(0, 23)
+        };
+        Window.Title.Attach(_infoIcons);
     }
 
     public override void OnUpdate()
@@ -76,36 +62,39 @@ public class TileInfoNode : Node
         {
             return;
         }
-        
-        _infoCounter = 0;
-        _statCounter = 0;
 
-        foreach (var tileInfo in _tileInfos)
+        for (var index = 0; index < _tileInfos.Count; index++)
         {
+            var tileInfo = _tileInfos[index];
             if (!tileInfo.ShouldRender(_selected))
             {
                 continue;
             }
 
-            tileInfo.Render(_selected);
+            if (_lastTileInfo != index)
+            {
+                Window.Height = tileInfo.WindowHeight;
+                tileInfo.Init(_selected);
+                _lastTileInfo = index;
+            }
+
+            tileInfo.Update(_selected);
             break;
         }
+    }
 
-        // for (var i = _infoCounter; i < 6; i++)
-        // {
-        //     AddInfoIcon("empty", TooltipDescription.Empty);
-        // }
-                
-        // for(var i = _statCounter; i < 6; i++)
-        // {
-        //     _statTexts[i].Text = string.Empty;
-        // }
+    private void ClearWindow()
+    {
+        _lastTileInfo = -1;
+        Window.Clear();
+        _infoIcons.Clear();
     }
 
     [Event(nameof(SelectTile))]
     private void SelectTile(MapTile tile)
     {
         _selected = tile;
+        ClearWindow();
         Window.Show = true;
     }
 
@@ -113,15 +102,21 @@ public class TileInfoNode : Node
     private void DeselectTile()
     {
         _selected = null;
+        ClearWindow();
         Window.Show = false;
     }
 
     public void AddInfoIcon(string icon, TooltipDescription tooltipDesc)
     {
-        // _infoIcons[_infoCounter].Value.Sprite = AssetManager.Get<Sprite>($"Game:HUD/info_icon_{icon}");
-        // _infoIcons[_infoCounter].Description = tooltipDesc;
+        var item = new TooltippedElement<Image>(new Image
+        {
+            Sprite = AssetManager.Get<Sprite>($"Game:HUD/info_icon_{icon}"),
+            Height = 60,
+            Width = 60
+        }, AssetManager);
+        _infoIcons.Attach(item);
 
-        _infoCounter++;
+        item.Description = tooltipDesc;
     }
 
     public void SetName(string name)
@@ -132,21 +127,5 @@ public class TileInfoNode : Node
     public void SetAvatarIcon(string avatar)
     {
         _avatar.Sprite = AssetManager.Get<Sprite>($"Game:HUD/info_avatar_{avatar}");
-    }
-
-    public void AddStat(string name, string value, TooltipDescription tooltipDesc, Color? colour = null)
-    {
-        // _statTexts[_statCounter].Text = value;
-        // if (colour != null)
-        // {
-        //     _statTexts[_statCounter].Color = colour.Value;
-        // }
-        
-        // var tooltip = statTooltip[statCounter];
-        // tooltip.header = tooltipDesc.Header;
-        // tooltip.content = tooltipDesc.Content;
-        // tooltip.subHeader = tooltipDesc.SubHeader;
-
-        _statCounter++;
     }
 }

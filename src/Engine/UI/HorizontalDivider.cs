@@ -14,14 +14,22 @@ public class HorizontalDivider : UIElement
         get => base.Width;
         set => base.Width = value;
     }
-    
-    public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+
+    protected override void OnInit(RenderContext renderContext, Stylesheet stylesheet)
+    {
+        var style = stylesheet.GetHorizontalDivider(Type);
+
+        if (Height == 0)
+        {
+            Height = style.Height;
+        }
+    }
+
+    protected override void OnRender(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
         var style = stylesheet.GetHorizontalDivider(Type);
         var position = GetPosition();
 
-        Height = style.Height;
-        
         if (!Show)
         {
             return;

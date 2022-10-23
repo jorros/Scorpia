@@ -1,4 +1,3 @@
-using Scorpia.Game.Blueprints;
 using Scorpia.Game.HUD.Tooltip;
 using Scorpia.Game.Nodes;
 using Scorpia.Game.Nodes.Entities;
@@ -16,26 +15,27 @@ public class CityTileInfo : ITileInfo
         _infoNode = infoNode;
     }
 
+    public int WindowHeight => 575;
+
     public bool ShouldRender(MapTile tile)
     {
         return tile.Location is not null;
     }
 
-    public void Render(MapTile mapTile)
+    public void Init(MapTile tile)
     {
-        if (mapTile.Location is null)
-        {
-            return;
-        }
-
-        var location = mapTile.Location;
+        var location = tile.Location;
         _infoNode.SetName(location.Name.Value);
 
         SetAvatar(location);
         AddPlayerIcon(location);
-        AddResourceIcon(mapTile);
-        AddFertilityIcon(mapTile);
+        AddResourceIcon(tile);
+        AddFertilityIcon(tile);
         AddStats(location);
+    }
+
+    public void Update(MapTile tile)
+    {
     }
 
     private void AddPlayerIcon(LocationNode location)
@@ -100,24 +100,24 @@ public class CityTileInfo : ITileInfo
 
     private void AddStats(LocationNode location)
     {
-        _infoNode.AddStat("population",
-            $"{location.Population.Value.Format()} / {location.MaxPopulation.Value.Format()}",
-            new TooltipDescription("Population",
-                $"The current population. Living space can be increased by building houses or upgrading the {location.Type.Value} to a higher tier",
-                string.Empty, TooltipPosition.Info));
-
-        _infoNode.AddStat("balance", $"{location.Income.Value.Total.FormatBalance()}",
-            new TooltipDescription("Income", $"Current monthly income generated.", string.Empty, TooltipPosition.Info));
-
-        _infoNode.AddStat("food",
-            $"{location.FoodStorage.Value.Format()} / {LocationBlueprint.GetMaxFoodStorage(location.Type.Value)} ({location.FoodProduction.Value.Total.FormatBalance()})",
-            new TooltipDescription("Food",
-                $"You are currently storing {location.FoodStorage.Value.Format()} and the monthly food production is at {location.FoodProduction.Value.Total.FormatBalance()}. You can increase the storage room by upgrading this {location.Type.Value}. All produced food that cannot stored here will be transferred to your global storage.",
-                string.Empty, TooltipPosition.Info));
-
-        _infoNode.AddStat("garrison", location.Garrison.Value.Format(),
-            new TooltipDescription("Garrison",
-                $"There are currently {location.Garrison.Value.Format()} troops stationed in this {location.Type.Value}",
-                string.Empty, TooltipPosition.Info));
+        // _infoNode.AddStat("population",
+        //     $"{location.Population.Value.Format()} / {location.MaxPopulation.Value.Format()}",
+        //     new TooltipDescription("Population",
+        //         $"The current population. Living space can be increased by building houses or upgrading the {location.Type.Value} to a higher tier",
+        //         string.Empty, TooltipPosition.Info));
+        //
+        // _infoNode.AddStat("balance", $"{location.Income.Value.Total.FormatBalance()}",
+        //     new TooltipDescription("Income", $"Current monthly income generated.", string.Empty, TooltipPosition.Info));
+        //
+        // _infoNode.AddStat("food",
+        //     $"{location.FoodStorage.Value.Format()} / {LocationBlueprint.GetMaxFoodStorage(location.Type.Value)} ({location.FoodProduction.Value.Total.FormatBalance()})",
+        //     new TooltipDescription("Food",
+        //         $"You are currently storing {location.FoodStorage.Value.Format()} and the monthly food production is at {location.FoodProduction.Value.Total.FormatBalance()}. You can increase the storage room by upgrading this {location.Type.Value}. All produced food that cannot stored here will be transferred to your global storage.",
+        //         string.Empty, TooltipPosition.Info));
+        //
+        // _infoNode.AddStat("garrison", location.Garrison.Value.Format(),
+        //     new TooltipDescription("Garrison",
+        //         $"There are currently {location.Garrison.Value.Format()} troops stationed in this {location.Type.Value}",
+        //         string.Empty, TooltipPosition.Info));
     }
 }

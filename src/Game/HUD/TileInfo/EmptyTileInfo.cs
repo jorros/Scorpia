@@ -12,18 +12,24 @@ public class EmptyTileInfo : ITileInfo
         _infoNode = infoNode;
     }
 
+    public int WindowHeight => 575;
+
     public bool ShouldRender(MapTile tile)
     {
         return tile.Location is null;
     }
 
-    public void Render(MapTile mapTile)
+    public void Init(MapTile tile)
     {
         _infoNode.SetName("Empty");
 
-        SetAvatar(mapTile);
-        AddResourceIcon(mapTile);
-        AddFertilityIcon(mapTile);
+        SetAvatar(tile);
+        AddResourceIcon(tile);
+        AddFertilityIcon(tile);
+    }
+
+    public void Update(MapTile tile)
+    {
     }
 
     private void SetAvatar(MapTile tile)

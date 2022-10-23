@@ -170,15 +170,15 @@ public class TextInput : UIElement
         Height = height;
     }
 
-    public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+    protected override void OnInit(RenderContext renderContext, Stylesheet stylesheet)
     {
         _backspaceAction ??= new DelayedAction(renderContext, Backspace);
         _deleteAction ??= new DelayedAction(renderContext, Delete);
         _leftCursor ??= new DelayedAction(renderContext, LeftCursor);
         _rightCursor ??= new DelayedAction(renderContext, RightCursor);
-
+        
         var style = stylesheet.GetTextInput(Type);
-
+        
         if (Width == 0)
         {
             Width = style.Width;
@@ -188,7 +188,12 @@ public class TextInput : UIElement
         {
             Height = style.Height;
         }
-        
+    }
+
+    protected override void OnRender(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+    {
+        var style = stylesheet.GetTextInput(Type);
+
         if (!Show)
         {
             return;

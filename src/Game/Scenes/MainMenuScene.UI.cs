@@ -32,7 +32,7 @@ public partial class MainMenuScene
     {
         _assetManager = assetManager;
         
-        _layout = new BasicLayout(ScorpiaStyle.Stylesheet)
+        _layout = new BasicLayout
         {
             Background = assetManager.Get<Sprite>("UI:menu_background")
         };
@@ -58,9 +58,9 @@ public partial class MainMenuScene
         var statusTextContainer = new HorizontalGridLayout
         {
             Anchor = UIAnchor.TopRight,
-            Position = new Point(20, 20)
+            Position = new Point(20, 20),
+            Height = 60
         };
-        statusTextContainer.SetHeight(60);
         _layout.Attach(statusTextContainer);
 
         var statusText = new Label
@@ -83,9 +83,10 @@ public partial class MainMenuScene
 
         _loginWindow = new Window
         {
-            Anchor = UIAnchor.Center
+            Anchor = UIAnchor.Center,
+            Width = 680,
+            Height = 480
         };
-        _loginWindow.SetSize(680, 480);
         _layout.Attach(_loginWindow);
         
         var loginLabel = new Label
@@ -116,16 +117,17 @@ public partial class MainMenuScene
         _lobbyContainer = new HorizontalGridLayout
         {
             Anchor = UIAnchor.Center,
-            SpaceBetween = 30
+            SpaceBetween = 30,
+            Height = 900
         };
-        _lobbyContainer.SetHeight(900);
         _layout.Attach(_lobbyContainer);
 
         var playerSettingsWindow = new Window
         {
-            Type = "full"
+            Type = "full",
+            Width = 1200,
+            Height = 1050
         };
-        playerSettingsWindow.SetSize(1200, 1050);
         playerSettingsWindow.AttachTitle("Lobby");
         _lobbyContainer.Attach(playerSettingsWindow);
         
@@ -135,7 +137,7 @@ public partial class MainMenuScene
             Content = "LEAVE",
             Type = "action_red"
         };
-        playerSettingsWindow.AttachAction(_leaveButton);
+        playerSettingsWindow.ActionBar.Attach(_leaveButton);
         
         _joinButton = new Button
         {
@@ -143,7 +145,7 @@ public partial class MainMenuScene
             Content = "JOIN",
             Type = "action_green"
         };
-        playerSettingsWindow.AttachAction(_joinButton);
+        playerSettingsWindow.ActionBar.Attach(_joinButton);
 
         var factionSelectionLabel = new Label
         {
@@ -158,9 +160,9 @@ public partial class MainMenuScene
         _factionSelectionContainer = new HorizontalGridLayout
         {
             Position = new Point(0, 60),
-            SpaceBetween = 40
+            SpaceBetween = 40,
+            Height = 164
         };
-        _factionSelectionContainer.SetHeight(164);
         playerSettingsWindow.Attach(_factionSelectionContainer);
 
         var freeCityFaction = new RadioButton
@@ -213,9 +215,10 @@ public partial class MainMenuScene
         _colorContainer = new GridLayout
         {
             GridSize = new Size(5, 2),
-            Position = new Point(0, 330)
+            Position = new Point(0, 330),
+            Width = 1120,
+            Height = 400
         };
-        _colorContainer.SetSize(1120, 400);
         playerSettingsWindow.Attach(_colorContainer);
 
         var colors = Enum.GetValues<PlayerColor>();
@@ -241,17 +244,18 @@ public partial class MainMenuScene
 
         var playerListWindow = new Window
         {
-            Type = "light"
+            Type = "light",
+            Width = 600,
+            Height = 960
         };
-        playerListWindow.SetSize(600, 960);
         playerListWindow.AttachTitle("Players");
         _lobbyContainer.Attach(playerListWindow);
 
         _playerList = new VerticalGridLayout
         {
-            SpaceBetween = 15
+            SpaceBetween = 15,
+            Width = 560
         };
-        _playerList.SetWidth(560);
         playerListWindow.Attach(_playerList);
 
 

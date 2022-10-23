@@ -53,6 +53,16 @@ public class MapNodeCamera : Component
             return true;
         }
 
+        if (scene.mapWindow.Boundaries.Contains(Input.MousePosition))
+        {
+            return true;
+        }
+
+        if (scene.menuButtons.Boundaries.Contains(Input.MousePosition))
+        {
+            return true;
+        }
+
         if (scene.infoWindow.Show && scene.infoWindow.Boundaries.Contains(Input.MousePosition))
         {
             return true;

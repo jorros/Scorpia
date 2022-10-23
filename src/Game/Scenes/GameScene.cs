@@ -67,7 +67,7 @@ public partial class GameScene : NetworkedScene
         var renderContext = ServiceProvider.GetService<RenderContext>();
         if (renderContext is not null)
         {
-            _fpsLabel!.Text = renderContext.FPS.ToString();
+            _fpsLabel.Text = renderContext.FPS.ToString();
         }
     }
 

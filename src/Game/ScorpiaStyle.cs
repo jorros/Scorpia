@@ -189,8 +189,25 @@ public static class ScorpiaStyle
         infoWindow.Padding = new Point(20, 20);
         infoWindow.HasTitle = true;
         infoWindow.TitleHeight = 114;
-        infoWindow.TitlePadding = new Rectangle(40, 25, 40, 0);
+        infoWindow.TitlePadding = new Rectangle(40, 4, 40, 0);
         infoWindow.TitleSpaceBetween = 30;
         infoWindow.TitleLabelStyle = "header";
+
+        var mapWindow = Stylesheet.CreateWindowStyle("map", "Game:HUD/mini_map");
+        mapWindow.HasTitle = true;
+        mapWindow.TitleHeight = 60;
+        mapWindow.TitlePadding = new Rectangle(5, 5, 5, 5);
+        mapWindow.TitleLabelStyle = "map";
+        mapWindow.TitleAnchor = UIAnchor.TopRight;
+        
+        var mapLabel = Stylesheet.CreateLabelStyle("map", "UI:Montserrat");
+        mapLabel.Size = 36;
+        mapLabel.Color = Color.White;
+
+        var menuButton = Stylesheet.CreateButtonStyle("menu", "Game:HUD/menu_button");
+        menuButton.FixedWidth = 116;
+        menuButton.FixedHeight = 117;
+        menuButton.PressedTint = Color.DarkGray;
+        menuButton.ContentPosition = new Point(-38, -38);
     }
 }

@@ -51,7 +51,11 @@ public class Image : UIElement
         }
     }
 
-    public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+    protected override void OnInit(RenderContext renderContext, Stylesheet stylesheet)
+    {
+    }
+
+    protected override void OnRender(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
         if (!Show)
         {
@@ -59,7 +63,7 @@ public class Image : UIElement
         }
         
         var position = stylesheet.Scale(GetPosition());
-        var bounds = new Rectangle(position.X, position.Y, stylesheet.Scale(base.Width), stylesheet.Scale(base.Height));
+        var bounds = new Rectangle(position.X, position.Y, stylesheet.Scale(Width), stylesheet.Scale(Height));
 
         renderContext.Draw(Sprite, bounds, 0, Color, 255, -1, inWorld);
     }

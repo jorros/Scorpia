@@ -74,7 +74,11 @@ public class RadioButton : UIElement
         _isPressed = false;
     }
 
-    public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+    protected override void OnInit(RenderContext renderContext, Stylesheet stylesheet)
+    {
+    }
+
+    protected override void OnRender(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
         var style = stylesheet.GetRadioButton(Type);
 

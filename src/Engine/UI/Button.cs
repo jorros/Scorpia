@@ -69,7 +69,11 @@ public class Button : UIElement
                position.Y >= _bounds.Value.Y && position.Y <= _bounds.Value.Y + _bounds.Value.Height;
     }
 
-    public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+    protected override void OnInit(RenderContext renderContext, Stylesheet stylesheet)
+    {
+    }
+
+    protected override void OnRender(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
         var style = stylesheet.GetButton(Type);
 

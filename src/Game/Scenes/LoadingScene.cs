@@ -54,6 +54,6 @@ public partial class LoadingScene : NetworkedScene
 
     protected override void OnRender(RenderContext context)
     {
-        _layout.Render(context, false);
+        _layout.Render(context, ScorpiaStyle.Stylesheet, false);
     }
 }

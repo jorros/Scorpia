@@ -15,7 +15,8 @@ public class PlayerPreviewUI : BasicLayout
     {
         Name = name;
         Background = assetManager.Get<Sprite>("UI:list");
-        SetSize(560, 80);
+        Width = 560;
+        Height = 80;
         
         var playerImage = new Image
         {

@@ -152,7 +152,7 @@ public partial class MainMenuScene : NetworkedScene
 
     protected override void OnRender(RenderContext context)
     {
-        _layout.Render(context, false);
+        _layout.Render(context, ScorpiaStyle.Stylesheet, false);
     }
 
     private void OnUserConnect(object? sender, UserConnectedEventArgs e)

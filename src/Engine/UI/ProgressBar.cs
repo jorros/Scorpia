@@ -15,15 +15,20 @@ public class ProgressBar : UIElement
     {
         Width = width;
     }
-    
-    public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+
+    protected override void OnInit(RenderContext renderContext, Stylesheet stylesheet)
     {
         var style = stylesheet.GetProgressBar(Type);
-
+        
         if (Height == 0)
         {
             Height = style.Height;
         }
+    }
+
+    protected override void OnRender(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+    {
+        var style = stylesheet.GetProgressBar(Type);
 
         if (!Show)
         {

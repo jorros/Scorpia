@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.Maths;
@@ -9,7 +10,7 @@ using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Engine.UI;
 
-public class VerticalGridLayout : UIElement
+public class VerticalGridLayout : UIElement, Container
 {
     public List<UIElement> Elements { get; } = new();
     public Sprite Background { get; set; }
@@ -24,7 +25,17 @@ public class VerticalGridLayout : UIElement
         element.Parent = this;
         Elements.Add(element);
     }
-    
+
+    public void Clear()
+    {
+        Elements.Clear();
+    }
+
+    public void Remove(UIElement element)
+    {
+        Elements.Remove(element);
+    }
+
     public void Remove(Func<UIElement, bool> predicate)
     {
         var element = Elements.FirstOrDefault(predicate);
@@ -33,18 +44,22 @@ public class VerticalGridLayout : UIElement
             Elements.Remove(element);
         }
     }
-    
-    public void SetWidth(int width)
+
+    protected override void OnInit(RenderContext renderContext, Stylesheet stylesheet)
     {
-        Width = width;
     }
 
-    public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+    protected override void OnRender(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
+        if (!Show)
+        {
+            return;
+        }
+        
         Height = Padding.Y + Padding.Height + Elements.Sum(element => element.Height);
         Height = Height > MinHeight ? Height : MinHeight;
         
-        if (Background is not null && Show)
+        if (Background is not null)
         {
             var scaledPos = stylesheet.Scale(GetPosition()).Add(stylesheet.Scale(Margin));
             var rect = new Rectangle(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), stylesheet.Scale(Height));
@@ -52,8 +67,10 @@ public class VerticalGridLayout : UIElement
         }
         
         var currentPos = new Point(Padding.X, Padding.Y).Add(Margin);
+        
+        var span = CollectionsMarshal.AsSpan(Elements);
 
-        foreach (var element in Elements)
+        foreach (var element in span)
         {
             element.Position = currentPos;
 

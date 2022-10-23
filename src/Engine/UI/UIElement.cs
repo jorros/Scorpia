@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.Maths;
@@ -9,8 +8,8 @@ namespace Scorpia.Engine.UI;
 
 public abstract class UIElement : IComparable<UIElement>
 {
-    public int Width { get; protected set; }
-    public int Height { get; protected set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
     public int Depth { get; set; }
     public Point Position { get; set; } = Point.Empty;
     public UIElement Parent { get; set; }
@@ -19,6 +18,7 @@ public abstract class UIElement : IComparable<UIElement>
     
     private bool? _show;
     private bool? _enabled;
+    private bool _initialized;
 
     public bool Enabled
     {
@@ -76,8 +76,21 @@ public abstract class UIElement : IComparable<UIElement>
             _ => relativePos
         };
     }
-    
-    public abstract void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld);
+
+    protected abstract void OnInit(RenderContext renderContext, Stylesheet stylesheet);
+    protected abstract void OnRender(RenderContext renderContext, Stylesheet stylesheet, bool inWorld);
+
+    public void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+    {
+        if (!_initialized)
+        {
+            OnInit(renderContext, stylesheet);
+            _initialized = true;
+        }
+        
+        OnRender(renderContext, stylesheet, inWorld);
+    }
+
     public int CompareTo(UIElement other)
     {
         return other.Depth - Depth;

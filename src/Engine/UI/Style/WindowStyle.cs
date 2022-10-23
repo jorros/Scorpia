@@ -32,4 +32,6 @@ public record WindowStyle
     public int TitleHeight { get; set; }
     
     public string TitleLabelStyle { get; set; }
+    
+    public UIAnchor TitleAnchor { get; set; }
 }

@@ -100,9 +100,9 @@ public class TopNode : Node
         var container = new TooltippedElement<HorizontalGridLayout>(new HorizontalGridLayout
         {
             Anchor = UIAnchor.Left,
-            Position = new Point(index * 200 + 20, 0)
+            Position = new Point(index * 200 + 20, 0),
+            Height = 59
         }, AssetManager);
-        container.Value.SetHeight(59);
         container.Description = new TooltipDescription(name, string.Empty, string.Empty, TooltipPosition.Top);
         TopBar.Attach(container);
 

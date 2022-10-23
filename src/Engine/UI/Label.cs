@@ -2,6 +2,7 @@ using System.Drawing;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Asset.Font;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.Maths;
 using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Engine.UI;
@@ -17,8 +18,13 @@ public class Label : UIElement
     public FontStyle? Style { get; set; }
     public int? Outline { get; set; }
     public Color? OutlineColor { get; set; }
+    public Point Margin { get; set; }
 
-    public override void Render(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
+    protected override void OnInit(RenderContext renderContext, Stylesheet stylesheet)
+    {
+    }
+
+    protected override void OnRender(RenderContext renderContext, Stylesheet stylesheet, bool inWorld)
     {
         var style = stylesheet.GetLabel(Type);
         
@@ -43,6 +49,6 @@ public class Label : UIElement
             return;
         }
         
-        renderContext.DrawText(font, stylesheet.Scale(GetPosition()), Text, fontSettings, inWorld);
+        renderContext.DrawText(font, stylesheet.Scale(GetPosition().Add(Margin)), Text, fontSettings, inWorld);
     }
 }
