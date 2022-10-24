@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using System.Numerics;
 using Scorpia.Engine.Maths;
@@ -120,6 +121,22 @@ public class Camera
     public void LookAt(Vector2 position)
     {
         Position = position - new Vector2(_viewport.w / 2f, _viewport.h / 2f);
+    }
+
+    public void LookAtAndClamp(Vector2 position, RectangleF clamp)
+    {
+        var pos = position - new Vector2(_viewport.w / 2f, _viewport.h / 2f);
+        
+        var screenBounds = BoundingRectangle;
+        var size = GetSize(clamp.Size).ToSize();
+
+        var start = clamp.Location.ToVector2();
+        var end = new Vector2(size.Width - screenBounds.Width, size.Height - screenBounds.Height);
+
+        var newX = Math.Clamp(pos.X, start.X, end.X);
+        var newY = Math.Clamp(pos.Y, start.Y, end.Y);
+        
+        Position = new Vector2(newX, newY);
     }
 
     public SizeF GetSize(SizeF size)
