@@ -18,6 +18,7 @@ public class RenderContext
     private ulong _currentTick;
     private readonly Dictionary<Action, ulong> _timedActions;
     public int FPS => _graphicsManager.FPS;
+    public Size DrawSize { get; private set; }
 
     public RenderContext(GraphicsManager graphicsManager, ILogger<RenderContext> logger)
     {
@@ -30,13 +31,16 @@ public class RenderContext
     {
         SDL_RenderGetViewport(_graphicsManager.Renderer, out var rect);
         Camera = new Camera(this, rect);
+
+        DrawSize = new Size(rect.w, rect.h);
     }
 
     internal void Begin(Color clearColor, ScaleQuality scaleQuality = ScaleQuality.Nearest)
     {
-        ErrorHandling.Handle(_logger, SDL_SetRenderDrawColor(_graphicsManager.Renderer, clearColor.R, clearColor.G, clearColor.B, 255));
+        ErrorHandling.Handle(_logger,
+            SDL_SetRenderDrawColor(_graphicsManager.Renderer, clearColor.R, clearColor.G, clearColor.B, 255));
         ErrorHandling.Handle(_logger, SDL_RenderClear(_graphicsManager.Renderer));
-        
+
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, $"{(int) scaleQuality}");
 
         _currentTick = SDL_GetTicks64();
@@ -68,14 +72,7 @@ public class RenderContext
             action.Invoke();
         }
     }
-
-    public Size GetDrawSize()
-    {
-        SDL_GetRendererOutputSize(_graphicsManager.Renderer, out var w, out var h);
-
-        return new Size(w, h);
-    }
-
+    
     public void SetClipping(Rectangle? rectangle)
     {
         if (rectangle is null)
@@ -117,19 +114,29 @@ public class RenderContext
             Width = rect.w
         };
     }
-    
+
+    public DrawableSprite CreateDrawable(Size size)
+    {
+        var texture = SDL_CreateTexture(_graphicsManager.Renderer, SDL_PIXELFORMAT_RGBA8888,
+            (int) SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, size.Width, size.Height);
+
+        return new DrawableSprite(_graphicsManager, texture, size);
+    }
+
     public void Draw(Sprite sprite, PointF position)
     {
         var dest = new RectangleF(position.X, position.Y, sprite.Size.Width, sprite.Size.Height);
         Draw(sprite, null, dest, 0, Color.White, 255);
     }
 
-    public void Draw(Sprite sprite, RectangleF dest, double angle, Color color, byte alpha, int index = -1, bool inWorld = true)
+    public void Draw(Sprite sprite, RectangleF dest, double angle, Color color, byte alpha, int index = -1,
+        bool inWorld = true)
     {
         Draw(sprite, null, dest, angle, color, alpha, index, inWorld);
     }
 
-    public void Draw(Sprite sprite, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha, int index = -1,
+    public void Draw(Sprite sprite, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha = 255,
+        int index = -1,
         bool inWorld = true)
     {
         if (inWorld)
@@ -149,24 +156,31 @@ public class RenderContext
             position = Camera.WorldToScreen(position.ToVector2()).ToPointF();
         }
 
-        font.Render(new Point((int)position.X, (int)position.Y), text, settings);
+        font.Render(new Point((int) position.X, (int) position.Y), text, settings);
     }
 
-    public void DrawLine(Point from, Point to, Color color)
-    {
-        var f = Camera.WorldToScreen(from);
-        var t = Camera.WorldToScreen(to);
-        
-        SDL_SetRenderDrawColor(_graphicsManager.Renderer, color.R, color.G, color.B, color.A);
-        SDL_RenderDrawLineF(_graphicsManager.Renderer, f.X, f.Y, t.X, t.Y);
-    }
-    
     public void DrawLine(PointF from, PointF to, Color color)
     {
         var f = Camera.WorldToScreen(from);
         var t = Camera.WorldToScreen(to);
-        
+
         SDL_SetRenderDrawColor(_graphicsManager.Renderer, color.R, color.G, color.B, color.A);
         SDL_RenderDrawLineF(_graphicsManager.Renderer, f.X, f.Y, t.X, t.Y);
+    }
+
+    public void DrawRectangle(RectangleF rect, Color color, bool fill)
+    {
+        var target = rect.ToSdl();
+        
+        SDL_SetRenderDrawColor(_graphicsManager.Renderer, color.R, color.G, color.B, color.A);
+
+        if (fill)
+        {
+            SDL_RenderFillRectF(_graphicsManager.Renderer, ref target);
+
+            return;
+        }
+        
+        SDL_RenderDrawRectF(_graphicsManager.Renderer, ref target);
     }
 }

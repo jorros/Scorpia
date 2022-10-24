@@ -4,6 +4,7 @@ using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.SceneManagement;
+using Scorpia.Game.HUD;
 using Scorpia.Game.HUD.TileInfo;
 using Scorpia.Game.HUD.Top;
 using Scorpia.Game.Nodes;
@@ -14,23 +15,20 @@ public partial class GameScene : NetworkedScene
 {
     private MapNode _map = null!;
     public override Color BackgroundColor => Color.FromArgb(105, 105, 108);
+    private Minimap? _minimap;
 
     protected override void OnLoad(AssetManager assetManager)
     {
         SetupUI(assetManager);
-        
-        Input.OnKeyboard += InputOnOnKeyboard;
-        
-        _map = CreateNode<MapNode>();
 
-        CreateNode<TileInfoNode>(node =>
-        {
-            node.Window = infoWindow;
-        });
-        CreateNode<TopNode>(node =>
-        {
-            node.TopBar = topContainer;
-        });
+        Input.OnKeyboard += InputOnOnKeyboard;
+
+        _map = CreateNode<MapNode>();
+        _minimap = new Minimap(ServiceProvider.GetRequiredService<RenderContext>(), _map, assetManager,
+            new Size(660, 440));
+
+        CreateNode<TileInfoNode>(node => { node.Window = infoWindow; });
+        CreateNode<TopNode>(node => { node.TopBar = topContainer; });
     }
 
     private void InputOnOnKeyboard(object? sender, KeyboardEventArgs e)
@@ -40,7 +38,7 @@ public partial class GameScene : NetworkedScene
             case KeyboardKey.A:
                 Camera.ZoomIn(0.05f);
                 break;
-            
+
             case KeyboardKey.D:
                 Camera.ZoomOut(0.05f);
                 break;
@@ -63,7 +61,7 @@ public partial class GameScene : NetworkedScene
         {
             return;
         }
-        
+
         var renderContext = ServiceProvider.GetService<RenderContext>();
         if (renderContext is not null)
         {
@@ -71,8 +69,14 @@ public partial class GameScene : NetworkedScene
         }
     }
 
+    protected override void OnUpdate()
+    {
+        _minimap?.Update();
+    }
+
     protected override void OnRender(RenderContext context)
     {
         _layout.Render(context, ScorpiaStyle.Stylesheet, false);
+        _minimap?.Render();
     }
 }

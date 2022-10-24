@@ -1,8 +1,5 @@
-using System;
 using System.Drawing;
 using System.Numerics;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Asset.Font;
 using Scorpia.Engine.Maths;
 using static SDL2.SDL;
 
@@ -10,8 +7,7 @@ namespace Scorpia.Engine.Graphics;
 
 public class Camera
 {
-    private SDL_Rect _viewport;
-    private SDL_Rect _previousRect;
+    private readonly SDL_Rect _viewport;
     private float _zoom;
     private float _minimumZoom;
     private float _maximumZoom;

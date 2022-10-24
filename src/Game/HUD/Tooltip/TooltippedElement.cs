@@ -72,7 +72,7 @@ public class TooltippedElement<T> : UIElement where T : UIElement
         actualWidth = Math.Max(actualWidth, MinWidth);
         var actualHeight = headerSize.Height + subHeaderSize.Height + contentSize.Height + Margin * 2;
         
-        var screenSize = renderContext.GetDrawSize();
+        var screenSize = renderContext.DrawSize;
 
         int actualY;
 

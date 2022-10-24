@@ -45,7 +45,7 @@ public class BasicLayout : UIElement, Container
     {
         if (Width == 0)
         {
-            var renderSize = renderContext.GetDrawSize();
+            var renderSize = renderContext.DrawSize;
             Width = renderSize.Width;
             Height = renderSize.Height;
         }

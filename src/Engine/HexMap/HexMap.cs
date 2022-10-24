@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Numerics;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
+using Scorpia.Engine.Maths;
 
 namespace Scorpia.Engine.HexMap;
 
@@ -13,6 +14,7 @@ public class HexMap<T> : IEnumerable<Hex> where T : class
     private readonly int _width;
     private readonly int _height;
     private readonly Size _tileSize;
+    private readonly PointF _position;
     private readonly Func<Hex, T> _construct;
     private readonly List<HexMapLayer<T>> _layers;
     private readonly Dictionary<Hex, T> _tiles;
@@ -26,11 +28,12 @@ public class HexMap<T> : IEnumerable<Hex> where T : class
 
     public SizeF Size { get; }
 
-    public HexMap(int width, int height, Size tileSize, Func<Hex, T> construct)
+    public HexMap(int width, int height, Size tileSize, PointF position, Func<Hex, T> construct)
     {
         _width = width;
         _height = height;
         _tileSize = tileSize;
+        _position = position;
         _construct = construct;
         _layers = new List<HexMapLayer<T>>();
         _tiles = new Dictionary<Hex, T>();
@@ -157,11 +160,12 @@ public class HexMap<T> : IEnumerable<Hex> where T : class
         var result = Vector2.Transform(new Vector2(position.Q, position.R), _matrix);
         result *= new Vector2(_tileSize.Width, _tileSize.Height);
         
-        return new PointF(result.X + _tileSize.Width / 2f, result.Y + _tileSize.Height / 2f);
+        return new PointF(result.X + _tileSize.Width / 2f + _position.X, result.Y + _tileSize.Height / 2f + _position.Y);
     }
 
     public Hex WorldToHex(PointF position)
     {
+        position = position.Subtract(_position);
         var pt = new Vector2((position.X - _tileSize.Width / 2f) / _tileSize.Width,
             (position.Y - _tileSize.Height / 2f) / _tileSize.Height);
         
@@ -212,7 +216,7 @@ public class HexMap<T> : IEnumerable<Hex> where T : class
             bottom = Math.Max(p.Y, bottom);
         }
 
-        return new RectangleF(left, top, right, bottom);
+        return new RectangleF(left, top, Math.Abs(left - right), Math.Abs(top - bottom));
     }
 
     private SizeF CalculateSize()
@@ -225,7 +229,7 @@ public class HexMap<T> : IEnumerable<Hex> where T : class
 
         var cornerBounds = PointGetBounds(corners);
         
-        return new SizeF(cornerBounds.Width * 2 * _width, cornerBounds.Height * 2 * _height);
+        return new SizeF(cornerBounds.Width * _width, cornerBounds.Height * _height * 0.75f);
     }
 
     private List<PointF> PolygonCorners(Hex h)

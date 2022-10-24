@@ -15,6 +15,16 @@ public static class Extensions
     {
         return new Point(a.X - b.X, a.Y - b.Y);
     }
+    
+    public static PointF Add(this PointF a, PointF b)
+    {
+        return new PointF(a.X + b.X, a.Y + b.Y);
+    }
+
+    public static PointF Subtract(this PointF a, PointF b)
+    {
+        return new PointF(a.X - b.X, a.Y - b.Y);
+    }
 
     public static Hex ToCube(this Point a)
     {
@@ -43,6 +53,11 @@ public static class Extensions
     public static Vector2 ToVector(this Point point)
     {
         return new Vector2(point.X, point.Y);
+    }
+
+    public static Vector2 ToVector(this Size size)
+    {
+        return new Vector2(size.Width, size.Height);
     }
 
     public static SizeF ToSize(this Vector2 vector)

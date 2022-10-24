@@ -153,12 +153,12 @@ public class MapNodeCamera : Component
 
     private Vector2 ClampCamera(Vector2 position)
     {
-        var screenBounds = Camera.RenderContext.GetDrawSize();
-        var size = Camera.GetSize(_map.Map.Size);
+        var screenBounds = Camera.BoundingRectangle;
+        var size = Camera.GetSize(_map.WorldSize).ToSize();
 
         var start = new Vector2(0, 0);
         var end = new Vector2(size.Width - screenBounds.Width, size.Height - screenBounds.Height);
-        
+
         var newX = Math.Clamp(position.X, start.X, end.X);
         var newY = Math.Clamp(position.Y, start.Y, end.Y);
         

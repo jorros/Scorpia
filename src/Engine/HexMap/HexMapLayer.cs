@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
+using Scorpia.Engine.Maths;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine.HexMap;
@@ -68,7 +69,7 @@ public class HexMapLayer<T> where T : class
 
     private void RenderTile(Sprite sprite, ulong current, RenderContext renderContext, Hex hex)
     {
-        var position = _parent.HexToWorld(hex) - sprite.Size / 2;
+        var position = (_parent.HexToWorld(hex) - sprite.Size / 2);
 
         if (sprite is AnimatedSprite animated)
         {

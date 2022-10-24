@@ -17,6 +17,7 @@ public class MapNode : Node
     public Random Rnd { get; private set; } = new();
     public int Width { get; private set; }
     public int Height { get; private set; }
+    public SizeF WorldSize { get; private set; }
 
     private const float Scale = 20;
     private const int Octaves = 5;
@@ -42,7 +43,10 @@ public class MapNode : Node
             new ResourceGenerator()
         };
 
-        Map = new HexMap<MapTile>(Width, Height, new Size(95, 95), hex => new MapTile(hex));
+        var tileSize = new Size(95, 95);
+        Map = new HexMap<MapTile>(Width, Height, tileSize, new PointF(tileSize.Width, tileSize.Height), hex => new MapTile(hex));
+
+        WorldSize = new SizeF(Map.Size.Width + tileSize.Width * 2, Map.Size.Height + tileSize.Height * 2);
 
         var biomeLayer = Map.AddLayer();
         var riverLayer = Map.AddLayer();

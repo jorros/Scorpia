@@ -57,7 +57,10 @@ public abstract class Scene : IDisposable
 
         foreach (var node in Nodes.Values)
         {
-            float dT;
+            var dT = (current - node.lastRender) / 1000f;
+            node.OnRender(context, dT);
+            node.lastRender = current;
+            
             foreach (var component in node.Components)
             {
                 dT = (current - component.lastRender) / 1000f;
@@ -65,10 +68,6 @@ public abstract class Scene : IDisposable
                 component.OnRender(context, dT);
                 component.lastRender = current;
             }
-            
-            dT = (current - node.lastRender) / 1000f;
-            node.OnRender(context, dT);
-            node.lastRender = current;
         }
         
         OnRender(context);
