@@ -39,7 +39,7 @@ internal class NinePatchSprite : Sprite
         _center = SdlHelper.Create(frame.Position.X + split.X, frame.Position.Y + split.Y, size.X - (split.Width + split.X), size.Y - (split.Height + split.Y));
     }
 
-    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha, int index)
+    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF? dest, double angle, Color color, byte alpha, int index)
     {
         SDL_SetTextureColorMod(Texture, color.R, color.G, color.B);
         SDL_SetTextureAlphaMod(Texture, alpha);
@@ -50,16 +50,30 @@ internal class NinePatchSprite : Sprite
             y = 0
         };
 
-        var centerWidth = dest.Width - (_frame.Split!.Value.X + _frame.Split.Value.Width);
-        var centerHeight = dest.Height - (_frame.Split.Value.Y + _frame.Split.Value.Height);
+        if (dest is null)
+        {
+            SDL_RenderGetLogicalSize(context.Renderer, out var w, out var h);
+            if (w == 0 && h == 0)
+            {
+                SDL_RenderGetViewport(context.Renderer, out var viewport);
+                dest = new RectangleF(viewport.x, viewport.y, viewport.w, viewport.h);
+            }
+            else
+            {
+                dest = new RectangleF(0, 0, w, h);
+            }
+        }
+
+        var centerWidth = dest.Value.Width - (_frame.Split!.Value.X + _frame.Split.Value.Width);
+        var centerHeight = dest.Value.Height - (_frame.Split.Value.Y + _frame.Split.Value.Height);
 
         SDL_SetRenderDrawColor(context.Renderer, 255, 0, 0, 100);
 
         // Draw top left
         var target = new SDL_FRect
         {
-            x = dest.X,
-            y = dest.Y,
+            x = dest.Value.X,
+            y = dest.Value.Y,
             w = _topLeft.w,
             h = _topLeft.h
         };
@@ -70,8 +84,8 @@ internal class NinePatchSprite : Sprite
         // Draw top
         target = new SDL_FRect
         {
-            x = dest.X + _topLeft.w,
-            y = dest.Y,
+            x = dest.Value.X + _topLeft.w,
+            y = dest.Value.Y,
             w = centerWidth,
             h = _top.h
         };
@@ -82,8 +96,8 @@ internal class NinePatchSprite : Sprite
         // Draw top right
         target = new SDL_FRect
         {
-            x = dest.X + _topLeft.w + centerWidth,
-            y = dest.Y,
+            x = dest.Value.X + _topLeft.w + centerWidth,
+            y = dest.Value.Y,
             w = _topRight.w,
             h = _topRight.h
         };
@@ -94,8 +108,8 @@ internal class NinePatchSprite : Sprite
         // Draw left
         target = new SDL_FRect
         {
-            x = dest.X,
-            y = dest.Y + _topLeft.h,
+            x = dest.Value.X,
+            y = dest.Value.Y + _topLeft.h,
             w = _left.w,
             h = centerHeight
         };
@@ -106,8 +120,8 @@ internal class NinePatchSprite : Sprite
         // // Draw center
         target = new SDL_FRect
         {
-            x = dest.X + _topLeft.w,
-            y = dest.Y + _topLeft.h,
+            x = dest.Value.X + _topLeft.w,
+            y = dest.Value.Y + _topLeft.h,
             w = centerWidth,
             h = centerHeight
         };
@@ -118,8 +132,8 @@ internal class NinePatchSprite : Sprite
         // Draw right
         target = new SDL_FRect
         {
-            x = dest.X + _left.w + centerWidth,
-            y = dest.Y + _topLeft.h,
+            x = dest.Value.X + _left.w + centerWidth,
+            y = dest.Value.Y + _topLeft.h,
             w = _right.w,
             h = centerHeight
         };
@@ -130,8 +144,8 @@ internal class NinePatchSprite : Sprite
         // Draw bottom left
         target = new SDL_FRect
         {
-            x = dest.X,
-            y = dest.Y + _topLeft.h + centerHeight,
+            x = dest.Value.X,
+            y = dest.Value.Y + _topLeft.h + centerHeight,
             w = _bottomLeft.w,
             h = _bottomLeft.h
         };
@@ -142,8 +156,8 @@ internal class NinePatchSprite : Sprite
         // Draw bottom
         target = new SDL_FRect
         {
-            x = dest.X + _bottomLeft.w,
-            y = dest.Y + _topLeft.h + centerHeight,
+            x = dest.Value.X + _bottomLeft.w,
+            y = dest.Value.Y + _topLeft.h + centerHeight,
             w = centerWidth,
             h = _bottom.h
         };
@@ -154,8 +168,8 @@ internal class NinePatchSprite : Sprite
         // Draw bottom right
         target = new SDL_FRect
         {
-            x = dest.X + _bottomLeft.w + centerWidth,
-            y = dest.Y + _topLeft.h + centerHeight,
+            x = dest.Value.X + _bottomLeft.w + centerWidth,
+            y = dest.Value.Y + _topLeft.h + centerHeight,
             w = _bottomRight.w,
             h = _bottomRight.h
         };

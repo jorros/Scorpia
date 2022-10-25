@@ -1,6 +1,8 @@
 using System.Drawing;
+using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.UI;
+using Scorpia.Game.Player;
 
 namespace Scorpia.Game.Scenes;
 
@@ -12,6 +14,9 @@ public partial class GameScene
     public BasicLayout topContainer = null!;
     public Window mapWindow = null!;
     public HorizontalGridLayout menuButtons;
+    private Label _dateLabel;
+    private Label _currentTileDebugLabel;
+    private Label _playerLabel;
 
     private void SetupUI(AssetManager assetManager)
     {
@@ -48,19 +53,19 @@ public partial class GameScene
         };
         _layout.Attach(mapWindow);
         
-        var playerLabel = new Label
+        _playerLabel = new Label
         {
             Type = "map",
-            Text = "jorros - "
+            Text = " - "
         };
-        mapWindow.AttachTitle(playerLabel);
+        mapWindow.AttachTitle(_playerLabel);
 
-        var dateLabel = new Label
+        _dateLabel = new Label
         {
             Type = "map",
             Text = DateTime.Now.ToString("yyyy MMMM")
         };
-        mapWindow.AttachTitle(dateLabel);
+        mapWindow.AttachTitle(_dateLabel);
 
         menuButtons = new HorizontalGridLayout
         {
@@ -121,13 +126,25 @@ public partial class GameScene
         };
         menuButtons.Attach(settingsButton);
 
+        var debugPanel = new VerticalGridLayout
+        {
+            Anchor = UIAnchor.BottomLeft,
+            Position = new Point(20, 20)
+        };
+        _layout.Attach(debugPanel);
+        
+        _currentTileDebugLabel = new Label
+        {
+            Text = "",
+            Type = "debug"
+        };
+        debugPanel.Attach(_currentTileDebugLabel);
+
         _fpsLabel = new Label
         {
             Text = "0",
-            Anchor = UIAnchor.BottomLeft,
-            Position = new Point(20, 20),
             Type = "debug"
         };
-        _layout.Attach(_fpsLabel);
+        debugPanel.Attach(_fpsLabel);
     }
 }

@@ -8,6 +8,7 @@ using Scorpia.Game.HUD;
 using Scorpia.Game.HUD.TileInfo;
 using Scorpia.Game.HUD.Top;
 using Scorpia.Game.Nodes;
+using Scorpia.Game.World;
 
 namespace Scorpia.Game.Scenes;
 
@@ -21,7 +22,7 @@ public partial class GameScene : NetworkedScene
     {
         SetupUI(assetManager);
 
-        Input.OnKeyboard += InputOnOnKeyboard;
+        Input.OnKeyboard += OnKeyPressed;
 
         _map = CreateNode<MapNode>();
         _minimap = new Minimap(ServiceProvider.GetRequiredService<RenderContext>(), _map, assetManager,
@@ -31,7 +32,12 @@ public partial class GameScene : NetworkedScene
         CreateNode<TopNode>(node => { node.TopBar = topContainer; });
     }
 
-    private void InputOnOnKeyboard(object? sender, KeyboardEventArgs e)
+    protected override void OnLeave()
+    {
+        Input.OnKeyboard -= OnKeyPressed;
+    }
+
+    private void OnKeyPressed(object? sender, KeyboardEventArgs e)
     {
         switch (e.Key)
         {
@@ -78,5 +84,24 @@ public partial class GameScene : NetworkedScene
     {
         _layout.Render(context, ScorpiaStyle.Stylesheet, false);
         _minimap?.Render();
+    }
+    
+    [Event(nameof(SelectTile))]
+    public void SelectTile(MapTile select)
+    {
+        var riverText = "none";
+
+        if (select.River is not null)
+        {
+            riverText = string.Join(",", select.River.Select(x => x.ToString()));
+        }
+        
+        _currentTileDebugLabel.Text = $"{select.Biome.ToString()} - R:{riverText}";
+    }
+
+    [Event(nameof(DeselectTile))]
+    public void DeselectTile()
+    {
+        _currentTileDebugLabel.Text = string.Empty;
     }
 }

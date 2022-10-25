@@ -28,6 +28,8 @@ public static class ScorpiaStyle
         var debugLabel = Stylesheet.CreateLabelStyle("debug", "UI:Montserrat");
         debugLabel.Size = 36;
         debugLabel.Color = Color.White;
+        debugLabel.Outline = 2;
+        debugLabel.OutlineColor = Color.Black;
 
         var cornerText = Stylesheet.CreateLabelStyle("corner", "UI:Montserrat");
         cornerText.Color = Color.White;

@@ -38,13 +38,14 @@ public class MapNode : Node
         _generators = new IGenerator[]
         {
             new BiomeGenerator(),
-            // new RiverGenerator(),
+            new RiverGenerator(),
             new FertilityGenerator(),
             new ResourceGenerator()
         };
 
         var tileSize = new Size(95, 95);
-        Map = new HexMap<MapTile>(Width, Height, tileSize, new PointF(tileSize.Width, tileSize.Height), hex => new MapTile(hex));
+        Map = new HexMap<MapTile>(Width, Height, tileSize, new PointF(tileSize.Width, tileSize.Height),
+            hex => new MapTile(hex));
 
         WorldSize = new SizeF(Map.Size.Width + tileSize.Width * 2, Map.Size.Height + tileSize.Height * 2);
 
@@ -62,16 +63,23 @@ public class MapNode : Node
         {
             return;
         }
+
+        var riverCombinations = new RenderDirections(assetManager, "Game:MAP/overlay_river_c_ne_3",
+            "Game:MAP/overlay_river_c_nw_3", "Game:MAP/overlay_river_c_w", "Game:MAP/overlay_river_c_sw",
+            "Game:MAP/overlay_river_c_se", "Game:MAP/overlay_river_c_e");
         
+        riverCombinations.GenerateCombinations(ServiceProvider.GetRequiredService<RenderContext>());
+
         _renderers = new TileRenderer[]
         {
             new BiomeRenderer(biomeLayer, AssetManager),
+            new RiverRenderer(riverLayer, assetManager, riverCombinations),
             new LocationsRenderer(locationsLayer, AssetManager),
             new FlairTileRenderer(flairLayer, AssetManager)
         };
-        
+
         _selectedTile = assetManager.Get<Sprite>("Game:MAP/selected_tile");
-            
+
         AttachComponent(new MapNodeCamera());
     }
 

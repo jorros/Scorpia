@@ -25,7 +25,7 @@ public class MapTile : IEquatable<MapTile>
 
     public Resource Resource { get; set; }
 
-    public Direction? River { get; set; }
+    public IReadOnlyList<Direction>? River { get; set; }
 
     public LocationNode? Location { get; set; }
 
@@ -42,8 +42,8 @@ public class MapTile : IEquatable<MapTile>
         };
         var directions = new[]
         {
-            Direction.SouthEast, Direction.East, Direction.NorthEast, Direction.NorthWest, Direction.West,
-            Direction.SouthWest
+            Direction.NorthEast, Direction.East, Direction.SouthEast, Direction.SouthWest, Direction.West,
+            Direction.NorthWest
         };
 
         var vector = to.Position - Position;

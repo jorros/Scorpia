@@ -15,6 +15,7 @@ public abstract class Scene : IDisposable
     public IServiceProvider ServiceProvider { get; private set; }
     public SceneManager SceneManager { get; private set; }
     public UserDataManager UserDataManager { get; private set; }
+    public EventManager EventManager { get; private set; }
     public Camera Camera { get; private set; }
     public Dictionary<ulong, Node> Nodes { get; } = new();
     public ILogger Logger { get; private set; }
@@ -110,8 +111,11 @@ public abstract class Scene : IDisposable
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         Logger = loggerFactory.CreateLogger(GetType());
         UserDataManager = serviceProvider.GetRequiredService<UserDataManager>();
+        EventManager = serviceProvider.GetRequiredService<EventManager>();
 
         var assetManager = serviceProvider.GetService<AssetManager>();
+        
+        EventManager.RegisterAll(this);
 
         if (assetManager is not null)
         {
@@ -140,6 +144,8 @@ public abstract class Scene : IDisposable
 
     public virtual void Dispose()
     {
+        EventManager.RemoveAll(this);
+        
         foreach (var node in Nodes.Values)
         {
             node.Dispose();

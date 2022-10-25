@@ -7,7 +7,7 @@ public partial class LoadingScene
 {
     protected override void ServerOnLoad()
     {
-        Seed.Value = 5213351;
+        Seed.Value = 20221025;
     }
 
     [ServerRpc]

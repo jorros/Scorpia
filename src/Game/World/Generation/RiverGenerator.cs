@@ -1,4 +1,3 @@
-using Scorpia.Engine;
 using Scorpia.Engine.HexMap;
 using Scorpia.Engine.Maths;
 using Scorpia.Game.Nodes;
@@ -50,23 +49,29 @@ public class RiverGenerator : IGenerator
 
                 Direction? flowDirection = null;
 
-                if (previousTile != null)
+                if (previousTile is not null)
                 {
-                    var dir = new List<Direction>();
+                    previousTile.River ??= new List<Direction>();
+                    var prevRiver = (List<Direction>)previousTile.River;
 
-                    if (previousTile.River != null)
+                    var dir = previousTile.GetDirection(currentTile).Value;
+                    if (!prevRiver.Contains(dir))
                     {
-                        dir.Add(previousTile.River.Value);
+                        prevRiver.Add(dir);
                     }
-
-                    dir.Add(previousTile.GetDirection(currentTile).Value);
-
-                    previousTile.River = dir.Combine();
 
                     flowDirection = currentTile.GetDirection(previousTile);
                 }
 
-                currentTile.River = flowDirection;
+                if (flowDirection is not null)
+                {
+                    currentTile.River ??= new List<Direction>();
+
+                    if (!currentTile.River.Contains(flowDirection.Value))
+                    {
+                        ((List<Direction>) currentTile.River).Add(flowDirection.Value);
+                    }
+                }
 
                 previousTile = currentTile;
             }

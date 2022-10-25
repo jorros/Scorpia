@@ -11,7 +11,7 @@ namespace Scorpia.Game.HUD;
 
 public class Minimap
 {
-    private readonly DrawableSprite _mapSprite;
+    private readonly RenderTargetSprite _mapSprite;
     private readonly RenderContext _renderContext;
     private readonly MapNode _map;
     private readonly Size _size;
@@ -28,7 +28,7 @@ public class Minimap
         _map = map;
         _size = size;
 
-        _mapSprite = _renderContext.CreateDrawable(size);
+        _mapSprite = _renderContext.CreateRenderTarget(size);
         _background = assetManager.Get<Sprite>("Game:HUD/minimap_background");
 
         _multiplier = new Vector2(_size.Width / (float) _map.Width, _size.Height / (float) _map.Height);

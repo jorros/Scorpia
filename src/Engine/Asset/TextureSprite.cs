@@ -21,15 +21,21 @@ public class TextureSprite : Sprite
         _frame = frame;
     }
 
-    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha, int index)
+    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF? dest, double angle, Color color, byte alpha, int index)
     {
-        var target = new SDL_FRect
+        var target = IntPtr.Zero;
+        SDL_FRect? targetRect = null;
+
+        if (dest is not null)
         {
-            x = dest.X,
-            y = dest.Y,
-            h = dest.Height,
-            w = dest.Width
-        };
+            targetRect = new SDL_FRect
+            {
+                x = dest.Value.X,
+                y = dest.Value.Y,
+                h = dest.Value.Height,
+                w = dest.Value.Width
+            };
+        }
 
         var source = IntPtr.Zero;
 
@@ -68,14 +74,17 @@ public class TextureSprite : Sprite
             var otherOffX = Size.Width - offX - w;
             var otherOffY = Size.Height - offY - h;
 
-            target = new SDL_FRect
+            if (targetRect is not null)
             {
-                x = target.x + offX,
-                y = target.y + otherOffY,
-                w = (int)(dest.Width / (double)Size.Width * w),
-                h = (int)(dest.Height / (double)Size.Height * h)
-            };
-            
+                targetRect = new SDL_FRect
+                {
+                    x = targetRect.Value.x + offX,
+                    y = targetRect.Value.y + otherOffY,
+                    w = (int) (dest.Value.Width / (double) Size.Width * w),
+                    h = (int) (dest.Value.Height / (double) Size.Height * h)
+                };
+            }
+
             // Center = new OffsetVector(w / 2, h / 2);
 
             source = Marshal.AllocHGlobal(Marshal.SizeOf(srcRect));
@@ -97,15 +106,28 @@ public class TextureSprite : Sprite
 
         // var centerSdl = Center.ToSdl();
 
+        if (targetRect is not null)
+        {
+            target = Marshal.AllocHGlobal(Marshal.SizeOf(targetRect));
+            Marshal.StructureToPtr(targetRect.Value, target, false);
+        }
+
         SDL_SetTextureColorMod(Texture, color.R, color.G, color.B);
         SDL_SetTextureAlphaMod(Texture, alpha);
 
-        SDL_RenderCopyExF(context.Renderer, Texture, source, ref target, angle, IntPtr.Zero, 
+        SDL_RenderCopyExF(context.Renderer, Texture, source, target, angle, IntPtr.Zero, 
             SDL_RendererFlip.SDL_FLIP_NONE);
 
         if (source != IntPtr.Zero)
         {
+            Marshal.DestroyStructure<SDL_Rect>(source);
             Marshal.FreeHGlobal(source);
+        }
+
+        if (target != IntPtr.Zero)
+        {
+            Marshal.DestroyStructure<SDL_FRect>(target);
+            Marshal.FreeHGlobal(target);
         }
     }
 }

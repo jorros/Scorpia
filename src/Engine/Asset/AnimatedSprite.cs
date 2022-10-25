@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using Scorpia.Engine.Graphics;
 using static SDL2.SDL;
 
@@ -22,7 +23,7 @@ public class AnimatedSprite : Sprite
 
     public int FramesCount => _frames.Count;
 
-    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF dest, double angle, Color color, byte alpha, int index)
+    internal override void Render(GraphicsManager context, Rectangle? src, RectangleF? dest, double angle, Color color, byte alpha, int index)
     {
         var srcRect = new SDL_Rect
         {
@@ -56,18 +57,32 @@ public class AnimatedSprite : Sprite
         
         var otherOffY = Size.Height - offY - h;
 
-        var target = new SDL_FRect
+        var target = IntPtr.Zero;
+
+        if (dest is not null)
         {
-            x = dest.X + offX,
-            y = dest.Y + otherOffY,
-            w = (int)(dest.Width / (double)Size.Width * w),
-            h = (int)(dest.Height / (double)Size.Height * h)
-        };
-        
+            var targetRect = new SDL_FRect
+            {
+                x = dest.Value.X + offX,
+                y = dest.Value.Y + otherOffY,
+                w = (int) (dest.Value.Width / (double) Size.Width * w),
+                h = (int) (dest.Value.Height / (double) Size.Height * h)
+            };
+            
+            target = Marshal.AllocHGlobal(Marshal.SizeOf(targetRect));
+            Marshal.StructureToPtr(targetRect, target, false);
+        }
+
         SDL_SetTextureColorMod(Texture, color.R, color.G, color.B);
         SDL_SetTextureAlphaMod(Texture, alpha);
 
-        SDL_RenderCopyExF(context.Renderer, Texture, ref srcRect, ref target, angle, IntPtr.Zero, 
+        SDL_RenderCopyExF(context.Renderer, Texture, ref srcRect, target, angle, IntPtr.Zero, 
             SDL_RendererFlip.SDL_FLIP_NONE);
+        
+        if (target != IntPtr.Zero)
+        {
+            Marshal.DestroyStructure<SDL_FRect>(target);
+            Marshal.FreeHGlobal(target);
+        }
     }
 }

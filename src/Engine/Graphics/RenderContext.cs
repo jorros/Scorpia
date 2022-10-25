@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Asset.Font;
@@ -115,18 +116,18 @@ public class RenderContext
         };
     }
 
-    public DrawableSprite CreateDrawable(Size size)
+    public RenderTargetSprite CreateRenderTarget(Size size)
     {
-        var texture = SDL_CreateTexture(_graphicsManager.Renderer, SDL_PIXELFORMAT_RGBA8888,
+        var texture = SDL_CreateTexture(_graphicsManager.Renderer, SDL_PIXELFORMAT_ARGB8888,
             (int) SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, size.Width, size.Height);
 
-        return new DrawableSprite(_graphicsManager, texture, size);
+        return new RenderTargetSprite(_graphicsManager, texture, size);
     }
 
     public void Draw(Sprite sprite, PointF position)
     {
         var dest = new RectangleF(position.X, position.Y, sprite.Size.Width, sprite.Size.Height);
-        Draw(sprite, null, dest, 0, Color.White, 255);
+        Draw(sprite, null, dest, 0, Color.White);
     }
 
     public void Draw(Sprite sprite, RectangleF dest, double angle, Color color, byte alpha, int index = -1,
@@ -182,5 +183,30 @@ public class RenderContext
         }
         
         SDL_RenderDrawRectF(_graphicsManager.Renderer, ref target);
+    }
+
+    public Sprite MergeSprites(IEnumerable<Sprite> sprites)
+    {
+        if (sprites is null)
+        {
+            return null;
+        }
+        
+        var input = sprites.ToArray();
+        var spriteSize = input.First().Size;
+
+        var renderTarget = CreateRenderTarget(spriteSize);
+        renderTarget.BeginDraw();
+        
+        renderTarget.Clear();
+
+        foreach (var sprite in input)
+        {
+            sprite.Render(_graphicsManager, null, new RectangleF(0, 0, spriteSize.Width, spriteSize.Height), 0, Color.White, 255, -1);
+        }
+        
+        renderTarget.EndDraw();
+
+        return renderTarget;
     }
 }
