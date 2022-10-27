@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Scorpia.Desktop</AssemblyName>
+        <RootNamespace>Scorpia.Desktop</RootNamespace>
+        <PublishReadyToRun>false</PublishReadyToRun>
+        <TieredCompilation>false</TieredCompilation>
+        <PublishTrimmed>true</PublishTrimmed>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Game\Game.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Content\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Content\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Content\**" />
+    </ItemGroup>
+
+</Project>
