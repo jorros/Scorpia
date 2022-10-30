@@ -84,8 +84,8 @@ public class RadioButton : UIElement
 
         if (Content is not null)
         {
-            Width = Math.Max(style.MinWidth, Content.Value.Width + style.Padding.X + style.Padding.Width);
-            Height = Math.Max(style.MinHeight, Content.Value.Height + style.Padding.Y + style.Padding.Height);
+            Width = Math.Max(style.MinWidth, Content.Value.Width + style.Padding.Left + style.Padding.Right);
+            Height = Math.Max(style.MinHeight, Content.Value.Height + style.Padding.Top + style.Padding.Bottom);
         }
         else
         {
@@ -142,7 +142,7 @@ public class RadioButton : UIElement
                 img.Color = tint;
             }
             
-            Content.Value.Position = new Point(style.Padding.X, style.Padding.Y);
+            Content.Value.Position = new Point(style.Padding.Left, style.Padding.Top);
             Content.Value.Render(renderContext, stylesheet, inWorld);
         }
     }

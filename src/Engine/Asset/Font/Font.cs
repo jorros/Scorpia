@@ -73,8 +73,8 @@ public class Font : IAsset, IDisposable
 
         var xModifier = settings.Alignment switch
         {
-            TextAlign.Center => (cursor.X - position.X) / 2,
-            TextAlign.Right => cursor.X - position.X,
+            Alignment.Center => (cursor.X - position.X) / 2,
+            Alignment.Right => cursor.X - position.X,
             _ => 0
         };
 
@@ -102,7 +102,6 @@ public class Font : IAsset, IDisposable
         var blocks = _fontMarkupReader.Read(text, startBlock);
 
         var cursor = new Point();
-        var size = new Size();
 
         var maxWidth = 0;
 
@@ -114,7 +113,7 @@ public class Font : IAsset, IDisposable
             maxWidth = Math.Max(maxWidth, cursor.X);
         }
         
-        size = new Size(maxWidth, cursor.Y);
+        var size = new Size(maxWidth, cursor.Y);
 
         return size;
     }

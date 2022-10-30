@@ -27,46 +27,49 @@ internal class FontMarkupReader
             using var reader = XmlReader.Create(stringReader, Settings);
 
             var blocks = new List<IBlock>();
-            var current = @default ?? new TextBlock();
+            IBlock current = @default ?? new TextBlock();
             blocks.Add(current);
 
             var currentElement = string.Empty;
 
             while (reader.MoveToNextAttribute() || reader.Read())
             {
+                TextBlock previousBlock;
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
+                        previousBlock = GetPrevious(blocks);
+                        
                         if (reader.Name == "br")
                         {
-                            blocks.Add(new NewLineBlock {LineHeight = (int)Math.Round(current.Size * 1.1)});
+                            current = new NewLineBlock {LineHeight = (int) Math.Round(previousBlock.Size * 1.1)};
+                            blocks.Add(current);
                             break;
                         }
 
-                        current = current with {Text = string.Empty};
+                        current = previousBlock with {Text = string.Empty};
                         blocks.Add(current);
 
                         currentElement = reader.Name;
                         break;
 
                     case XmlNodeType.Text:
-                        current.Text = reader.Value;
+                        previousBlock = GetPrevious(blocks);
+
+                        current = previousBlock with {Text = reader.Value};
+                        blocks.Add(current);
                         break;
 
                     case XmlNodeType.Attribute:
-                        Process(currentElement.ToLowerInvariant(), reader.Name.ToLowerInvariant(), reader.Value,
-                            current);
+                        if (current is TextBlock tb)
+                        {
+                            Process(currentElement.ToLowerInvariant(), reader.Name.ToLowerInvariant(), reader.Value,
+                                tb);
+                        }
                         break;
 
                     case XmlNodeType.EndElement:
-                        TextBlock previousBlock = null;
-                        for (var i = blocks.Count - 1; i >= 0; i--)
-                        {
-                            if (blocks[i] is TextBlock tb)
-                            {
-                                previousBlock = tb;
-                            }
-                        }
+                        previousBlock = GetPrevious(blocks);
                         
                         current = previousBlock with {Text = string.Empty};
                         blocks.Add(current);
@@ -86,6 +89,20 @@ internal class FontMarkupReader
         }
 
         return _cache.Get((content, @default), CalculateTextBlocks);
+    }
+
+    private TextBlock GetPrevious(IReadOnlyList<IBlock> blocks)
+    {
+        TextBlock previousBlock = null;
+        for (var i = blocks.Count - 1; i >= 0; i--)
+        {
+            if (blocks[i] is TextBlock tb)
+            {
+                previousBlock = tb;
+            }
+        }
+
+        return previousBlock;
     }
 
     private static void Process(string type, string attribute, string value, TextBlock textBlock)

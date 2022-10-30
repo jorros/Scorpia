@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using Scorpia.Engine.Maths;
 
 namespace Scorpia.Engine.Asset.SpriteSheetParsers;
 
@@ -59,33 +60,33 @@ internal class LibgdxSpriteSheetParser : ISpriteSheetParser
         {
             return;
         }
-        
+
         switch (data.field)
         {
             case "xy":
-                frame.Position = (Point)data.value;
+                frame.Position = (Point) data.value;
                 break;
-            
+
             case "size":
-                frame.Size = (Point) data.value;
+                frame.Size = new Size((Point) data.value);
                 break;
-            
+
             case "split":
-                frame.Split = (Rectangle) data.value;
+                frame.Split = new Box((Rectangle) data.value);
                 break;
-            
+
             case "orig":
-                frame.OriginalSize = (Point) data.value;
+                frame.OriginalSize = new Size((Point) data.value);
                 break;
-            
+
             case "offset":
                 frame.Offset = (Point) data.value;
                 break;
-            
+
             case "rotate":
                 frame.Rotated = (bool) data.value;
                 break;
-            
+
             case "index":
                 frame.Index = (int) data.value;
                 break;
@@ -115,7 +116,7 @@ internal class LibgdxSpriteSheetParser : ISpriteSheetParser
         {
             return (kvp[0], rectangle);
         }
-        
+
         if (TryParsePoint(kvp[1], out var point))
         {
             return (kvp[0], point);
@@ -139,7 +140,8 @@ internal class LibgdxSpriteSheetParser : ISpriteSheetParser
             return false;
         }
 
-        rectangle = new Rectangle(int.Parse(fields[0]), int.Parse(fields[2]), int.Parse(fields[1]), int.Parse(fields[3]));
+        rectangle = new Rectangle(int.Parse(fields[0]), int.Parse(fields[2]), int.Parse(fields[1]),
+            int.Parse(fields[3]));
         return true;
     }
 

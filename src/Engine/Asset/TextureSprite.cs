@@ -9,14 +9,13 @@ namespace Scorpia.Engine.Asset;
 
 public class TextureSprite : Sprite
 {
-    private SpritesheetFrame _frame;
+    private readonly SpritesheetFrame _frame;
 
-    internal TextureSprite(IntPtr texture, int width, int height) : base(texture, new Size(width, height))
+    internal TextureSprite(IntPtr texture, Size size) : base(texture, size)
     {
     }
 
-    internal TextureSprite(IntPtr texture, SpritesheetFrame frame) : this(texture, frame.OriginalSize.X,
-        frame.OriginalSize.Y)
+    internal TextureSprite(IntPtr texture, SpritesheetFrame frame) : base(texture, frame.OriginalSize)
     {
         _frame = frame;
     }
@@ -43,8 +42,8 @@ public class TextureSprite : Sprite
         {
             var srcRect = new SDL_Rect
             {
-                w = _frame.Size.X,
-                h = _frame.Size.Y,
+                w = _frame.Size.Width,
+                h = _frame.Size.Height,
                 x = _frame.Position.X,
                 y = _frame.Position.Y
             };
@@ -68,8 +67,8 @@ public class TextureSprite : Sprite
             var offX = _frame.Offset.X;
             var offY = _frame.Offset.Y;
 
-            var w = _frame.Size.X;
-            var h = _frame.Size.Y;
+            var w = _frame.Size.Width;
+            var h = _frame.Size.Height;
 
             var otherOffX = Size.Width - offX - w;
             var otherOffY = Size.Height - offY - h;

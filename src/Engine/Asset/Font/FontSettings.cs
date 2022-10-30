@@ -11,7 +11,7 @@ public readonly struct FontSettings
 
     public FontStyle Style { get; init; }
 
-    public TextAlign Alignment { get; init; }
+    public Alignment Alignment { get; init; }
 
     public int Outline { get; init; }
     

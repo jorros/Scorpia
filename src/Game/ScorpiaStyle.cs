@@ -1,7 +1,6 @@
 using System.Drawing;
 using Scorpia.Engine.Asset;
-using Scorpia.Engine.Helper;
-using Scorpia.Engine.UI;
+using Scorpia.Engine.Maths;
 using Scorpia.Engine.UI.Style;
 
 namespace Scorpia.Game;
@@ -80,12 +79,12 @@ public static class ScorpiaStyle
         var bigButtonLabel = Stylesheet.CreateLabelStyle("big-button", "UI:Montserrat-SemiBold");
         bigButtonLabel.Color = Color.White;
         bigButtonLabel.Size = 34;
-        bigButtonLabel.TextAlign = TextAlign.Center;
+        bigButtonLabel.Alignment = Alignment.Center;
         
         var smallButtonLabel = Stylesheet.CreateLabelStyle("small-button", "UI:Montserrat-SemiBold");
         smallButtonLabel.Color = Color.White;
         smallButtonLabel.Size = 26;
-        smallButtonLabel.TextAlign = TextAlign.Center;
+        smallButtonLabel.Alignment = Alignment.Center;
         
         //
         // INPUTS
@@ -163,13 +162,13 @@ public static class ScorpiaStyle
         var bothWindow = Stylesheet.CreateWindowStyle("full", "UI:container_both");
         bothWindow.Padding = new Point(40, 40);
         bothWindow.ActionBarHeight = 90;
-        bothWindow.ActionBarPadding = new Rectangle(50, -30, 50, 0);
+        bothWindow.ActionBarPadding = new Box(50, 15, 50, 0);
         bothWindow.ActionBarSpaceBetween = 20;
-        bothWindow.ActionBarAnchor = UIAnchor.Right;
+        bothWindow.ActionBarAlign = Alignment.Right;
         bothWindow.HasActionBar = true;
         bothWindow.HasTitle = true;
         bothWindow.TitleHeight = 107;
-        bothWindow.TitlePadding = new Rectangle(40, 25, 40, 0);
+        bothWindow.TitlePadding = new Box(40, 25, 40, 0);
         bothWindow.TitleSpaceBetween = 30;
         bothWindow.TitleLabelStyle = "header";
         
@@ -177,7 +176,7 @@ public static class ScorpiaStyle
         lightWindow.Padding = new Point(20, 20);
         lightWindow.HasTitle = true;
         lightWindow.TitleHeight = 107;
-        lightWindow.TitlePadding = new Rectangle(40, 25, 40, 0);
+        lightWindow.TitlePadding = new Box(40, 25, 40, 0);
         lightWindow.TitleSpaceBetween = 30;
         lightWindow.TitleLabelStyle = "header";
 
@@ -191,16 +190,36 @@ public static class ScorpiaStyle
         infoWindow.Padding = new Point(20, 20);
         infoWindow.HasTitle = true;
         infoWindow.TitleHeight = 114;
-        infoWindow.TitlePadding = new Rectangle(40, 4, 40, 0);
+        infoWindow.TitlePadding = new Box(40, 4, 40, 0);
         infoWindow.TitleSpaceBetween = 30;
         infoWindow.TitleLabelStyle = "header";
+        
+        var notificationWindow = Stylesheet.CreateWindowStyle("notification", "Game:HUD/menu_container");
+        notificationWindow.Padding = new Point(26, 0);
+        notificationWindow.Width = 800;
+        notificationWindow.Height = 800;
+        notificationWindow.HasTitle = true;
+        notificationWindow.TitleHeight = 114;
+        notificationWindow.TitlePadding = new Box(60, 24, 60, 0);
+        notificationWindow.TitleSpaceBetween = 30;
+        notificationWindow.TitleLabelStyle = "header";
+        notificationWindow.IsDraggable = true;
+        notificationWindow.HasActionBar = true;
+        notificationWindow.ActionBarHeight = 162;
+        notificationWindow.ActionBarSpaceBetween = 30;
+        notificationWindow.ActionBarPadding = new Box(0, 17, 0, 0);
+        notificationWindow.ActionBarAlign = Alignment.Center;
+
+        var notificationLabel = Stylesheet.CreateLabelStyle("notification", "UI:Montserrat");
+        notificationLabel.Color = Color.White;
+        notificationLabel.Size = 30;
 
         var mapWindow = Stylesheet.CreateWindowStyle("map", "Game:HUD/mini_map");
         mapWindow.HasTitle = true;
         mapWindow.TitleHeight = 60;
-        mapWindow.TitlePadding = new Rectangle(5, 5, 5, 5);
+        mapWindow.TitlePadding = new Box(5, 5, 5, 5);
         mapWindow.TitleLabelStyle = "map";
-        mapWindow.TitleAnchor = UIAnchor.TopRight;
+        mapWindow.TitleAlign = Alignment.Right;
         
         var mapLabel = Stylesheet.CreateLabelStyle("map", "UI:Montserrat");
         mapLabel.Size = 36;

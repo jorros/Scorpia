@@ -18,37 +18,31 @@ internal class NinePatchSprite : Sprite
     private SDL_Rect _left;
     private SDL_Rect _center;
 
-    private SpritesheetFrame _frame;
+    private readonly SpritesheetFrame _frame;
 
     public NinePatchSprite(IntPtr texture, SpritesheetFrame frame) : base(texture,
-        new Size(frame.OriginalSize.X, frame.OriginalSize.Y))
+        frame.OriginalSize)
     {
         _frame = frame;
 
         var split = frame.Split!.Value;
         var size = frame.OriginalSize;
 
-        _topLeft = SdlHelper.Create(frame.Position.X, frame.Position.Y, split.X, split.Y);
-        _top = SdlHelper.Create(frame.Position.X + split.X, frame.Position.Y, size.X - (split.Width + split.X), split.Y);
-        _topRight = SdlHelper.Create(frame.Position.X + size.X - split.Width, frame.Position.Y, split.Width, split.Y);
-        _right = SdlHelper.Create(frame.Position.X + size.X - split.Width, frame.Position.Y + split.Y, split.Width, size.Y - (split.Height + split.Y));
-        _bottomRight = SdlHelper.Create(frame.Position.X + size.X - split.Width, frame.Position.Y + size.Y - split.Y, split.Width, split.Height);
-        _bottom = SdlHelper.Create(frame.Position.X + split.X, frame.Position.Y + size.Y - split.Y, size.X - (split.Width + split.X), split.Height);
-        _bottomLeft = SdlHelper.Create(frame.Position.X, frame.Position.Y + size.Y - split.Y, split.X, split.Height);
-        _left = SdlHelper.Create(frame.Position.X, frame.Position.Y + split.Y, split.X, size.Y - (split.Height + split.Y));
-        _center = SdlHelper.Create(frame.Position.X + split.X, frame.Position.Y + split.Y, size.X - (split.Width + split.X), size.Y - (split.Height + split.Y));
+        _topLeft = SdlHelper.Create(frame.Position.X, frame.Position.Y, split.Left, split.Top);
+        _top = SdlHelper.Create(frame.Position.X + split.Left, frame.Position.Y, size.Width - (split.Right + split.Left), split.Top);
+        _topRight = SdlHelper.Create(frame.Position.X + size.Width - split.Right, frame.Position.Y, split.Right, split.Top);
+        _right = SdlHelper.Create(frame.Position.X + size.Width - split.Right, frame.Position.Y + split.Top, split.Right, size.Height - (split.Bottom + split.Top));
+        _bottomRight = SdlHelper.Create(frame.Position.X + size.Width - split.Right, frame.Position.Y + size.Height - split.Bottom, split.Right, split.Bottom);
+        _bottom = SdlHelper.Create(frame.Position.X + split.Left, frame.Position.Y + size.Height - split.Bottom, size.Width - (split.Right + split.Left), split.Bottom);
+        _bottomLeft = SdlHelper.Create(frame.Position.X, frame.Position.Y + size.Height - split.Bottom, split.Left, split.Bottom);
+        _left = SdlHelper.Create(frame.Position.X, frame.Position.Y + split.Top, split.Left, size.Height - (split.Bottom + split.Top));
+        _center = SdlHelper.Create(frame.Position.X + split.Left, frame.Position.Y + split.Top, size.Width - (split.Right + split.Left), size.Height - (split.Bottom + split.Top));
     }
 
     internal override void Render(GraphicsManager context, Rectangle? src, RectangleF? dest, double angle, Color color, byte alpha, int index)
     {
         SDL_SetTextureColorMod(Texture, color.R, color.G, color.B);
         SDL_SetTextureAlphaMod(Texture, alpha);
-
-        var center = new SDL_FPoint()
-        {
-            x = 0,
-            y = 0
-        };
 
         if (dest is null)
         {
@@ -64,8 +58,8 @@ internal class NinePatchSprite : Sprite
             }
         }
 
-        var centerWidth = dest.Value.Width - (_frame.Split!.Value.X + _frame.Split.Value.Width);
-        var centerHeight = dest.Value.Height - (_frame.Split.Value.Y + _frame.Split.Value.Height);
+        var centerWidth = dest.Value.Width - (_frame.Split!.Value.Left + _frame.Split.Value.Right);
+        var centerHeight = dest.Value.Height - (_frame.Split.Value.Top + _frame.Split.Value.Bottom);
 
         SDL_SetRenderDrawColor(context.Renderer, 255, 0, 0, 100);
 
@@ -151,7 +145,7 @@ internal class NinePatchSprite : Sprite
         };
         SDL_RenderCopyExF(context.Renderer, Texture, ref _bottomLeft, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
-        // SDL_RenderDrawRect(context.Renderer, ref target);
+        // SDL_RenderDrawRectF(context.Renderer, ref target);
         
         // Draw bottom
         target = new SDL_FRect
@@ -163,7 +157,7 @@ internal class NinePatchSprite : Sprite
         };
         SDL_RenderCopyExF(context.Renderer, Texture, ref _bottom, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
-        // SDL_RenderDrawRect(context.Renderer, ref target);
+        // SDL_RenderDrawRectF(context.Renderer, ref target);
         
         // Draw bottom right
         target = new SDL_FRect
@@ -175,6 +169,6 @@ internal class NinePatchSprite : Sprite
         };
         SDL_RenderCopyExF(context.Renderer, Texture, ref _bottomRight, ref target, 0, IntPtr.Zero,
             SDL_RendererFlip.SDL_FLIP_NONE);
-        // SDL_RenderDrawRect(context.Renderer, ref target);
+        // SDL_RenderDrawRectF(context.Renderer, ref target);
     }
 }

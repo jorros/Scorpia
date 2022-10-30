@@ -1,8 +1,6 @@
 using System.Drawing;
-using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.UI;
-using Scorpia.Game.Player;
 
 namespace Scorpia.Game.Scenes;
 
@@ -13,10 +11,11 @@ public partial class GameScene
     private Label _fpsLabel = null!;
     public BasicLayout topContainer = null!;
     public Window mapWindow = null!;
-    public HorizontalGridLayout menuButtons;
-    private Label _dateLabel;
-    private Label _currentTileDebugLabel;
-    private Label _playerLabel;
+    public HorizontalGridLayout menuButtons = null!;
+    public List<Window> notificationWindows = new();
+    private Label _dateLabel = null!;
+    private Label _currentTileDebugLabel = null!;
+    private Label _playerLabel = null!;
 
     private void SetupUI(AssetManager assetManager)
     {
@@ -40,7 +39,7 @@ public partial class GameScene
             Anchor = UIAnchor.TopLeft,
             Background = assetManager.Get<Sprite>("Game:HUD/top_bar"),
             Width = 1220,
-            Height = 59
+            Height = 40
         };
         _layout.Attach(topContainer);
 

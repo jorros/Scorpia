@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -42,7 +43,7 @@ internal class SpriteLoader : IAssetLoader
 
         if (metaEntry is null)
         {
-            sprites.Add((key, new TextureSprite(texture, width, height)));
+            sprites.Add((key, new TextureSprite(texture, new Size(width, height))));
 
             return sprites;
         }
@@ -53,7 +54,7 @@ internal class SpriteLoader : IAssetLoader
 
         if (descriptor == null)
         {
-            sprites.Add((key, new TextureSprite(texture, width, height)));
+            sprites.Add((key, new TextureSprite(texture, new Size(width, height))));
 
             return sprites;
         }

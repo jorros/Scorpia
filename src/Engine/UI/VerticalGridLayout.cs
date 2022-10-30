@@ -16,7 +16,7 @@ public class VerticalGridLayout : UIElement, Container
     public Sprite Background { get; set; }
     
     public int MinHeight { get; set; }
-    public Rectangle Padding { get; set; }
+    public Box Padding { get; set; }
     public int SpaceBetween { get; set; }
     public Point Margin { get; set; } = Point.Empty;
     
@@ -56,7 +56,15 @@ public class VerticalGridLayout : UIElement, Container
             return;
         }
         
-        Height = Padding.Y + Padding.Height + Elements.Sum(element => element.Height);
+        var span = CollectionsMarshal.AsSpan(Elements);
+
+        var elementSum = 0;
+        foreach (var element in span)
+        {
+            elementSum += element.Height;
+        }
+        
+        Height = Padding.Top + Padding.Bottom + elementSum;
         Height = Height > MinHeight ? Height : MinHeight;
         
         if (Background is not null)
@@ -66,9 +74,7 @@ public class VerticalGridLayout : UIElement, Container
             renderContext.Draw(Background, rect, 0, Color.White, 255, -1, inWorld);
         }
         
-        var currentPos = new Point(Padding.X, Padding.Y).Add(Margin);
-        
-        var span = CollectionsMarshal.AsSpan(Elements);
+        var currentPos = new Point(Padding.Left, Padding.Right).Add(Margin);
 
         foreach (var element in span)
         {

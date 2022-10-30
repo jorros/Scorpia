@@ -11,7 +11,7 @@ public class AnimatedSprite : Sprite
 {
     private Dictionary<int, SpritesheetFrame> _frames;
 
-    internal AnimatedSprite(IntPtr texture, SpritesheetFrame frame) : base(texture, new Size(frame.OriginalSize.X, frame.OriginalSize.Y))
+    internal AnimatedSprite(IntPtr texture, SpritesheetFrame frame) : base(texture, frame.OriginalSize)
     {
         _frames = new Dictionary<int, SpritesheetFrame>();
     }
@@ -29,8 +29,8 @@ public class AnimatedSprite : Sprite
         {
             x = _frames[index].Position.X,
             y = _frames[index].Position.Y,
-            w = _frames[index].Size.X,
-            h = _frames[index].Size.Y
+            w = _frames[index].Size.Width,
+            h = _frames[index].Size.Height
         };
         
         if (src is not null)
@@ -52,8 +52,8 @@ public class AnimatedSprite : Sprite
         var offX = _frames[index].Offset.X;
         var offY = _frames[index].Offset.Y;
 
-        var w = _frames[index].Size.X;
-        var h = _frames[index].Size.Y;
+        var w = _frames[index].Size.Width;
+        var h = _frames[index].Size.Height;
         
         var otherOffY = Size.Height - offY - h;
 

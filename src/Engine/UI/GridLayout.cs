@@ -13,7 +13,7 @@ public class GridLayout : UIElement, Container
 {
     public List<UIElement> Elements { get; } = new();
     public Sprite Background { get; set; }
-    public Rectangle Padding { get; set; }
+    public Point Padding { get; set; }
     public Point Margin { get; set; } = Point.Empty;
     public Size GridSize { get; set; }
     

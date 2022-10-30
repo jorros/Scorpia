@@ -16,10 +16,10 @@ public class HorizontalGridLayout : UIElement, Container
     public Sprite Background { get; set; }
     
     public int MinWidth { get; set; }
-    public Rectangle Padding { get; set; }
+    public Box Padding { get; set; }
     public int SpaceBetween { get; set; }
     public Point Margin { get; set; } = Point.Empty;
-    
+
     public void Attach(UIElement element)
     {
         element.Parent = this;
@@ -57,8 +57,16 @@ public class HorizontalGridLayout : UIElement, Container
         }
         
         var scaledHeight = stylesheet.Scale(Height);
+        
+        var span = CollectionsMarshal.AsSpan(Elements);
+        
+        var elementSum = 0;
+        foreach (var element in span)
+        {
+            elementSum += element.Width;
+        }
 
-        Width = Padding.X + Padding.Width + Elements.Sum(element => element.Width) + Math.Max(Elements.Count - 1, 0) * SpaceBetween;
+        Width = Padding.Left + Padding.Right + elementSum + Math.Max(Elements.Count - 1, 0) * SpaceBetween;
         Width = Width > MinWidth ? Width : MinWidth;
         
         if (Background is not null)
@@ -68,9 +76,7 @@ public class HorizontalGridLayout : UIElement, Container
             renderContext.Draw(Background, rect, 0, Color.White, 255, -1, inWorld);
         }
         
-        var currentPos = new Point(Padding.X, Padding.Y).Add(Margin);
-        
-        var span = CollectionsMarshal.AsSpan(Elements);
+        var currentPos = new Point(Padding.Left, Padding.Top).Add(Margin);
 
         foreach (var element in span)
         {

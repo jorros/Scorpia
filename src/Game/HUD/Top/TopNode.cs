@@ -101,7 +101,7 @@ public class TopNode : Node
         {
             Anchor = UIAnchor.Left,
             Position = new Point(index * 200 + 20, 0),
-            Height = 59
+            Height = 40
         }, AssetManager);
         container.Description = new TooltipDescription(name, string.Empty, string.Empty, TooltipPosition.Top);
         TopBar.Attach(container);

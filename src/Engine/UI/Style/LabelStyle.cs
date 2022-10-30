@@ -18,13 +18,15 @@ public record LabelStyle
     
     public int Outline { get; set; }
     
-    public TextAlign TextAlign { get; set; }
+    public Alignment Alignment { get; set; }
+    
+    public int? MaxWidth { get; set; }
 
     public FontSettings ToFontSettings()
     {
         return new FontSettings
         {
-            Alignment = TextAlign,
+            Alignment = Alignment,
             Color = Color,
             Outline = Outline,
             Size = Size,

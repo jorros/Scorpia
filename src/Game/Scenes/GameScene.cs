@@ -4,6 +4,7 @@ using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.SceneManagement;
+using Scorpia.Engine.UI;
 using Scorpia.Game.HUD;
 using Scorpia.Game.HUD.TileInfo;
 using Scorpia.Game.HUD.Top;
@@ -30,6 +31,14 @@ public partial class GameScene : NetworkedScene
 
         CreateNode<TileInfoNode>(node => { node.Window = infoWindow; });
         CreateNode<TopNode>(node => { node.TopBar = topContainer; });
+
+        var notification = new NotificationWindow(assetManager)
+        {
+            Anchor = UIAnchor.Center,
+            Type = "notification"
+        };
+        _layout.Attach(notification);
+        notificationWindows.Add(notification);
     }
 
     protected override void OnLeave()

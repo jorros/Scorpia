@@ -1,5 +1,6 @@
 using System.Drawing;
 using Scorpia.Engine.Asset;
+using Scorpia.Engine.Maths;
 
 namespace Scorpia.Engine.UI.Style;
 
@@ -15,17 +16,17 @@ public record WindowStyle
     
     public bool HasActionBar { get; set; }
     
-    public Rectangle ActionBarPadding { get; set; }
+    public Box ActionBarPadding { get; set; }
     
     public int ActionBarSpaceBetween { get; set; }
     
     public int ActionBarHeight { get; set; }
     
-    public UIAnchor ActionBarAnchor { get; set; }
+    public Alignment ActionBarAlign { get; set; }
     
     public bool HasTitle { get; set; }
     
-    public Rectangle TitlePadding { get; set; }
+    public Box TitlePadding { get; set; }
     
     public int TitleSpaceBetween { get; set; }
     
@@ -33,5 +34,7 @@ public record WindowStyle
     
     public string TitleLabelStyle { get; set; }
     
-    public UIAnchor TitleAnchor { get; set; }
+    public Alignment TitleAlign { get; set; }
+    
+    public bool IsDraggable { get; set; }
 }

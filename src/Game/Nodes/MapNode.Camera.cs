@@ -68,7 +68,7 @@ public class MapNodeCamera : Component
             return true;
         }
 
-        return false;
+        return scene.notificationWindows.Any(ntfWindow => ntfWindow.Boundaries.Contains(Input.MousePosition));
     }
     
     private void ProcessHover()
