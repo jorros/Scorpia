@@ -12,6 +12,8 @@ public interface INotification : INetworkPacket
     
     string Text { get; }
     
+    bool Immediate { get; }
+    
     NotificationAction? Action1 { get; }
     
     NotificationAction? Action2 { get; }

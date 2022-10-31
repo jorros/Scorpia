@@ -41,6 +41,13 @@ public class NotificationNode : NetworkedNode
     [ClientRpc]
     public void Receive(INotification notification)
     {
+        if (notification.Immediate)
+        {
+            AddWindow(notification);
+            
+            return;
+        }
+
         AddButton(notification);
     }
 

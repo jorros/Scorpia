@@ -9,6 +9,7 @@ public struct FamineNotification : INotification
     public string Icon => "famine";
     public string Title => $"Famine in {CityName}";
     public string Text => $"The silos are empty and your people are dying on the streets of {CityName}. You need to produce more food by building farms.";
+    public bool Immediate => false;
     public string CityName { get; set; }
 
     public NotificationAction? Action1 => new()

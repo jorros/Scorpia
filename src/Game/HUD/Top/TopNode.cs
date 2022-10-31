@@ -38,13 +38,6 @@ public class TopNode : Node
         (_sofrum, _sofrumLabel, _sofrumBalanceLabel) = CreateStat("sofrum", "Sofrum", 3);
         (_zellos, _zellosLabel, _zellosBalanceLabel) = CreateStat("zellos", "Zellos", 4);
         (_population, _populationLabel, _populationBalanceLabel) = CreateStat("population", "Population", 5);
-
-        // CreateButton("finance", "Finance", "Blabla", new Point(819, -59));
-        // CreateButton("research", "Research", "Blabla", new Point(710, -59));
-        // CreateButton("diplomacy", "Diplomacy", "Blabla", new Point(601, -59));
-        // CreateButton("military", "Military", "Blabla", new Point(492, -59));
-        // CreateButton("cities", "Cities", "Blabla", new Point(383, -59));
-        // CreateButton("notifications", "Notifications", "Blabla", new Point(260, -59), true);
     }
 
     public override void OnTick()
@@ -76,27 +69,6 @@ public class TopNode : Node
         _zellosLabel.Text = player.Zellos.Value.Format();
         _zellosBalanceLabel.Text = $" ({player.ZellosBalance.Value.Total.FormatBalance()})";
         _zellos.Description!.Content = BalanceSheetFormatter.Format(player.ZellosBalance.Value);
-    }
-
-    private Button CreateButton(string icon, string name, string description, Point position, bool isCorner = false)
-    {
-        var btn = new TooltippedElement<Button>(new Button
-        {
-            Anchor = UIAnchor.Right,
-            Content = new Image
-            {
-                Sprite = AssetManager.Get<Sprite>($"Game:HUD/top_button_{icon}"),
-                Anchor = UIAnchor.Center
-            },
-            Position = position,
-            Type = isCorner ? "top_button_corner" : "top_button"
-        }, AssetManager)
-        {
-            Description = new TooltipDescription(name, string.Empty, description, TooltipPosition.Top)
-        };
-        TopBar.Attach(btn);
-
-        return btn.Value;
     }
 
     private (TooltippedElement<HorizontalGridLayout>, Label, Label) CreateStat(string icon, string name, int index)
