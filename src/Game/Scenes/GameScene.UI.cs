@@ -6,20 +6,21 @@ namespace Scorpia.Game.Scenes;
 
 public partial class GameScene
 {
-    private BasicLayout _layout = null!;
+    public BasicLayout layout = null!;
     public Window infoWindow = null!;
     private Label _fpsLabel = null!;
     public BasicLayout topContainer = null!;
     public Window mapWindow = null!;
     public HorizontalGridLayout menuButtons = null!;
     public List<Window> notificationWindows = new();
+    public List<Button> notificationButtons = new();
     private Label _dateLabel = null!;
     private Label _currentTileDebugLabel = null!;
     private Label _playerLabel = null!;
 
     private void SetupUI(AssetManager assetManager)
     {
-        _layout = new BasicLayout();
+        layout = new BasicLayout();
 
         ScorpiaStyle.SetupInGame(assetManager);
 
@@ -32,7 +33,7 @@ public partial class GameScene
             Width = 1120,
             Height = 575
         };
-        _layout.Attach(infoWindow);
+        layout.Attach(infoWindow);
         
         topContainer = new BasicLayout
         {
@@ -41,7 +42,7 @@ public partial class GameScene
             Width = 1220,
             Height = 40
         };
-        _layout.Attach(topContainer);
+        layout.Attach(topContainer);
 
         mapWindow = new Window
         {
@@ -50,7 +51,7 @@ public partial class GameScene
             Width = 660,
             Height = 500
         };
-        _layout.Attach(mapWindow);
+        layout.Attach(mapWindow);
         
         _playerLabel = new Label
         {
@@ -73,7 +74,7 @@ public partial class GameScene
             Position = new Point(10, mapWindow.Height + 10),
             SpaceBetween = 15
         };
-        _layout.Attach(menuButtons);
+        layout.Attach(menuButtons);
         
         var formationButton = new Button
         {
@@ -130,7 +131,7 @@ public partial class GameScene
             Anchor = UIAnchor.BottomLeft,
             Position = new Point(20, 20)
         };
-        _layout.Attach(debugPanel);
+        layout.Attach(debugPanel);
         
         _currentTileDebugLabel = new Label
         {

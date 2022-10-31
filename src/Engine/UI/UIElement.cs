@@ -11,10 +11,10 @@ public abstract class UIElement : IComparable<UIElement>
     public int Width { get; set; }
     public int Height { get; set; }
     public int Depth { get; set; }
-    public Point Position { get; set; } = Point.Empty;
+    public PointF Position { get; set; } = PointF.Empty;
     public UIElement Parent { get; set; }
     public UIAnchor Anchor { get; set; } = UIAnchor.TopLeft;
-    public Rectangle Boundaries => new(GetPosition(), new Size(Width, Height));
+    public RectangleF Boundaries => new(GetPosition(), new Size(Width, Height));
     
     private bool? _show;
     private bool? _enabled;
@@ -48,7 +48,7 @@ public abstract class UIElement : IComparable<UIElement>
         set => _show = value;
     }
 
-    public Point GetPosition()
+    public PointF GetPosition()
     {
         if (Parent is null)
         {
@@ -61,17 +61,17 @@ public abstract class UIElement : IComparable<UIElement>
         return Anchor switch
         {
             UIAnchor.TopLeft => relativePos,
-            UIAnchor.Top => new Point(relativePos.X + Parent.Width / 2 - Width / 2, relativePos.Y),
-            UIAnchor.TopRight => new Point(parentsPos.X + Parent.Width - Width - Position.X, relativePos.Y),
-            UIAnchor.Left => new Point(relativePos.X, relativePos.Y + Parent.Height / 2 - Height / 2),
-            UIAnchor.Center => new Point(relativePos.X + Parent.Width / 2 - Width / 2,
+            UIAnchor.Top => new PointF(relativePos.X + Parent.Width / 2f - Width / 2f, relativePos.Y),
+            UIAnchor.TopRight => new PointF(parentsPos.X + Parent.Width - Width - Position.X, relativePos.Y),
+            UIAnchor.Left => new PointF(relativePos.X, relativePos.Y + Parent.Height / 2 - Height / 2),
+            UIAnchor.Center => new PointF(relativePos.X + Parent.Width / 2 - Width / 2,
                 relativePos.Y + Parent.Height / 2 - Height / 2),
-            UIAnchor.Right => new Point(parentsPos.X + Parent.Width - Width - Position.X,
+            UIAnchor.Right => new PointF(parentsPos.X + Parent.Width - Width - Position.X,
                 relativePos.Y + Parent.Height / 2 - Height / 2),
-            UIAnchor.BottomLeft => new Point(relativePos.X, parentsPos.Y + Parent.Height - Height - Position.Y),
-            UIAnchor.Bottom => new Point(relativePos.X + Parent.Width / 2 - Width / 2,
+            UIAnchor.BottomLeft => new PointF(relativePos.X, parentsPos.Y + Parent.Height - Height - Position.Y),
+            UIAnchor.Bottom => new PointF(relativePos.X + Parent.Width / 2 - Width / 2,
                 parentsPos.Y + Parent.Height - Height - Position.Y),
-            UIAnchor.BottomRight => new Point(parentsPos.X + Parent.Width - Width - Position.X,
+            UIAnchor.BottomRight => new PointF(parentsPos.X + Parent.Width - Width - Position.X,
                 parentsPos.Y + Parent.Height - Height - Position.Y),
             _ => relativePos
         };

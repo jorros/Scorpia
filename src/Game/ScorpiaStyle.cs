@@ -125,8 +125,10 @@ public static class ScorpiaStyle
         regularActionButton.MinHeight = 52;
         regularActionButton.MinWidth = 180;
         regularActionButton.ContentPosition = new Point(0, -18);
-        regularActionButton.Padding = new Point(0, 0);
+        regularActionButton.Padding = new Point(15, 0);
         regularActionButton.DefaultLabelStyle = "small-button";
+        regularActionButton.Tint = Color.FromArgb(53, 52, 52);
+        regularActionButton.PressedTint = Color.FromArgb(40, 40, 40);
 
         var greenActionButton = Stylesheet.CopyButtonStyle(regularActionButton, "action_green", "UI:button");
         greenActionButton.PressedTint = Color.FromArgb(0, 166, 79);
@@ -230,5 +232,11 @@ public static class ScorpiaStyle
         menuButton.FixedHeight = 117;
         menuButton.PressedTint = Color.DarkGray;
         menuButton.ContentPosition = new Point(-38, -38);
+        
+        var notificationButton = Stylesheet.CreateButtonStyle("notification", "Game:HUD/notification_button");
+        notificationButton.FixedWidth = 132;
+        notificationButton.FixedHeight = 132;
+        notificationButton.PressedTint = Color.DarkGray;
+        notificationButton.ContentPosition = new Point(-65, -65);
     }
 }

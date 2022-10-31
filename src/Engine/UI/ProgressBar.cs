@@ -40,12 +40,12 @@ public class ProgressBar : UIElement
 
         var position = stylesheet.Scale(GetPosition());
 
-        var target = new Rectangle(position.X, position.Y, width, height);
+        var target = new RectangleF(position.X, position.Y, width, height);
 
         renderContext.Draw(style.Background, target, 0, Color.White, 255, -1, inWorld);
         
-        target = new Rectangle(position.X, position.Y, (int)Math.Round(width / 100.0 * Progress), height);
-        var src = target with {X = 0, Y = 0};
+        target = new RectangleF(position.X, position.Y, (int)Math.Round(width / 100.0 * Progress), height);
+        var src = new Rectangle(0, 0, (int)target.Width, (int)target.Height);
         
         renderContext.Draw(style.Fill, src, target, 0, Color.White, 255, -1, inWorld);
     }

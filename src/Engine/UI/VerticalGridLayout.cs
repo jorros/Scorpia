@@ -70,11 +70,11 @@ public class VerticalGridLayout : UIElement, Container
         if (Background is not null)
         {
             var scaledPos = stylesheet.Scale(GetPosition()).Add(stylesheet.Scale(Margin));
-            var rect = new Rectangle(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), stylesheet.Scale(Height));
+            var rect = new RectangleF(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), stylesheet.Scale(Height));
             renderContext.Draw(Background, rect, 0, Color.White, 255, -1, inWorld);
         }
         
-        var currentPos = new Point(Padding.Left, Padding.Right).Add(Margin);
+        var currentPos = new PointF(Padding.Left, Padding.Right).Add(Margin);
 
         foreach (var element in span)
         {
@@ -82,7 +82,7 @@ public class VerticalGridLayout : UIElement, Container
 
             element.Render(renderContext, stylesheet, inWorld);
 
-            currentPos = currentPos.Add(new Point(0, SpaceBetween + element.Height));
+            currentPos = currentPos.Add(new PointF(0, SpaceBetween + element.Height));
         }
     }
 }

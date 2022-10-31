@@ -16,7 +16,7 @@ public class TextInput : UIElement
     public string Text { get; set; } = string.Empty;
 
     private bool _focus;
-    private Rectangle _bounds;
+    private RectangleF _bounds;
     private int _caret;
 
     private DelayedAction _backspaceAction;
@@ -200,7 +200,7 @@ public class TextInput : UIElement
         }
 
         var position = stylesheet.Scale(GetPosition());
-        _bounds = new Rectangle(position.X, position.Y, stylesheet.Scale(Width), stylesheet.Scale(Height));
+        _bounds = new RectangleF(position.X, position.Y, stylesheet.Scale(Width), stylesheet.Scale(Height));
 
         var tint = Color.White;
 
@@ -215,7 +215,7 @@ public class TextInput : UIElement
         var textSettings = style.Text.ToFontSettings();
         textSettings = textSettings with {Size = stylesheet.Scale(textSettings.Size)};
 
-        var clippingRect = new Rectangle(position.X + padding.X, position.Y + padding.Y,
+        var clippingRect = new RectangleF(position.X + padding.X, position.Y + padding.Y,
             _bounds.Width - padding.X * 2, _bounds.Height - padding.Y * 2);
 
         renderContext.SetClipping(clippingRect);
@@ -223,7 +223,7 @@ public class TextInput : UIElement
         var startPos = position.Add(padding);
         var textWidth = style.Text.Font.CalculateSize(Text[.._caret], textSettings).Width;
         var textHeight = style.Text.Font.GetHeight(textSettings);
-        var textCorrection = 0;
+        var textCorrection = 0f;
 
         if (startPos.X + textWidth > (clippingRect.Right - stylesheet.Scale(InputStartScrolling)))
         {
@@ -231,15 +231,15 @@ public class TextInput : UIElement
         }
 
         renderContext.DrawText(style.Text.Font,
-            new Point(position.X + padding.X + textCorrection, position.Y + padding.Y), Text, textSettings,
+            new PointF(position.X + padding.X + textCorrection, position.Y + padding.Y), Text, textSettings,
             inWorld);
         
         renderContext.SetClipping(null);
         
-        if (_focus && Enabled != false)
+        if (_focus && Enabled)
         {
-            renderContext.DrawLine(new Point(startPos.X + textWidth + textCorrection, startPos.Y),
-                new Point(startPos.X + textWidth + textCorrection, startPos.Y + textHeight), style.Text.Color);
+            renderContext.DrawLine(new PointF(startPos.X + textWidth + textCorrection, startPos.Y),
+                new PointF(startPos.X + textWidth + textCorrection, startPos.Y + textHeight), style.Text.Color);
         }
     }
 }

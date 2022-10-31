@@ -18,13 +18,13 @@ public class TooltippedElement<T> : UIElement where T : UIElement
     private const int MinWidth = 200;
     private const int Margin = 15;
 
-    public new Point Position
+    public new PointF Position
     {
         get => Value.Position;
         set => Value.Position = value;
     }
 
-    public new Point GetPosition()
+    public new PointF GetPosition()
     {
         return Value.GetPosition();
     }
@@ -53,7 +53,7 @@ public class TooltippedElement<T> : UIElement where T : UIElement
 
         var pos = Value.GetPosition();
 
-        var rect = new Rectangle(pos.X, pos.Y, Value.Width, Value.Height);
+        var rect = new RectangleF(pos.X, pos.Y, Value.Width, Value.Height);
         if (!rect.Contains(Input.MousePosition))
         {
             return;
@@ -74,7 +74,7 @@ public class TooltippedElement<T> : UIElement where T : UIElement
         
         var screenSize = renderContext.DrawSize;
 
-        int actualY;
+        float actualY;
 
         switch (Description.Position)
         {
@@ -85,7 +85,7 @@ public class TooltippedElement<T> : UIElement where T : UIElement
             case TooltipPosition.None:
             default:
                 var offset = Offset;
-                if (rect.Top > screenSize.Height / 2)
+                if (rect.Top > screenSize.Height / 2f)
                 {
                     offset *= -1;
                     offset -= actualHeight;

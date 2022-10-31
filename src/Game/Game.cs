@@ -28,6 +28,7 @@ public class Game : Engine.Engine
         
         networkedNodes.Add(typeof(LocationNode));
         networkedNodes.Add(typeof(PlayerNode));
+        networkedNodes.Add(typeof(NotificationNode));
         AddNetworkPacketsFrom(GetType().Assembly);
         
         SetAuthentication(Auth);

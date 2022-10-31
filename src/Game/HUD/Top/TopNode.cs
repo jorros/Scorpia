@@ -27,6 +27,8 @@ public class TopNode : Node
     private TooltippedElement<HorizontalGridLayout> _zellos = null!;
     private Label _zellosLabel = null!;
     private Label _zellosBalanceLabel = null!;
+    
+    public Label playerLabel = null!;
 
     public override void OnInit()
     {
@@ -52,6 +54,8 @@ public class TopNode : Node
         {
             return;
         }
+
+        playerLabel.Text = $"{player.Name.Value} - ";
 
         _scorpionsLabel.Text = player.Scorpions.Value.Format();
         _scorpionsBalanceLabel.Text = $" ({player.ScorpionsBalance.Value.Total.FormatBalance()})";

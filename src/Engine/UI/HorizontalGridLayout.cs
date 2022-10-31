@@ -72,11 +72,11 @@ public class HorizontalGridLayout : UIElement, Container
         if (Background is not null)
         {
             var scaledPos = stylesheet.Scale(GetPosition()).Add(stylesheet.Scale(Margin));
-            var rect = new Rectangle(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), scaledHeight);
+            var rect = new RectangleF(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), scaledHeight);
             renderContext.Draw(Background, rect, 0, Color.White, 255, -1, inWorld);
         }
         
-        var currentPos = new Point(Padding.Left, Padding.Top).Add(Margin);
+        var currentPos = new PointF(Padding.Left, Padding.Top).Add(Margin);
 
         foreach (var element in span)
         {
@@ -84,7 +84,7 @@ public class HorizontalGridLayout : UIElement, Container
 
             element.Render(renderContext, stylesheet, inWorld);
 
-            currentPos = currentPos.Add(new Point(SpaceBetween + element.Width, 0));
+            currentPos = currentPos.Add(new PointF(SpaceBetween + element.Width, 0));
         }
     }
 }

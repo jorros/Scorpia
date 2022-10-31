@@ -68,6 +68,11 @@ public class MapNodeCamera : Component
             return true;
         }
 
+        if (scene.notificationButtons.Any(btn => btn.Boundaries.Contains(Input.MousePosition)))
+        {
+            return true;
+        }
+
         return scene.notificationWindows.Any(ntfWindow => ntfWindow.Boundaries.Contains(Input.MousePosition));
     }
     

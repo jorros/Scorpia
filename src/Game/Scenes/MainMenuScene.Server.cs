@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Scorpia.Engine.Network;
 using Scorpia.Engine.Network.Protocol;
 using Scorpia.Game.Lobby;
-using Scorpia.Game.Nodes;
 using Scorpia.Game.Player;
 
 namespace Scorpia.Game.Scenes;

@@ -40,10 +40,20 @@ public class Stylesheet
     {
         return (int)Math.Floor(val * ScaleModifier);
     }
+    
+    public float Scale(float val)
+    {
+        return (float)(val * ScaleModifier);
+    }
 
     public Point Scale(Point val)
     {
         return new Point(Scale(val.X), Scale(val.Y));
+    }
+    
+    public PointF Scale(PointF val)
+    {
+        return new PointF(Scale(val.X), Scale(val.Y));
     }
     
     #region ProgressBar

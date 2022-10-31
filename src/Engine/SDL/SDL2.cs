@@ -6602,7 +6602,7 @@ namespace SDL2
 		public static extern SDL_bool SDL_JoystickGetAxisInitialState(
 			IntPtr joystick,
 			int axis,
-			out ushort state
+			out short state
 		);
 
 		/* joystick refers to an SDL_Joystick* */
@@ -7516,6 +7516,17 @@ namespace SDL2
 			IntPtr gamecontroller,
 			SDL_SensorType type,
 			IntPtr data,
+			int num_values
+		);
+
+		/* gamecontroller refers to an SDL_GameController*.
+		 * Only available in 2.0.14 or higher.
+		 */
+		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int SDL_GameControllerGetSensorData(
+			IntPtr gamecontroller,
+			SDL_SensorType type,
+			[In] float[] data,
 			int num_values
 		);
 
@@ -8873,7 +8884,7 @@ namespace SDL2
 
 		/* Only available in SDL 2.0.11 or higher. */
 		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SDL_HasARMSIMD();
+		public static extern SDL_bool SDL_HasARMSIMD();
 
 		#endregion
 

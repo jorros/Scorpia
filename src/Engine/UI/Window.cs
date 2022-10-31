@@ -75,7 +75,7 @@ public class Window : UIElement, Container
         if (style.HasActionBar)
         {
             ActionBar.Padding = style.ActionBarPadding;
-            ActionBar.Position = new Point(0, Height - style.ActionBarHeight);
+            ActionBar.Position = new PointF(0, Height - style.ActionBarHeight);
             ActionBar.SpaceBetween = style.ActionBarSpaceBetween;
             ActionBar.Anchor = style.ActionBarAlign switch
             {
@@ -123,16 +123,16 @@ public class Window : UIElement, Container
         }
 
         var position = stylesheet.Scale(GetPosition());
-        var rect = new Rectangle(position.X, position.Y, stylesheet.Scale(Width),
+        var rect = new RectangleF(position.X, position.Y, stylesheet.Scale(Width),
             stylesheet.Scale(Height));
 
         if (style.IsDraggable)
         {
-            var titleRect = new Rectangle(GetPosition(), new Size(Width, style.TitleHeight));
+            var titleRect = new RectangleF(GetPosition(), new Size(Width, style.TitleHeight));
 
             if (titleRect.Contains(Input.MousePosition) && Input.IsButtonDown(MouseButton.Left))
             {
-                _startDrag = Input.MousePosition.ToVector() - Position.ToVector();
+                _startDrag = Input.MousePosition.ToVector() - Position.ToVector2();
             }
             
             if (_startDrag is not null)
@@ -145,7 +145,7 @@ public class Window : UIElement, Container
 
             if (_startDrag is not null)
             {
-                Position = (Input.MousePosition.ToVector() - _startDrag.Value).ToPoint();
+                Position = (Input.MousePosition.ToVector() - _startDrag.Value).ToPointF();
             }
         }
 

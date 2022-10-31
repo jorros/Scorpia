@@ -1,31 +1,29 @@
 using System.Drawing;
 using Scorpia.Engine.Asset;
+using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.UI;
 
 namespace Scorpia.Game.HUD;
 
 public class NotificationWindow : Window
 {
-    public NotificationWindow(AssetManager assetManager) : base()
+    public NotificationWindow(AssetManager assetManager, string title, string cover, string text) : base()
     {
         Anchor = UIAnchor.Center;
         Type = "notification";
         Height = 1000;
         
-        AttachTitle("Test");
+        AttachTitle(title);
 
-        var cover = new Image
+        var coverImage = new Image
         {
-            Sprite = assetManager.Get<Sprite>("Game:HUD/notification_cover_famine"),
+            Sprite = assetManager.Get<Sprite>($"Game:HUD/notification_cover_{cover}"),
             Width = 745,
             Height = 373,
             Position = new Point(1, 0)
         };
-        Attach(cover);
-
-        var text =
-            "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et";
-
+        Attach(coverImage);
+        
         var contentLabel = new Label
         {
             Type = "notification",
@@ -34,26 +32,28 @@ public class NotificationWindow : Window
             MaxWidth = 745 - 46
         };
         Attach(contentLabel);
+    }
 
-        var goodButton = new Button
+    public void AddAction(string text, Action? action, Action closeAction, NotificationActionType type = NotificationActionType.Standard)
+    {
+        var button = new Button
         {
-            Type = "action_green",
-            Content = "Cool"
+            Type = type switch
+            {
+                NotificationActionType.Positive => "action_positive",
+                NotificationActionType.Negative => "action_negative",
+                _ => "action_regular"
+            },
+            Content = text,
         };
-        ActionBar.Attach(goodButton);
-
-        var badButton = new Button
+        button.OnClick += (_, args) =>
         {
-            Type = "action_red",
-            Content = "Not cool"
+            if (args.Button == MouseButton.Left)
+            {
+                action?.Invoke();
+                closeAction.Invoke();
+            }
         };
-        ActionBar.Attach(badButton);
-        
-        var neutralButton = new Button
-        {
-            Type = "action_regular",
-            Content = "Hmm"
-        };
-        ActionBar.Attach(neutralButton);
+        ActionBar.Attach(button);
     }
 }

@@ -42,17 +42,17 @@ public class GridLayout : UIElement, Container
         }
     }
 
-    private Point GetPoint(int x, int y)
+    private PointF GetPoint(float x, float y)
     {
-        var cellWidth = Width / GridSize.Width;
-        var cellHeight = Height / GridSize.Height;
+        var cellWidth = (float)Width / GridSize.Width;
+        var cellHeight = (float)Height / GridSize.Height;
 
-        return new Point(x * cellWidth, y * cellHeight);
+        return new PointF(x * cellWidth, y * cellHeight);
     }
 
-    private Point GetPoint(int pos)
+    private PointF GetPoint(int pos)
     {
-        var y = (int)Math.Floor(pos / (float)GridSize.Width);
+        var y = pos / (float)GridSize.Width;
         var x = pos % GridSize.Width;
 
         return GetPoint(x, y);
@@ -72,11 +72,11 @@ public class GridLayout : UIElement, Container
         if (Background is not null)
         {
             var scaledPos = stylesheet.Scale(GetPosition()).Add(stylesheet.Scale(Margin));
-            var rect = new Rectangle(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), stylesheet.Scale(Height));
+            var rect = new RectangleF(scaledPos.X, scaledPos.Y, stylesheet.Scale(Width), stylesheet.Scale(Height));
             renderContext.Draw(Background, rect, 0, Color.White, 255, -1, inWorld);
         }
         
-        var currentPos = new Point(Padding.X, Padding.Y).Add(Margin);
+        var currentPos = new PointF(Padding.X, Padding.Y).Add(Margin);
         
         for (var i = 0; i < Elements.Count; i++)
         {

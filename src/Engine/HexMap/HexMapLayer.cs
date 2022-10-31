@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
-using Scorpia.Engine.Maths;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine.HexMap;

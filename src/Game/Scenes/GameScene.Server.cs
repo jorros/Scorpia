@@ -25,5 +25,6 @@ public partial class GameScene
         }
         
         _map = CreateNode<MapNode>();
+        SpawnNode<NotificationNode>();
     }
 }

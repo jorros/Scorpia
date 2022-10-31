@@ -60,16 +60,16 @@ public class BasicLayout : UIElement, Container
         
         if (Background is not null)
         {
-            Rectangle backgroundRect;
+            RectangleF backgroundRect;
             var position = GetPosition();
 
             if (Background is NinePatchSprite)
             {
-                backgroundRect = new Rectangle(position.X, position.Y, Width, Height);
+                backgroundRect = new RectangleF(position.X, position.Y, Width, Height);
             }
             else
             {
-                backgroundRect = new Rectangle(position.X + Width / 2, position.Y + Height / 2, Background.Size.Width,
+                backgroundRect = new RectangleF(position.X + Width / 2f, position.Y + Height / 2f, Background.Size.Width,
                     Background.Size.Height);
                 var ratio = Background.Size.Width / (double) Background.Size.Height;
                 switch (ratio)
@@ -84,8 +84,8 @@ public class BasicLayout : UIElement, Container
                         break;
                 }
 
-                backgroundRect.X = position.X + Width / 2 - backgroundRect.Width / 2;
-                backgroundRect.Y = position.Y + Height / 2 - backgroundRect.Height / 2;
+                backgroundRect.X = position.X + Width / 2f - backgroundRect.Width / 2f;
+                backgroundRect.Y = position.Y + Height / 2f - backgroundRect.Height / 2f;
             }
 
             renderContext.Draw(Background, backgroundRect, 0, Color.White, 255, -1, inWorld);

@@ -36,7 +36,7 @@ public class HorizontalDivider : UIElement
         }
 
         var width = Math.Max(Width, style.MinWidth);
-        var target = new Rectangle(stylesheet.Scale(position.X), stylesheet.Scale(position.Y), stylesheet.Scale(width),
+        var target = new RectangleF(stylesheet.Scale(position.X), stylesheet.Scale(position.Y), stylesheet.Scale(width),
             stylesheet.Scale(Height));
         
         renderContext.Draw(style.Background, target, 0, Color.White, 255, -1, inWorld);

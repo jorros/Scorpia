@@ -17,12 +17,12 @@ var game = new Game();
 
 var actions = new IAction[]
 {
-    new TestAction()
+    new SendEventAction()
 };
 
 settings.HeadlessLoopAction = () =>
 {
-    var input = Prompt.Select("Select action", new[] {"Test"});
+    var input = Prompt.Select("Select action", new[] {"Event"});
 
     var action = actions.FirstOrDefault(x => string.Equals(x.Name, input, StringComparison.InvariantCultureIgnoreCase));
     action?.Execute(game.ServiceProvider);

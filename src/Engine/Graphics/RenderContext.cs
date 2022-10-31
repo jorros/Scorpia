@@ -73,7 +73,15 @@ public class RenderContext
             action.Invoke();
         }
     }
-    
+
+    public void SetClipping(RectangleF? rectangle)
+    {
+        SetClipping(rectangle.HasValue
+            ? new Rectangle((int) rectangle.Value.X, (int) rectangle.Value.Y, (int) rectangle.Value.Width,
+                (int) rectangle.Value.Height)
+            : null);
+    }
+
     public void SetClipping(Rectangle? rectangle)
     {
         if (rectangle is null)
@@ -172,7 +180,7 @@ public class RenderContext
     public void DrawRectangle(RectangleF rect, Color color, bool fill)
     {
         var target = rect.ToSdl();
-        
+
         SDL_SetRenderDrawColor(_graphicsManager.Renderer, color.R, color.G, color.B, color.A);
 
         if (fill)
@@ -181,7 +189,7 @@ public class RenderContext
 
             return;
         }
-        
+
         SDL_RenderDrawRectF(_graphicsManager.Renderer, ref target);
     }
 
@@ -191,20 +199,21 @@ public class RenderContext
         {
             return null;
         }
-        
+
         var input = sprites.ToArray();
         var spriteSize = input.First().Size;
 
         var renderTarget = CreateRenderTarget(spriteSize);
         renderTarget.BeginDraw();
-        
+
         renderTarget.Clear();
 
         foreach (var sprite in input)
         {
-            sprite.Render(_graphicsManager, null, new RectangleF(0, 0, spriteSize.Width, spriteSize.Height), 0, Color.White, 255, -1);
+            sprite.Render(_graphicsManager, null, new RectangleF(0, 0, spriteSize.Width, spriteSize.Height), 0,
+                Color.White, 255, -1);
         }
-        
+
         renderTarget.EndDraw();
 
         return renderTarget;

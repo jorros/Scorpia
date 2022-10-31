@@ -17,7 +17,7 @@ public class Button : UIElement
 
     public event ClickedEventHandler OnClick;
 
-    private Rectangle? _bounds;
+    private RectangleF? _bounds;
     private bool _isPressed;
 
     public Button()
@@ -58,7 +58,7 @@ public class Button : UIElement
         };
     }
 
-    private bool IsInButton(Point position)
+    private bool IsInButton(PointF position)
     {
         if (_bounds is null)
         {
@@ -86,7 +86,7 @@ public class Button : UIElement
 
         var position = GetPosition();
 
-        _bounds = new Rectangle(stylesheet.Scale(position.X), stylesheet.Scale(position.Y), stylesheet.Scale(Width),
+        _bounds = new RectangleF(stylesheet.Scale(position.X), stylesheet.Scale(position.Y), stylesheet.Scale(Width),
             stylesheet.Scale(Height));
         
         if (!Show)
@@ -126,7 +126,7 @@ public class Button : UIElement
                 break;
         }
 
-        content.Position = new Point(Width / 2, Height / 2).Add(position).Add(style.ContentPosition);
+        content.Position = new PointF(Width / 2f, Height / 2f).Add(position).Add(style.ContentPosition);
         content.Render(renderContext, stylesheet, inWorld);
     }
 }

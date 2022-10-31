@@ -30,7 +30,7 @@ public class RadioButton : UIElement
 
     public bool IsSelected { get; set; }
 
-    private Rectangle? _bounds;
+    private RectangleF? _bounds;
     private bool _isPressed;
     private Content _content;
 
@@ -94,7 +94,7 @@ public class RadioButton : UIElement
         }
 
         var position = GetPosition();
-        _bounds = new Rectangle(stylesheet.Scale(position.X), stylesheet.Scale(position.Y), stylesheet.Scale(Width),
+        _bounds = new RectangleF(stylesheet.Scale(position.X), stylesheet.Scale(position.Y), stylesheet.Scale(Width),
             stylesheet.Scale(Height));
 
         if (!Show)
@@ -142,7 +142,7 @@ public class RadioButton : UIElement
                 img.Color = tint;
             }
             
-            Content.Value.Position = new Point(style.Padding.Left, style.Padding.Top);
+            Content.Value.Position = new PointF(style.Padding.Left, style.Padding.Top);
             Content.Value.Render(renderContext, stylesheet, inWorld);
         }
     }

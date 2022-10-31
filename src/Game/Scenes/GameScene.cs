@@ -4,7 +4,6 @@ using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.SceneManagement;
-using Scorpia.Engine.UI;
 using Scorpia.Game.HUD;
 using Scorpia.Game.HUD.TileInfo;
 using Scorpia.Game.HUD.Top;
@@ -30,15 +29,11 @@ public partial class GameScene : NetworkedScene
             new Size(660, 440));
 
         CreateNode<TileInfoNode>(node => { node.Window = infoWindow; });
-        CreateNode<TopNode>(node => { node.TopBar = topContainer; });
-
-        var notification = new NotificationWindow(assetManager)
+        CreateNode<TopNode>(node =>
         {
-            Anchor = UIAnchor.Center,
-            Type = "notification"
-        };
-        _layout.Attach(notification);
-        notificationWindows.Add(notification);
+            node.TopBar = topContainer;
+            node.playerLabel = _playerLabel;
+        });
     }
 
     protected override void OnLeave()
@@ -91,10 +86,10 @@ public partial class GameScene : NetworkedScene
 
     protected override void OnRender(RenderContext context)
     {
-        _layout.Render(context, ScorpiaStyle.Stylesheet, false);
+        layout.Render(context, ScorpiaStyle.Stylesheet, false);
         _minimap?.Render();
     }
-    
+
     [Event(nameof(SelectTile))]
     public void SelectTile(MapTile select)
     {
@@ -104,7 +99,7 @@ public partial class GameScene : NetworkedScene
         {
             riverText = string.Join(",", select.River.Select(x => x.ToString()));
         }
-        
+
         _currentTileDebugLabel.Text = $"{select.Biome.ToString()} - R:{riverText}";
     }
 

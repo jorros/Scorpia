@@ -27,7 +27,8 @@ public class GraphicsManager
 
     internal void Init(IntPtr? handle = null)
     {
-        _logger.LogDebug("Starting");
+        SDL_GetVersion(out var version);
+        _logger.LogDebug("Starting (using SDL {Version})", $"{version.major}.{version.minor}.{version.patch}");
         if (SDL_Init(SDL_INIT_VIDEO) < 0)
         {
             _logger.LogCritical("Could not initialise SDL: {Error}", SDL_GetError());
