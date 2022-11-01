@@ -6,7 +6,7 @@ using Scorpia.Engine.Network.Protocol;
 
 namespace Scorpia.Engine.Network.Packets;
 
-public struct SyncListPacket : INetworkPacket
+public struct SyncListPacket : ISyncPacket
 {
     public string Scene { get; set; }
     public ulong NodeId { get; set; }

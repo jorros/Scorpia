@@ -5,6 +5,7 @@ using System.Linq;
 using CommunityToolkit.HighPerformance;
 using Microsoft.Extensions.Logging;
 using Scorpia.Engine.Helper;
+using Scorpia.Engine.HexMap;
 using Scorpia.Engine.Network.Packets;
 
 namespace Scorpia.Engine.Network;
@@ -29,7 +30,8 @@ public class PacketManager
         Double,
         Bool,
         Packet,
-        Array
+        Array,
+        Hex
     };
 
     public PacketManager(EngineSettings settings, ILogger<PacketManager> logger)
@@ -70,6 +72,8 @@ public class PacketManager
                 return stream.Read<double>();
             case Mapping.Bool:
                 return stream.Read<bool>();
+            case Mapping.Hex:
+                return new Hex(stream.Read<int>(), stream.Read<int>(), stream.Read<int>());
             case Mapping.Packet:
             {
                 var id = stream.Read<ushort>();
@@ -158,6 +162,12 @@ public class PacketManager
             case bool val:
                 stream.WriteByte((byte) Mapping.Bool);
                 stream.Write(val);
+                break;
+            case Hex hex:
+                stream.WriteByte((byte)Mapping.Hex);
+                stream.Write(hex.Q);
+                stream.Write(hex.R);
+                stream.Write(hex.S);
                 break;
             case INetworkPacket packet:
             {

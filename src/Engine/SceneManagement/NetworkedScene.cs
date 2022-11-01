@@ -15,14 +15,14 @@ public abstract class NetworkedScene : Scene
     public NetworkManager NetworkManager { get; private set; }
     public EngineSettings Settings { get; set; }
 
-    private readonly Dictionary<uint, Node> _networkedNodes = new();
-    private uint _lastNetworkId = 1;
+    internal readonly Dictionary<ulong, NetworkedNode> networkedNodes = new();
+    private ulong _lastNetworkId = 1;
 
-    private IDictionary<int, MethodBase> ClientRpcs { get; set; }
-    private IDictionary<int, MethodBase> ServerRpcs { get; set; }
+    internal IDictionary<int, MethodBase> ClientRpcs { get; set; }
+    internal IDictionary<int, MethodBase> ServerRpcs { get; set; }
 
-    private IDictionary<int, FieldInfo> NetworkedVars { get; set; }
-    private IDictionary<int, FieldInfo> NetworkedLists { get; set; }
+    internal IDictionary<int, FieldInfo> NetworkedVars { get; set; }
+    internal IDictionary<int, FieldInfo> NetworkedLists { get; set; }
 
     protected T SpawnNode<T>() where T : NetworkedNode
     {
@@ -41,7 +41,7 @@ public abstract class NetworkedScene : Scene
             NetworkId = _lastNetworkId
         });
 
-        _networkedNodes.Add(_lastNetworkId, node);
+        networkedNodes.Add(_lastNetworkId, node);
 
         _lastNetworkId++;
 
@@ -55,18 +55,18 @@ public abstract class NetworkedScene : Scene
             return;
         }
 
-        foreach (var node in _networkedNodes.Where(node => node.Value is NetworkedNode))
+        foreach (var node in networkedNodes.Where(node => node.Value is NetworkedNode))
         {
-            _networkedNodes.Remove(node.Key);
+            networkedNodes.Remove(node.Key);
         }
 
-        NetworkManager.Send(new SyncSceneRequest
+        NetworkManager.Send(new SyncSceneRequestPacket
         {
             Scene = GetType().Name
         });
     }
 
-    private void SpawnNode(string name, uint id)
+    internal void SpawnNode(string name, ulong id)
     {
         foreach (var node in from nodeType in Settings.NetworkedNodes
                  where nodeType.Name == name
@@ -74,98 +74,16 @@ public abstract class NetworkedScene : Scene
         {
             node?.Create(id);
 
-            _networkedNodes.Add(id, node);
+            networkedNodes.Add(id, node);
             break;
         }
     }
 
-    private void OnPacketReceive(object sender, DataReceivedEventArgs e)
+    internal NetworkedNode GetNetworkedNode(ulong id)
     {
-        switch (e.Data)
-        {
-            case CreateNodePacket createNodePacket:
-            {
-                if (createNodePacket.Scene != GetType().Name)
-                {
-                    break;
-                }
+        networkedNodes.TryGetValue(id, out var node);
 
-                SpawnNode(createNodePacket.Node, createNodePacket.NetworkId);
-                break;
-            }
-            case RemoteCallPacket remoteCallPacket:
-            {
-                if (remoteCallPacket.NodeId != 0 || remoteCallPacket.Scene != GetType().Name)
-                {
-                    break;
-                }
-
-                var method = NetworkManager.IsClient
-                    ? ClientRpcs[remoteCallPacket.Method]
-                    : ServerRpcs[remoteCallPacket.Method];
-
-                var onlySenderInfo = method.GetParameters().FirstOrDefault()?.ParameterType == typeof(SenderInfo);
-
-                var args = method.GetParameters().Length switch
-                {
-                    0 => null,
-                    1 => onlySenderInfo
-                        ? new object[] {new SenderInfo(e.SenderId)}
-                        : new[] {remoteCallPacket.Arguments},
-                    2 => new[] {remoteCallPacket.Arguments, new SenderInfo(e.SenderId)}
-                };
-
-                method.Invoke(this, args);
-                break;
-            }
-            case SyncSceneRequest syncSceneRequest:
-            {
-                if (syncSceneRequest.Scene != GetType().Name || NetworkManager.IsClient)
-                {
-                    break;
-                }
-
-                foreach (var node in _networkedNodes)
-                {
-                    NetworkManager.Send(new CreateNodePacket
-                    {
-                        NetworkId = node.Key,
-                        Node = node.Value.GetType().Name,
-                        Scene = GetType().Name
-                    });
-                }
-
-                break;
-            }
-            case SyncVarPacket syncVarPacket:
-            {
-                if (syncVarPacket.NodeId != 0 || syncVarPacket.Scene != GetType().Name)
-                {
-                    break;
-                }
-
-                var field = NetworkedVars[syncVarPacket.Field];
-                dynamic netVar = field.GetValue(this);
-                netVar.Accept(syncVarPacket.Value);
-
-                break;
-            }
-            case SyncListPacket syncListPacket:
-            {
-                if (syncListPacket.NodeId != 0 || syncListPacket.Scene != GetType().Name)
-                {
-                    break;
-                }
-                
-                var field = NetworkedLists[syncListPacket.Field];
-                dynamic netList = field.GetValue(this);
-
-                netList.Commit(syncListPacket);
-                netList.packets.Clear();
-
-                break;
-            }
-        }
+        return node;
     }
 
     private void OnUserConnect(object sender, UserConnectedEventArgs e)
@@ -182,8 +100,7 @@ public abstract class NetworkedScene : Scene
         ServerRpcs = GetType().GetServerRpcs();
         NetworkedVars = GetType().GetNetworkedFields();
         NetworkedLists = GetType().GetNetworkedLists();
-
-        NetworkManager.OnPacketReceive += OnPacketReceive;
+        
         NetworkManager.OnUserConnect += OnUserConnect;
         
         SyncNodes();
@@ -287,9 +204,8 @@ public abstract class NetworkedScene : Scene
 
     public override void Dispose()
     {
-        NetworkManager.OnPacketReceive -= OnPacketReceive;
         NetworkManager.OnUserConnect -= OnUserConnect;
-        _networkedNodes.Clear();
+        networkedNodes.Clear();
 
         base.Dispose();
     }

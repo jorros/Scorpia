@@ -14,11 +14,12 @@ public class LocationsRenderer : TileRenderer
     public override Sprite? GetTile(MapTile tile) => tile.Location?.Type.Value switch
     {
         LocationType.Village => GetSprite("overlay_location_village"),
-        LocationType.Town => GetSprite("overlay_location_town"),
-        LocationType.City => GetSprite("overlay_location_town"),
+        LocationType.City => GetSprite("overlay_location_city"),
         LocationType.Outpost => GetSprite("overlay_location_outpost"),
-        LocationType.Fob => GetSprite("overlay_location_fob"),
-        LocationType.MilitaryBase => GetSprite("overlay_location_militarybase"),
+        LocationType.Farmland => GetSprite("overlay_location_farmland"),
+        LocationType.Fortification => GetSprite("overlay_location_fortification"),
+        LocationType.Mine => GetSprite("overlay_location_mine"),
+        LocationType.University => GetSprite("overlay_location_university"),
         _ => null
     };
 }

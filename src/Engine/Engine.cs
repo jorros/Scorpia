@@ -20,6 +20,7 @@ using Scorpia.Engine.InputManagement;
 using Scorpia.Engine.Network;
 using Scorpia.Engine.Network.Packets;
 using Scorpia.Engine.SceneManagement;
+using Scorpia.Engine.SceneManagement.PacketHandlers;
 using static SDL2.SDL;
 
 namespace Scorpia.Engine;
@@ -34,7 +35,9 @@ public abstract class Engine
 
     public IServiceProvider ServiceProvider => _serviceProvider;
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "Requires referenced packets anyways")]
+    [UnconditionalSuppressMessage("Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Requires referenced packets anyways")]
     protected void AddNetworkPacketsFrom(Assembly assembly)
     {
         foreach (var type in assembly.GetTypes().Where(t => t.IsAssignableTo(typeof(INetworkPacket)) && !t.IsInterface))
@@ -60,7 +63,7 @@ public abstract class Engine
 
         _settings = settings;
         services.AddSingleton(_ => settings);
-        
+
         services.AddSingleton<UserDataManager>();
         services.AddSingleton<EventManager>();
 
@@ -83,8 +86,10 @@ public abstract class Engine
             services.AddSingleton<PacketManager>();
 
             services.AddSingleton<SceneManager, NetworkedSceneManager>();
-            
+            services.AddSingleton<ScenePacketManager>();
+
             AddNetworkPacketsFrom(typeof(Engine).Assembly);
+            services.RegisterAllTypes<IPacketHandler>(new[] {typeof(Engine).Assembly});
         }
         else
         {
@@ -136,10 +141,10 @@ public abstract class Engine
                 settings.HeadlessLoopAction?.Invoke();
                 Thread.Sleep(100);
             }
-            
+
             var networkManager = _serviceProvider.GetRequiredService<NetworkManager>();
             networkManager.Stop();
-            
+
             return;
         }
 
@@ -153,7 +158,7 @@ public abstract class Engine
         var cap = 1000 / (double) settings.TicksPerSecond;
         var sceneManager = _serviceProvider.GetRequiredService<SceneManager>();
         var networkManager = _serviceProvider.GetService<NetworkManager>();
-        
+
         Task.Run(async () =>
         {
             while (!token.IsCancellationRequested)
@@ -258,7 +263,6 @@ public abstract class Engine
                         break;
                 }
             }
-
             sceneManager.Render(stopwatch.Elapsed);
 
             graphicsManager.Flush();

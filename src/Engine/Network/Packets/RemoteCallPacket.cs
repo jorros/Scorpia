@@ -4,7 +4,7 @@ using CommunityToolkit.HighPerformance;
 
 namespace Scorpia.Engine.Network.Packets;
 
-public struct RemoteCallPacket : INetworkPacket
+public struct RemoteCallPacket : ISyncPacket
 {
     public string Scene { get; set; }
     public ulong NodeId { get; set; }

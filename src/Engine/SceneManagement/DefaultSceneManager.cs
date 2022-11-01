@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Scorpia.Engine.Graphics;
@@ -30,6 +31,11 @@ public class DefaultSceneManager : SceneManager
         loadedScenes.Add(typeof(T).Name, scene);
 
         return (T)scene;
+    }
+
+    internal override Scene GetLoadedScene(string name)
+    {
+        return loadedScenes.ContainsKey(name) ? loadedScenes[name] : null;
     }
 
     public override void Switch(string scene, bool unloadCurrent = true)

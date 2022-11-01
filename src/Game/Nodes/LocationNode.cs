@@ -26,7 +26,25 @@ public class LocationNode : NetworkedNode
     public NetworkedList<Building> Buildings { get; } = new();
 
     public MapTile MapTile { get; private set; }
-    
+
+    public override void OnInit()
+    {
+        var map = Scene.FindNode<MapNode>();
+        
+        map.Map.GetData(Position.Value).Location = this;
+
+        if (NetworkManager.IsClient)
+        {
+            map.RefreshTile(Position.Value);
+        }
+    }
+
+    public override void OnTick()
+    {
+        Console.WriteLine(Name.Value);
+        Console.WriteLine(Position.Value);
+    }
+
     public Building? GetCurrentConstruction()
     {
         foreach (var building in Buildings)

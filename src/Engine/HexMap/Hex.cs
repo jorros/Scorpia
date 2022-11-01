@@ -78,4 +78,9 @@ public readonly struct Hex : IEquatable<Hex>
     {
         return HashCode.Combine(Q, R, S);
     }
+
+    public override string ToString()
+    {
+        return $"{Q}:{R}:{S}";
+    }
 }

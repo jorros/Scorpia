@@ -3,7 +3,7 @@ using CommunityToolkit.HighPerformance;
 
 namespace Scorpia.Engine.Network.Packets;
 
-public struct SyncVarPacket : INetworkPacket
+public struct SyncVarPacket : ISyncPacket
 {
     public string Scene { get; set; }
     public ulong NodeId { get; set; }

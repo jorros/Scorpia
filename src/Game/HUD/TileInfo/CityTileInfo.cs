@@ -53,8 +53,12 @@ public class CityTileInfo : ITileInfo
         var i = location.Type.Value switch
         {
             LocationType.Village => "village",
-            LocationType.Town => "town",
             LocationType.City => "city",
+            LocationType.Farmland => "farmland",
+            LocationType.Fortification => "fortification",
+            LocationType.Mine => "mine",
+            LocationType.University => "university",
+            LocationType.Outpost => "outpost",
             _ => null
         };
 

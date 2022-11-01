@@ -91,23 +91,23 @@ public class Minimap
     {
         var renderSize = _renderContext.Camera.BoundingRectangle.Size;
         _rect = new RectangleF(_renderContext.DrawSize.Width - _size.Width, 60, _size.Width, _size.Height);
-
+        
         _mapSprite.BeginDraw();
         _renderContext.Draw(_background, null, _rect with {X = 0, Y = 0}, 0, Color.White, inWorld: false);
-
+        
         RenderMinimap();
-
+        
         var relativePos = _renderContext.Camera.Position / _map.WorldSize.ToVector2() * _size.ToVector();
         var relativeSize = renderSize.ToVector2() / _map.WorldSize.ToVector2() * _size.ToVector();
-
+        
         var viewRect = new RectangleF(relativePos.ToPointF(), relativeSize.ToSize());
         _renderContext.DrawRectangle(viewRect, Color.White, false);
-
+        
         viewRect = new RectangleF(relativePos.ToPointF().Add(new PointF(1, 1)),
             relativeSize.ToSize() - new SizeF(2, 2));
         _renderContext.DrawRectangle(viewRect, Color.White, false);
         _mapSprite.EndDraw();
-
+        
         _renderContext.Draw(_mapSprite, null, _rect, 0, Color.White, inWorld: false);
     }
 }

@@ -48,8 +48,7 @@ public class GraphicsManager
 
             Window = SDL_CreateWindow(_settings.DisplayName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                 windowWidth, windowHeight,
-                SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL_WindowFlags.SDL_WINDOW_METAL |
-                SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI);
+                SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI);
         }
 
         if (Window == IntPtr.Zero)
@@ -60,8 +59,7 @@ public class GraphicsManager
 
         Renderer = SDL_CreateRenderer(Window,
             -1,
-            SDL_RendererFlags.SDL_RENDERER_ACCELERATED |
-            SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
+            SDL_RendererFlags.SDL_RENDERER_ACCELERATED | SDL_RendererFlags.SDL_RENDERER_TARGETTEXTURE);
 
         if (Renderer == IntPtr.Zero)
         {

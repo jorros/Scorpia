@@ -29,6 +29,8 @@ public class MapNode : Node
     private HexMapLayer<MapTile> _selectedLayer = null!;
 
     private Sprite _selectedTile = null!;
+    private RenderDirections _riverCombinations;
+    private bool _initialised;
 
     public override void OnInit()
     {
@@ -64,16 +66,14 @@ public class MapNode : Node
             return;
         }
 
-        var riverCombinations = new RenderDirections(assetManager, "Game:MAP/overlay_river_c_ne_3",
+        _riverCombinations = new RenderDirections(assetManager, "Game:MAP/overlay_river_c_ne_3",
             "Game:MAP/overlay_river_c_nw_3", "Game:MAP/overlay_river_c_w", "Game:MAP/overlay_river_c_sw",
             "Game:MAP/overlay_river_c_se", "Game:MAP/overlay_river_c_e");
-        
-        riverCombinations.GenerateCombinations(ServiceProvider.GetRequiredService<RenderContext>());
 
         _renderers = new TileRenderer[]
         {
             new BiomeRenderer(biomeLayer, AssetManager),
-            new RiverRenderer(riverLayer, assetManager, riverCombinations),
+            new RiverRenderer(riverLayer, assetManager, _riverCombinations),
             new LocationsRenderer(locationsLayer, AssetManager),
             new FlairTileRenderer(flairLayer, AssetManager)
         };
@@ -114,6 +114,17 @@ public class MapNode : Node
         }
     }
 
+    public void RefreshTile(Hex position)
+    {
+        var mapTile = Map.GetData(position);
+            
+        foreach (var renderer in _renderers)
+        {
+            var sprite = renderer.GetTile(mapTile);
+            renderer.Layer.SetSprite(mapTile.Position, sprite);
+        }
+    }
+
     [Event(nameof(SelectTile))]
     public void SelectTile(MapTile select)
     {
@@ -129,6 +140,13 @@ public class MapNode : Node
 
     public override void OnRender(RenderContext context, float dT)
     {
+        if (!_initialised)
+        {
+            _riverCombinations.GenerateCombinations(context);
+            RefreshTilemap();
+            _initialised = true;
+        }
+        
         Map.Render(context);
     }
 }

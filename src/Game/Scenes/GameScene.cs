@@ -18,6 +18,8 @@ public partial class GameScene : NetworkedScene
     public override Color BackgroundColor => Color.FromArgb(105, 105, 108);
     private Minimap? _minimap;
 
+    private bool _initialised;
+
     protected override void OnLoad(AssetManager assetManager)
     {
         SetupUI(assetManager);
@@ -58,11 +60,6 @@ public partial class GameScene : NetworkedScene
     public void InitMap(int seed, bool graphics)
     {
         _map.Generate(seed);
-
-        if (graphics)
-        {
-            _map.RefreshTilemap();
-        }
     }
 
     protected override void OnTick()
@@ -86,6 +83,10 @@ public partial class GameScene : NetworkedScene
 
     protected override void OnRender(RenderContext context)
     {
+        if (!_initialised)
+        {
+            
+        }
         layout.Render(context, ScorpiaStyle.Stylesheet, false);
         _minimap?.Render();
     }

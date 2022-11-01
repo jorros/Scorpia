@@ -70,7 +70,10 @@ public class NetworkManager
             return;
         }
 
-        _client = new TcpClient();
+        _client = new TcpClient
+        {
+            NoDelay = true
+        };
     }
 
     private async Task RunServer()

@@ -2,16 +2,17 @@ using System.IO;
 
 namespace Scorpia.Engine.Network.Packets;
 
-public struct SwitchScenePacket : INetworkPacket
+public struct SwitchScenePacket : ISyncPacket
 {
-    public string Name { get; set; }
+    public string Scene { get; set; }
+    
     public void Write(Stream stream, PacketManager packetManager)
     {
-        stream.Write(Name);
+        stream.Write(Scene);
     }
 
     public void Read(Stream stream, PacketManager packetManager)
     {
-        Name = stream.ReadString();
+        Scene = stream.ReadString();
     }
 }

@@ -1,6 +1,7 @@
 using Scorpia.Engine.Asset;
 using Scorpia.Engine.Graphics;
 using Scorpia.Engine.HexMap;
+using Scorpia.Game.Nodes.Entities;
 using Scorpia.Game.Utils;
 
 namespace Scorpia.Game.World.Render;
@@ -16,6 +17,7 @@ public class BiomeRenderer : TileRenderer
     public override Sprite GetTile(MapTile tile) =>
         tile switch
         {
+            {Location.Type.Value:LocationType.City} => GetSprite("tile_city_clear_green", _counter.Next()),
             {Biome: Biome.Water} when tile.HasFeature(MapTileFeature.Wave) => GetSprite("tile_ocean_waves_small_dark",
                 _counter.Next()),
             {Biome: Biome.Water} => GetSprite("tile_ocean_plain_dark", 0),

@@ -10,21 +10,12 @@ public static class BuildingBlueprints
 {
     private static readonly IReadOnlyList<IBuildingBlueprint> Blueprints = new IBuildingBlueprint[]
     {
-        new AcademyBuildingBlueprint(),
         new BarracksBuildingBlueprint(),
         new BunkerBuildingBlueprint(),
-        new DeepMineBuildingBlueprint(),
-        new EstateBuildingBlueprint(),
-        new FarmBuildingBlueprint(),
-        new FortsBuildingBlueprint(),
         new MineBuildingBlueprint(),
-        new MintBuildingBlueprint(),
         new RefineryBuildingBlueprint(),
-        new RefineryComplexBuildingBlueprint(),
-        new ResidenceBuildingBlueprint(),
         new SchoolBuildingBlueprint(),
         new SmallholdingBuildingBlueprint(),
-        new UniversityBuildingBlueprint()
     };
 
     private static IBuildingBlueprint GetBlueprint(BuildingType type) => Blueprints.First(x => x.Type == type);

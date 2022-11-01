@@ -10,25 +10,27 @@ public class NetworkedSceneManager : DefaultSceneManager
     private readonly IServiceProvider _serviceProvider;
     private readonly NetworkManager _networkManager;
     private readonly ILogger<NetworkedSceneManager> _logger;
+    private readonly ScenePacketManager _scenePacketManager;
 
     public NetworkedSceneManager(IServiceProvider serviceProvider, NetworkManager networkManager,
-        ILogger<NetworkedSceneManager> logger) : base(
+        ILogger<NetworkedSceneManager> logger, ScenePacketManager scenePacketManager) : base(
         serviceProvider)
     {
         _serviceProvider = serviceProvider;
         _networkManager = networkManager;
         _logger = logger;
+        _scenePacketManager = scenePacketManager;
         _networkManager.OnPacketReceive += OnPacketReceive;
     }
 
     private void OnPacketReceive(object sender, DataReceivedEventArgs e)
     {
-        switch (e.Data)
+        if (e.Data is not ISyncPacket syncPacket)
         {
-            case SwitchScenePacket switchScenePacket:
-                SwitchInternally(switchScenePacket.Name);
-                break;
+            return;
         }
+
+        _scenePacketManager.Process(syncPacket, this, e.SenderId);
     }
 
     public override T Load<T>()
@@ -48,6 +50,8 @@ public class NetworkedSceneManager : DefaultSceneManager
         if (_networkManager.IsClient)
         {
             base.Switch(scene);
+            
+            _logger.LogInformation("Switching scene to {Scene}", scene);
 
             return;
         }
@@ -56,22 +60,10 @@ public class NetworkedSceneManager : DefaultSceneManager
 
         _networkManager.Send(new SwitchScenePacket
         {
-            Name = scene
+            Scene = scene
         });
 
         base.Switch(scene, unloadCurrent);
-    }
-
-    private void SwitchInternally(string scene)
-    {
-        if (_networkManager.IsServer)
-        {
-            return;
-        }
-
-        _logger.LogInformation("Server switches scene to {Scene}", scene);
-
-        base.Switch(scene);
     }
 
     internal override void Update()

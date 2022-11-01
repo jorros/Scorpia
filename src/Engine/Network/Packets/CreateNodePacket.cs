@@ -3,11 +3,12 @@ using CommunityToolkit.HighPerformance;
 
 namespace Scorpia.Engine.Network.Packets;
 
-public struct CreateNodePacket : INetworkPacket
+public struct CreateNodePacket : ISyncPacket
 {
-    public uint NetworkId { get; set; }
+    public ulong NetworkId { get; set; }
     public string Node { get; set; }
     public string Scene { get; set; }
+    public SyncVarPacket[] Variables { get; set; }
 
     public void Write(Stream stream, PacketManager packetManager)
     {
@@ -18,7 +19,7 @@ public struct CreateNodePacket : INetworkPacket
 
     public void Read(Stream stream, PacketManager packetManager)
     {
-        NetworkId = stream.Read<uint>();
+        NetworkId = stream.Read<ulong>();
         Node = stream.ReadString();
         Scene = stream.ReadString();
     }
