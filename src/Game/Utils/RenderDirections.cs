@@ -1,6 +1,6 @@
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Graphics;
 using Scorpia.Game.World;
+using Scorpian.Asset;
+using Scorpian.Graphics;
 
 namespace Scorpia.Game.Utils;
 

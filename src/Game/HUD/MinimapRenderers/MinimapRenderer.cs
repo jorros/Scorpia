@@ -1,6 +1,6 @@
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.HexMap;
 using Scorpia.Game.World;
+using Scorpian.Asset;
+using Scorpian.HexMap;
 
 namespace Scorpia.Game.HUD.MinimapRenderers;
 

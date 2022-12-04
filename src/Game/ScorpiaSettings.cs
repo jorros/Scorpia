@@ -1,4 +1,4 @@
-using Scorpia.Engine;
+using Scorpian;
 
 namespace Scorpia.Game;
 

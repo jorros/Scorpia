@@ -1,7 +1,6 @@
 using System.Drawing;
-using Scorpia.Engine;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.UI;
+using Scorpian.Asset;
+using Scorpian.UI;
 
 namespace Scorpia.Game.Scenes;
 

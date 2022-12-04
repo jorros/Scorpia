@@ -1,7 +1,7 @@
 using System.Drawing;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.InputManagement;
-using Scorpia.Engine.UI;
+using Scorpian.Asset;
+using Scorpian.InputManagement;
+using Scorpian.UI;
 
 namespace Scorpia.Game.HUD;
 

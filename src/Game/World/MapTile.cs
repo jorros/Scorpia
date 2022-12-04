@@ -1,5 +1,5 @@
-using Scorpia.Engine.HexMap;
 using Scorpia.Game.Nodes;
+using Scorpian.HexMap;
 
 namespace Scorpia.Game.World;
 

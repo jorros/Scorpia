@@ -1,6 +1,5 @@
-using CommunityToolkit.HighPerformance;
-using Scorpia.Engine.Network;
-using Scorpia.Engine.Network.Packets;
+using Scorpian.Network;
+using Scorpian.Network.Packets;
 
 namespace Scorpia.Game.Player;
 
@@ -12,37 +11,37 @@ public record Player : INetworkPacket
     
     public PlayerFaction? Faction { get; set; }
 
-    public ushort NetworkId { get; set; }
+    public uint NetworkId { get; set; }
 
     public bool Ready => Color is not null && !string.IsNullOrWhiteSpace(Name);
 
-    public virtual void Write(Stream stream, PacketManager packetManager)
+    public virtual void Write(BinaryWriter writer, PacketManager packetManager)
     {
-        stream.Write(Name);
-        stream.Write(Color is not null);
+        writer.Write(Name);
+        writer.Write(Color is not null);
         if (Color is not null)
         {
-            stream.Write((byte) Color);
+            writer.Write((byte) Color);
         }
         
-        stream.Write(Faction is not null);
+        writer.Write(Faction is not null);
         if (Faction is not null)
         {
-            stream.Write((byte) Faction);
+            writer.Write((byte) Faction);
         }
     }
 
-    public virtual void Read(Stream stream, PacketManager packetManager)
+    public virtual void Read(BinaryReader reader, PacketManager packetManager)
     {
-        Name = stream.ReadString();
-        if (stream.Read<bool>())
+        Name = reader.ReadString();
+        if (reader.ReadBoolean())
         {
-            Color = (PlayerColor) stream.ReadByte();
+            Color = (PlayerColor) reader.ReadByte();
         }
         
-        if (stream.Read<bool>())
+        if (reader.ReadBoolean())
         {
-            Faction = (PlayerFaction) stream.ReadByte();
+            Faction = (PlayerFaction) reader.ReadByte();
         }
     }
 }

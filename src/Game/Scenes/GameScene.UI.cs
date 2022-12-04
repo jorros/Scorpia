@@ -1,6 +1,6 @@
 using System.Drawing;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.UI;
+using Scorpian.Asset;
+using Scorpian.UI;
 
 namespace Scorpia.Game.Scenes;
 
@@ -28,7 +28,7 @@ public partial class GameScene
         {
             Anchor = UIAnchor.BottomRight,
             Show = false,
-            Position = new Point(5, -25),
+            Position = new Point(-15, -55),
             Type = "info",
             Width = 1120,
             Height = 575

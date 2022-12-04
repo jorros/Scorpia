@@ -1,4 +1,4 @@
-using Scorpia.Engine;
+using Scorpian;
 
 namespace Scorpia.Game.Player;
 
@@ -6,7 +6,7 @@ public class ServerPlayerManager
 {
     private readonly GameState _gameState;
     private readonly UserDataManager _userDataManager;
-    private readonly Dictionary<ushort, ServerPlayer> _players = new();
+    private readonly Dictionary<uint, ServerPlayer> _players = new();
 
     public ServerPlayerManager(GameState gameState, UserDataManager userDataManager)
     {
@@ -14,7 +14,7 @@ public class ServerPlayerManager
         _userDataManager = userDataManager;
     }
 
-    public bool Add(string deviceId, string name, ushort networkId)
+    public bool Add(string deviceId, string name, uint networkId)
     {
         if (_gameState.Current != GameState.State.Lobby)
         {
@@ -53,12 +53,12 @@ public class ServerPlayerManager
         return _gameState.Current == GameState.State.Lobby || _players.Any(x => x.Value.DeviceId == deviceId);
     }
 
-    public void Remove(ushort networkId)
+    public void Remove(uint networkId)
     {
         _players.Remove(networkId);
     }
 
-    public ServerPlayer? Get(ushort networkId)
+    public ServerPlayer? Get(uint networkId)
     {
         return !_players.ContainsKey(networkId) ? null : _players[networkId];
     }

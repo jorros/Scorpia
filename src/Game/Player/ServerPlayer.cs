@@ -1,5 +1,5 @@
 using CommunityToolkit.HighPerformance;
-using Scorpia.Engine.Network;
+using Scorpian.Network;
 
 namespace Scorpia.Game.Player;
 
@@ -9,17 +9,17 @@ public record ServerPlayer : Player
     
     public byte LoadingProgress { get; set; }
 
-    public override void Read(Stream stream, PacketManager packetManager)
+    public override void Read(BinaryReader reader, PacketManager packetManager)
     {
-        base.Read(stream, packetManager);
-        DeviceId = stream.ReadString();
-        LoadingProgress = stream.Read<byte>();
+        base.Read(reader, packetManager);
+        DeviceId = reader.ReadString();
+        LoadingProgress = reader.ReadByte();
     }
 
-    public override void Write(Stream stream, PacketManager packetManager)
+    public override void Write(BinaryWriter writer, PacketManager packetManager)
     {
-        base.Write(stream, packetManager);
-        stream.Write(DeviceId);
-        stream.Write(LoadingProgress);
+        base.Write(writer, packetManager);
+        writer.Write(DeviceId);
+        writer.Write(LoadingProgress);
     }
 }

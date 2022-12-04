@@ -1,5 +1,5 @@
-using Scorpia.Engine.Asset;
 using Scorpia.Game.World;
+using Scorpian.Asset;
 
 namespace Scorpia.Game.HUD.MinimapRenderers;
 

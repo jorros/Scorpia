@@ -16,6 +16,6 @@ public sealed class LocationTypeRequirement : Requirement
 
     public override bool IsFulfilled(PlayerNode player, MapTile mapTile)
     {
-        return mapTile.Location.Type.Value == (LocationType) Value;
+        return mapTile.Location.Type.Value == (byte) Value;
     }
 }

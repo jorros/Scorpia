@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AssemblyName>Scorpia.Game</AssemblyName>
@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Engine\Engine.csproj" />
+      <ProjectReference Include="..\..\..\Scorpian\src\Scorpian\Scorpian.csproj" />
     </ItemGroup>
 
     <ItemGroup>

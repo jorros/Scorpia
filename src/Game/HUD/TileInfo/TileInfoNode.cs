@@ -1,11 +1,11 @@
 using System.Drawing;
 using Microsoft.Extensions.DependencyInjection;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.SceneManagement;
-using Scorpia.Engine.UI;
 using Scorpia.Game.HUD.Tooltip;
 using Scorpia.Game.Player;
 using Scorpia.Game.World;
+using Scorpian.Asset;
+using Scorpian.SceneManagement;
+using Scorpian.UI;
 
 namespace Scorpia.Game.HUD.TileInfo;
 
@@ -24,12 +24,12 @@ public class TileInfoNode : Node
 
     private int _lastTileInfo = -1;
 
-    public override void OnInit()
+    public override Task OnInit()
     {
         _tileInfos = new ITileInfo[]
         {
             new EmptyTileInfo(this),
-            new CityTileInfo(this)
+            new CityTileInfo(this, AssetManager)
         };
 
         _avatar = new Image
@@ -43,7 +43,7 @@ public class TileInfoNode : Node
         _nameText = new Label
         {
             Type = "header",
-            Text = "Test",
+            Text = "Header",
             Margin = new Point(0, 23)
         };
         Window.AttachTitle(_nameText);
@@ -54,13 +54,15 @@ public class TileInfoNode : Node
             Margin = new Point(0, 23)
         };
         Window.Title.Attach(_infoIcons);
+        
+        return Task.CompletedTask;
     }
 
-    public override void OnUpdate()
+    public override Task OnUpdate()
     {
         if (_selected is null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         for (var index = 0; index < _tileInfos.Count; index++)
@@ -81,6 +83,8 @@ public class TileInfoNode : Node
             tileInfo.Update(_selected);
             break;
         }
+        
+        return Task.CompletedTask;
     }
 
     private void ClearWindow()

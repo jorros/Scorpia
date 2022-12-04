@@ -1,8 +1,8 @@
 using CommunityToolkit.HighPerformance;
-using Scorpia.Engine.Network;
-using Scorpia.Engine.Network.Packets;
 using Scorpia.Game.Blueprints;
 using Scorpia.Game.Blueprints.Requirements;
+using Scorpian.Network;
+using Scorpian.Network.Packets;
 
 namespace Scorpia.Game.Nodes.Entities;
 
@@ -56,18 +56,7 @@ public struct Building : IEquatable<Building>, INetworkPacket
         // Population
         if (Type == BuildingType.Residence)
         {
-            location.MaxPopulation.Value = LocationBlueprint.GetMaxPopulation(location.Type.Value) + Level * 1000;
-        }
-
-        if (Type is BuildingType.Forts or BuildingType.Bunker)
-        {
-            var garrison = 2000;
-            if (demolished)
-            {
-                garrison *= -1;
-            }
-
-            location.Garrison.Value = Math.Clamp(location.Garrison.Value + garrison, 0, 4000);
+            location.MaxPopulation.Value = LocationBlueprint.GetMaxPopulation((LocationType)location.Type.Value) + Level * 1000;
         }
     }
 
@@ -88,17 +77,17 @@ public struct Building : IEquatable<Building>, INetworkPacket
         player.ScorpionsBalance.Value = (BalanceSheet) boxed;
     }
 
-    public void Write(Stream stream, PacketManager packetManager)
+    public void Write(BinaryWriter writer, PacketManager packetManager)
     {
-        stream.Write((byte) Type);
-        stream.Write(IsBuilding);
-        stream.Write(Level);
+        writer.Write((byte) Type);
+        writer.Write(IsBuilding);
+        writer.Write(Level);
     }
 
-    public void Read(Stream stream, PacketManager packetManager)
+    public void Read(BinaryReader reader, PacketManager packetManager)
     {
-        Type = (BuildingType) stream.Read<byte>();
-        IsBuilding = stream.Read<bool>();
-        Level = stream.Read<int>();
+        Type = (BuildingType) reader.ReadByte();
+        IsBuilding = reader.ReadBoolean();
+        Level = reader.ReadInt32();
     }
 }

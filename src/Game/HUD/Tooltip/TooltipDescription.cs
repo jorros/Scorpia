@@ -14,6 +14,10 @@ public class TooltipDescription
         Position = position;
     }
 
+    public TooltipDescription(string header, string content, TooltipPosition position) : this(header, content, string.Empty, position)
+    {
+    }
+
     public static TooltipDescription Empty => new(string.Empty, string.Empty);
 
     public TooltipPosition Position { get; }

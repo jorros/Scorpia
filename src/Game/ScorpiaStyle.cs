@@ -1,7 +1,8 @@
 using System.Drawing;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Maths;
-using Scorpia.Engine.UI.Style;
+using Scorpian.Asset;
+using Scorpian.Maths;
+using Scorpian.UI;
+using Scorpian.UI.Style;
 
 namespace Scorpia.Game;
 
@@ -154,7 +155,7 @@ public static class ScorpiaStyle
         // PROGRESS BARS
         //
         var loadingProgressBar =
-            Stylesheet.CreateProgressBarStyle("loading", "UI:progress_loading_empty", "UI:progress_loading_full");
+            Stylesheet.CreateProgressBarStyle("loading", "UI:progress_loading_full", backgroundSprite: "UI:progress_loading_empty");
         loadingProgressBar.Height = 15;
         
         //
@@ -189,10 +190,10 @@ public static class ScorpiaStyle
     public static void SetupInGame(AssetManager assetManager)
     {
         var infoWindow = Stylesheet!.CreateWindowStyle("info", "Game:HUD/info_box");
-        infoWindow.Padding = new Point(20, 20);
+        infoWindow.Padding = new Point(50, 20);
         infoWindow.HasTitle = true;
         infoWindow.TitleHeight = 114;
-        infoWindow.TitlePadding = new Box(40, 4, 40, 0);
+        infoWindow.TitlePadding = new Box(50, 4, 40, 0);
         infoWindow.TitleSpaceBetween = 30;
         infoWindow.TitleLabelStyle = "header";
         
@@ -238,5 +239,47 @@ public static class ScorpiaStyle
         notificationButton.FixedHeight = 132;
         notificationButton.PressedTint = Color.DarkGray;
         notificationButton.ContentPosition = new Point(-65, -65);
+
+        var districtButton = Stylesheet.CreateButtonStyle("district", "Game:HUD/district_button");
+        districtButton.FixedWidth = 162;
+        districtButton.FixedHeight = 86;
+        districtButton.ContentPosition = new Point(-51, -30);
+        districtButton.PressedTint = Color.DarkGray;
+
+        var buildingButton = Stylesheet.CreateButtonStyle("building", "Game:HUD/building_button");
+        buildingButton.FixedHeight = 83;
+        buildingButton.FixedWidth = 83;
+        buildingButton.ContentPosition = new Point(-41, -41);
+        buildingButton.PressedTint = Color.DarkGray;
+        
+        var districtLabel = Stylesheet.CreateLabelStyle("district", "UI:Montserrat");
+        districtLabel.Size = 48;
+        districtLabel.Color = Color.White;
+        districtLabel.Alignment = Alignment.Center;
+
+        var actionButton = Stylesheet.CreateButtonStyle("action", "Game:HUD/action_button");
+        actionButton.FixedWidth = 103;
+        actionButton.FixedHeight = 103;
+        actionButton.ContentPosition = new Point(-39, -39);
+        actionButton.PressedTint = Color.DarkGray;
+
+        var storageProgress =
+            Stylesheet.CreateProgressBarStyle("storage", "Game:HUD/storage_full", foregroundSprite: "Game:HUD/storage_empty");
+        storageProgress.Width = 279;
+        storageProgress.Height = 279;
+        storageProgress.Orientation = Orientation.Vertical;
+        storageProgress.FillColor = Color.FromArgb(0, 152, 64);
+
+        var infoLabel = Stylesheet.CreateLabelStyle("info", "UI:Montserrat");
+        infoLabel.Size = 30;
+        infoLabel.Color = Color.White;
+
+        var infoHeaderLabel = Stylesheet.CreateLabelStyle("info_label", "UI:Montserrat-SemiBold");
+        infoHeaderLabel.Size = 30;
+        infoHeaderLabel.Color = Color.White;
+
+        var titleLabel = Stylesheet.CreateLabelStyle("title", "Game:HUD/honeyblot_caps");
+        titleLabel.Size = 36;
+        titleLabel.Color = Color.FromArgb(105, 105, 105);
     }
 }

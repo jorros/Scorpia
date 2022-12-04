@@ -32,9 +32,9 @@ public static class LocationBlueprint
     public static int GetViewDistance(LocationNode location) =>
         location switch
         {
-            {Type: {Value: LocationType.Village}} => 2,
-            {Type: {Value: LocationType.City}} => 4,
-            {Type: {Value: LocationType.Outpost}} => 6,
+            {Type.Value: (byte)LocationType.Village} => 2,
+            {Type.Value: (byte)LocationType.City} => 4,
+            {Type.Value: (byte)LocationType.Outpost} => 6,
             _ => 0
         };
 }

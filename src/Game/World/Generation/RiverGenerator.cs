@@ -1,7 +1,7 @@
-using Scorpia.Engine.HexMap;
-using Scorpia.Engine.Maths;
 using Scorpia.Game.Nodes;
 using Scorpia.Game.Utils;
+using Scorpian.HexMap;
+using Scorpian.Maths;
 
 namespace Scorpia.Game.World.Generation;
 

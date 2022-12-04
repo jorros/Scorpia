@@ -1,7 +1,6 @@
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Graphics;
-using Scorpia.Engine.HexMap;
 using Scorpia.Game.Nodes.Entities;
+using Scorpian.Asset;
+using Scorpian.HexMap;
 
 namespace Scorpia.Game.World.Render;
 
@@ -13,13 +12,13 @@ public class LocationsRenderer : TileRenderer
 
     public override Sprite? GetTile(MapTile tile) => tile.Location?.Type.Value switch
     {
-        LocationType.Village => GetSprite("overlay_location_village"),
-        LocationType.City => GetSprite("overlay_location_city"),
-        LocationType.Outpost => GetSprite("overlay_location_outpost"),
-        LocationType.Farmland => GetSprite("overlay_location_farmland"),
-        LocationType.Fortification => GetSprite("overlay_location_fortification"),
-        LocationType.Mine => GetSprite("overlay_location_mine"),
-        LocationType.University => GetSprite("overlay_location_university"),
+        (byte)LocationType.Village => GetSprite("overlay_location_village"),
+        (byte)LocationType.City => GetSprite("overlay_location_city"),
+        (byte)LocationType.Outpost => GetSprite("overlay_location_outpost"),
+        (byte)LocationType.Farmland => GetSprite("overlay_location_farmland"),
+        (byte)LocationType.Fortification => GetSprite("overlay_location_fortification"),
+        (byte)LocationType.Mine => GetSprite("overlay_location_mine"),
+        (byte)LocationType.University => GetSprite("overlay_location_university"),
         _ => null
     };
 }

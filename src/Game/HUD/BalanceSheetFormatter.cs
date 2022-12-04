@@ -3,7 +3,7 @@ using Scorpia.Game.Nodes.Entities;
 
 namespace Scorpia.Game.HUD;
 
-public class BalanceSheetFormatter
+public static class BalanceSheetFormatter
 {
     public static string Format(BalanceSheet balance)
     {

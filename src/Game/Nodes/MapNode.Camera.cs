@@ -1,11 +1,11 @@
 using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
-using Scorpia.Engine.InputManagement;
-using Scorpia.Engine.Maths;
-using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Player;
 using Scorpia.Game.Scenes;
 using Scorpia.Game.World;
+using Scorpian.InputManagement;
+using Scorpian.Maths;
+using Scorpian.SceneManagement;
 
 namespace Scorpia.Game.Nodes;
 
@@ -21,17 +21,19 @@ public class MapNodeCamera : Component
 
     public static bool clickIsBlocked;
 
-    public override void OnInit()
+    public override Task OnInit()
     {
         _map = (MapNode)Parent;
         _currentPlayer = ServiceProvider.GetRequiredService<CurrentPlayer>();
+        
+        return Task.CompletedTask;
     }
 
-    public override void OnUpdate()
+    public override Task OnUpdate()
     {
         if (IsOverUI())
         {
-            return;
+            return Task.CompletedTask;
         }
         
         ProcessHover();
@@ -39,6 +41,8 @@ public class MapNodeCamera : Component
         StartDragging();
         SelectTile();
         StopDragging();
+        
+        return Task.CompletedTask;
     }
 
     private bool IsOverUI()
@@ -130,7 +134,6 @@ public class MapNodeCamera : Component
         if(Input.IsButtonDown(MouseButton.Left))
         {
             _dragOrigin = Camera.ScreenToWorld(Input.MousePosition.ToVector());
-            Console.WriteLine("Start dragging");
         }
 
         if (!Input.IsButton(MouseButton.Left) || _dragOrigin == null)

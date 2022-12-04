@@ -1,9 +1,9 @@
 using System.Drawing;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Graphics;
-using Scorpia.Engine.InputManagement;
-using Scorpia.Engine.UI;
-using Scorpia.Engine.UI.Style;
+using Scorpian.Asset;
+using Scorpian.Graphics;
+using Scorpian.InputManagement;
+using Scorpian.UI;
+using Scorpian.UI.Style;
 
 namespace Scorpia.Game.HUD.Tooltip;
 
@@ -79,7 +79,7 @@ public class TooltippedElement<T> : UIElement where T : UIElement
         switch (Description.Position)
         {
             case TooltipPosition.Info:
-                actualY = screenSize.Height - 575 - actualHeight;
+                actualY = screenSize.Height - 660 - actualHeight;
                 break;
             
             case TooltipPosition.None:

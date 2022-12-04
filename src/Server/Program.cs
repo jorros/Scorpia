@@ -1,6 +1,6 @@
-﻿using Scorpia.Engine;
-using Scorpia.Engine.Network;
-using Scorpia.Game;
+﻿using Scorpia.Game;
+using Scorpian;
+using Scorpian.Network;
 using Server.Actions;
 using Sharprompt;
 

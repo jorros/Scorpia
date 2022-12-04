@@ -1,9 +1,8 @@
 using System.Drawing;
-using Scorpia.Engine;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.UI;
 using Scorpia.Game.Player;
 using Scorpia.Game.Utils;
+using Scorpian.Asset;
+using Scorpian.UI;
 
 namespace Scorpia.Game.Lobby;
 

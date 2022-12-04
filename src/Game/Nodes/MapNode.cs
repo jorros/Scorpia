@@ -1,13 +1,13 @@
 using System.Drawing;
 using Microsoft.Extensions.DependencyInjection;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Graphics;
-using Scorpia.Engine.HexMap;
-using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Utils;
 using Scorpia.Game.World;
 using Scorpia.Game.World.Generation;
 using Scorpia.Game.World.Render;
+using Scorpian.Asset;
+using Scorpian.Graphics;
+using Scorpian.HexMap;
+using Scorpian.SceneManagement;
 
 namespace Scorpia.Game.Nodes;
 
@@ -32,7 +32,7 @@ public class MapNode : Node
     private RenderDirections _riverCombinations;
     private bool _initialised;
 
-    public override void OnInit()
+    public override Task OnInit()
     {
         Width = 60;
         Height = 40;
@@ -63,7 +63,7 @@ public class MapNode : Node
 
         if (assetManager is null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         _riverCombinations = new RenderDirections(assetManager, "Game:MAP/overlay_river_c_ne_3",
@@ -81,6 +81,8 @@ public class MapNode : Node
         _selectedTile = assetManager.Get<Sprite>("Game:MAP/selected_tile");
 
         AttachComponent(new MapNodeCamera());
+        
+        return Task.CompletedTask;
     }
 
     public void Generate(int seed)

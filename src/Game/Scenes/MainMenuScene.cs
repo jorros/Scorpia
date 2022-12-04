@@ -1,14 +1,15 @@
 using System.Drawing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Graphics;
-using Scorpia.Engine.InputManagement;
-using Scorpia.Engine.Network;
-using Scorpia.Engine.Network.Protocol;
-using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Lobby;
 using Scorpia.Game.Player;
+using Scorpian.Asset;
+using Scorpian.Graphics;
+using Scorpian.InputManagement;
+using Scorpian.Network;
+using Scorpian.Network.Protocol;
+using Scorpian.Network.RPC;
+using Scorpian.SceneManagement;
 
 namespace Scorpia.Game.Scenes;
 
@@ -16,7 +17,7 @@ namespace Scorpia.Game.Scenes;
 public partial class MainMenuScene : NetworkedScene
 {
     private PlayerLobby _currentLobby = null!;
-    public ServerPlayerManager ServerPlayerManager { get; private set; }
+    public ServerPlayerManager ServerPlayerManager { get; private set; } = null!;
     private ScorpiaSettings _settings = null!;
 
     private NetworkedList<Player.Player> Players { get; } = new();
@@ -129,12 +130,12 @@ public partial class MainMenuScene : NetworkedScene
         _colorContainer.Enabled = _currentLobby.EnablePlayerSettings;
     }
 
-    protected override void OnTick()
+    protected override async Task OnTick()
     {
         if (NetworkManager.IsServer)
         {
             ServerOnTick();
-            
+
             return;
         }
 
@@ -143,10 +144,10 @@ public partial class MainMenuScene : NetworkedScene
         {
             _fpsLabel.Text = renderContext.FPS.ToString();
         }
-
+        
         if (!NetworkManager.IsConnected)
         {
-            NetworkManager.Connect("127.0.0.1", 1992, _settings.Identifier);
+            await NetworkManager.Connect("127.0.0.1", 1992, _settings.Identifier);
         }
     }
 

@@ -1,4 +1,4 @@
-using Scorpia.Engine.Network.Packets;
+using Scorpian.Network.Packets;
 
 namespace Scorpia.Game.Notifications;
 

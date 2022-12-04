@@ -1,6 +1,6 @@
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.HexMap;
 using Scorpia.Game.Utils;
+using Scorpian.Asset;
+using Scorpian.HexMap;
 
 namespace Scorpia.Game.World.Render;
 

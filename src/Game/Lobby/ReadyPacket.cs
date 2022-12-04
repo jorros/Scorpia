@@ -1,7 +1,6 @@
-using CommunityToolkit.HighPerformance;
-using Scorpia.Engine.Network;
-using Scorpia.Engine.Network.Packets;
 using Scorpia.Game.Player;
+using Scorpian.Network;
+using Scorpian.Network.Packets;
 
 namespace Scorpia.Game.Lobby;
 
@@ -11,15 +10,15 @@ public struct ReadyPacket : INetworkPacket
     
     public PlayerFaction Faction { get; set; }
     
-    public void Write(Stream stream, PacketManager packetManager)
+    public void Write(BinaryWriter writer, PacketManager packetManager)
     {
-        stream.Write((byte)Color);
-        stream.Write((byte)Faction);
+        writer.Write((byte)Color);
+        writer.Write((byte)Faction);
     }
 
-    public void Read(Stream stream, PacketManager packetManager)
+    public void Read(BinaryReader reader, PacketManager packetManager)
     {
-        Color = (PlayerColor) stream.ReadByte();
-        Faction = (PlayerFaction) stream.ReadByte();
+        Color = (PlayerColor) reader.ReadByte();
+        Faction = (PlayerFaction) reader.ReadByte();
     }
 }

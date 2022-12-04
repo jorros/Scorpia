@@ -1,8 +1,8 @@
 using System.Drawing;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.SceneManagement;
-using Scorpia.Engine.UI;
 using Scorpia.Game.HUD.Tooltip;
+using Scorpian.Asset;
+using Scorpian.SceneManagement;
+using Scorpian.UI;
 
 namespace Scorpia.Game.HUD.Top;
 
@@ -30,7 +30,7 @@ public class TopNode : Node
     
     public Label playerLabel = null!;
 
-    public override void OnInit()
+    public override Task OnInit()
     {
         (_scorpions, _scorpionsLabel, _scorpionsBalanceLabel) = CreateStat("doubloons", "Scorpions", 0);
         (_food, _foodLabel, _foodBalanceLabel) = CreateStat("food", "Food", 1);
@@ -38,14 +38,16 @@ public class TopNode : Node
         (_sofrum, _sofrumLabel, _sofrumBalanceLabel) = CreateStat("sofrum", "Sofrum", 3);
         (_zellos, _zellosLabel, _zellosBalanceLabel) = CreateStat("zellos", "Zellos", 4);
         (_population, _populationLabel, _populationBalanceLabel) = CreateStat("population", "Population", 5);
+        
+        return Task.CompletedTask;
     }
 
-    public override void OnTick()
+    public override Task OnTick()
     {
         var player = Game.CurrentPlayer.GetSelf();
         if (player is null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         playerLabel.Text = $"{player.Name.Value} - ";
@@ -69,6 +71,8 @@ public class TopNode : Node
         _zellosLabel.Text = player.Zellos.Value.Format();
         _zellosBalanceLabel.Text = $" ({player.ZellosBalance.Value.Total.FormatBalance()})";
         _zellos.Description!.Content = BalanceSheetFormatter.Format(player.ZellosBalance.Value);
+        
+        return Task.CompletedTask;
     }
 
     private (TooltippedElement<HorizontalGridLayout>, Label, Label) CreateStat(string icon, string name, int index)

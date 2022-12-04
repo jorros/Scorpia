@@ -1,11 +1,11 @@
 using System.Drawing;
 using System.Numerics;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Graphics;
-using Scorpia.Engine.InputManagement;
-using Scorpia.Engine.Maths;
 using Scorpia.Game.HUD.MinimapRenderers;
 using Scorpia.Game.Nodes;
+using Scorpian.Asset;
+using Scorpian.Graphics;
+using Scorpian.InputManagement;
+using Scorpian.Maths;
 
 namespace Scorpia.Game.HUD;
 

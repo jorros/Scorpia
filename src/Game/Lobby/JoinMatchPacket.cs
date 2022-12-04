@@ -1,5 +1,5 @@
-using Scorpia.Engine.Network;
-using Scorpia.Engine.Network.Packets;
+using Scorpian.Network;
+using Scorpian.Network.Packets;
 
 namespace Scorpia.Game.Lobby;
 
@@ -9,15 +9,15 @@ public class JoinMatchPacket : INetworkPacket
     
     public string Name { get; set; }
     
-    public void Write(Stream stream, PacketManager packetManager)
+    public void Write(BinaryWriter writer, PacketManager packetManager)
     {
-        stream.Write(DeviceId);
-        stream.Write(Name);
+        writer.Write(DeviceId);
+        writer.Write(Name);
     }
 
-    public void Read(Stream stream, PacketManager packetManager)
+    public void Read(BinaryReader reader, PacketManager packetManager)
     {
-        DeviceId = stream.ReadString();
-        Name = stream.ReadString();
+        DeviceId = reader.ReadString();
+        Name = reader.ReadString();
     }
 }

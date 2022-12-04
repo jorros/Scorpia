@@ -1,7 +1,7 @@
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Graphics;
-using Scorpia.Engine.Network.Protocol;
-using Scorpia.Engine.SceneManagement;
+using Scorpian.Asset;
+using Scorpian.Graphics;
+using Scorpian.Network.Protocol;
+using Scorpian.SceneManagement;
 
 namespace Scorpia.Game.Scenes;
 
@@ -17,7 +17,7 @@ public partial class LoadingScene : NetworkedScene
         SetupUI(assetManager);
     }
 
-    protected override void OnTick()
+    protected override async Task OnTick()
     {
         if (NetworkManager.IsServer)
         {
@@ -38,7 +38,7 @@ public partial class LoadingScene : NetworkedScene
 
         while (Seed.Value == 0)
         {
-            Thread.Sleep(100);
+            await Task.Delay(100);
         }
         
         var game = SceneManager.Load<GameScene>();

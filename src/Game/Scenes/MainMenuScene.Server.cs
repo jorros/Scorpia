@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Scorpia.Engine.Network;
-using Scorpia.Engine.Network.Protocol;
 using Scorpia.Game.Lobby;
 using Scorpia.Game.Player;
+using Scorpian.Network;
+using Scorpian.Network.RPC;
 
 namespace Scorpia.Game.Scenes;
 

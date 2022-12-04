@@ -1,14 +1,15 @@
 using Microsoft.Extensions.DependencyInjection;
-using Scorpia.Engine;
-using Scorpia.Engine.Network.Packets;
-using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Nodes;
 using Scorpia.Game.Player;
 using Scorpia.Game.Scenes;
+using Scorpian;
+using Scorpian.Network;
+using Scorpian.Network.Packets;
+using Scorpian.SceneManagement;
 
 namespace Scorpia.Game;
 
-public class Game : Engine.Engine
+public class Game : Engine
 {
     public static CurrentPlayer CurrentPlayer { get; private set; } = null!;
     public static ServerPlayerManager ServerPlayerManager { get; private set; } = null!;
@@ -53,9 +54,10 @@ public class Game : Engine.Engine
         };
     }
 
-    protected override void Load(IServiceProvider serviceProvider)
+    protected override async Task Load(IServiceProvider serviceProvider)
     {
         var sceneManager = serviceProvider.GetRequiredService<SceneManager>();
+        var networkManager = serviceProvider.GetRequiredService<NetworkManager>();
 
         CurrentPlayer = serviceProvider.GetRequiredService<CurrentPlayer>();
         ServerPlayerManager = serviceProvider.GetRequiredService<ServerPlayerManager>();
@@ -64,7 +66,7 @@ public class Game : Engine.Engine
         
         sceneManager.Load<MainMenuScene>();
         sceneManager.Load<LoadingScene>();
-        
+
         sceneManager.Switch(nameof(MainMenuScene));
     }
 }

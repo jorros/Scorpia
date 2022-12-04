@@ -1,13 +1,13 @@
 using System.Drawing;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Graphics;
-using Scorpia.Engine.InputManagement;
-using Scorpia.Engine.Network.Protocol;
-using Scorpia.Engine.SceneManagement;
-using Scorpia.Engine.UI;
 using Scorpia.Game.HUD;
 using Scorpia.Game.Notifications;
 using Scorpia.Game.Scenes;
+using Scorpian.Asset;
+using Scorpian.Graphics;
+using Scorpian.InputManagement;
+using Scorpian.Network.RPC;
+using Scorpian.SceneManagement;
+using Scorpian.UI;
 
 namespace Scorpia.Game.Nodes;
 
@@ -24,18 +24,20 @@ public class NotificationNode : NetworkedNode
 
     private static NotificationNode _node = null!;
 
-    public override void OnInit()
+    public override Task OnInit()
     {
         _node = this;
 
         if (!NetworkManager.IsClient || Scene is not GameScene scene)
         {
-            return;
+            return Task.CompletedTask;
         }
         
         _layout = scene.layout;
         _notificationButtons = scene.notificationButtons;
         _notificationWindows = scene.notificationWindows;
+        
+        return Task.CompletedTask;
     }
 
     [ClientRpc]
@@ -51,7 +53,7 @@ public class NotificationNode : NetworkedNode
         AddButton(notification);
     }
 
-    public static void Send(INotification notification, ushort clientId)
+    public static void Send(INotification notification, uint clientId)
     {
         _node.Invoke(nameof(Receive), notification, clientId);
     }

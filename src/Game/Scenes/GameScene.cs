@@ -1,14 +1,14 @@
 using System.Drawing;
 using Microsoft.Extensions.DependencyInjection;
-using Scorpia.Engine.Asset;
-using Scorpia.Engine.Graphics;
-using Scorpia.Engine.InputManagement;
-using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.HUD;
 using Scorpia.Game.HUD.TileInfo;
 using Scorpia.Game.HUD.Top;
 using Scorpia.Game.Nodes;
 using Scorpia.Game.World;
+using Scorpian.Asset;
+using Scorpian.Graphics;
+using Scorpian.InputManagement;
+using Scorpian.SceneManagement;
 
 namespace Scorpia.Game.Scenes;
 
@@ -38,9 +38,11 @@ public partial class GameScene : NetworkedScene
         });
     }
 
-    protected override void OnLeave()
+    protected override Task OnLeave()
     {
         Input.OnKeyboard -= OnKeyPressed;
+        
+        return Task.CompletedTask;
     }
 
     private void OnKeyPressed(object? sender, KeyboardEventArgs e)
@@ -62,11 +64,11 @@ public partial class GameScene : NetworkedScene
         _map.Generate(seed);
     }
 
-    protected override void OnTick()
+    protected override Task OnTick()
     {
         if (NetworkManager.IsServer)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         var renderContext = ServiceProvider.GetService<RenderContext>();
@@ -74,11 +76,15 @@ public partial class GameScene : NetworkedScene
         {
             _fpsLabel.Text = renderContext.FPS.ToString();
         }
+        
+        return Task.CompletedTask;
     }
 
-    protected override void OnUpdate()
+    protected override Task OnUpdate()
     {
         _minimap?.Update();
+        
+        return Task.CompletedTask;
     }
 
     protected override void OnRender(RenderContext context)
@@ -101,7 +107,7 @@ public partial class GameScene : NetworkedScene
             riverText = string.Join(",", select.River.Select(x => x.ToString()));
         }
 
-        _currentTileDebugLabel.Text = $"{select.Biome.ToString()} - R:{riverText}";
+        _currentTileDebugLabel.Text = $"[{select.Position}] {select.Biome.ToString()} - R:{riverText}";
     }
 
     [Event(nameof(DeselectTile))]

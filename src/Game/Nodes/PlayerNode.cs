@@ -1,17 +1,15 @@
-using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
-using Scorpia.Engine.Network.Protocol;
-using Scorpia.Engine.SceneManagement;
-using Scorpia.Game.HUD.Top;
 using Scorpia.Game.Nodes.Entities;
 using Scorpia.Game.Player;
+using Scorpian.Network.Protocol;
+using Scorpian.SceneManagement;
 
 namespace Scorpia.Game.Nodes;
 
 public class PlayerNode : NetworkedNode
 {
     public NetworkedVar<string> Name { get; } = new();
-    public NetworkedVar<ushort> Uid { get; } = new();
+    public NetworkedVar<uint> Uid { get; } = new();
     public NetworkedVar<byte> Color { get; } = new();
     public NetworkedVar<float> Scorpions { get; }
     public NetworkedVar<float> Zellos { get; }
@@ -26,7 +24,7 @@ public class PlayerNode : NetworkedNode
     public NetworkedVar<BalanceSheet> NitraBalance { get; }
     public NetworkedVar<BalanceSheet> SofrumBalance { get; }
 
-    private bool OnlyOwner(ushort client) => client == Uid.Value;
+    private bool OnlyOwner(uint client) => client == Uid.Value;
 
     public PlayerNode()
     {
@@ -43,11 +41,10 @@ public class PlayerNode : NetworkedNode
         SofrumBalance = new NetworkedVar<BalanceSheet>(OnlyOwner);
     }
 
-    public override void OnInit()
+    public override Task OnInit()
     {
-        Uid.OnChange += (_, _) =>
-        {
-            ServiceProvider.GetRequiredService<CurrentPlayer>().AddPlayer(this);
-        };
+        ServiceProvider.GetRequiredService<CurrentPlayer>().AddPlayer(this);
+
+        return Task.CompletedTask;
     }
 }

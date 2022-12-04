@@ -1,6 +1,5 @@
-using CommunityToolkit.HighPerformance;
-using Scorpia.Engine.Network;
-using Scorpia.Engine.Network.Packets;
+using Scorpian.Network;
+using Scorpian.Network.Packets;
 
 namespace Scorpia.Game.Nodes.Entities;
 
@@ -33,47 +32,47 @@ public struct BalanceSheet : INetworkPacket
         return (BalanceSheet) boxed;
     }
     
-    public void Write(Stream stream, PacketManager packetManager)
+    public void Write(BinaryWriter writer, PacketManager packetManager)
     {
-        stream.Write(BuildingOut is not null);
+        writer.Write(BuildingOut is not null);
         if (BuildingOut is not null)
         {
-            stream.Write(BuildingOut.Value);
+            writer.Write(BuildingOut.Value);
         }
-        stream.Write(BuildingIn is not null);
+        writer.Write(BuildingIn is not null);
         if (BuildingIn is not null)
         {
-            stream.Write(BuildingIn.Value);
+            writer.Write(BuildingIn.Value);
         }
-        stream.Write(PopulationIn is not null);
+        writer.Write(PopulationIn is not null);
         if (PopulationIn is not null)
         {
-            stream.Write(PopulationIn.Value);
+            writer.Write(PopulationIn.Value);
         }
-        stream.Write(PopulationOut is not null);
+        writer.Write(PopulationOut is not null);
         if (PopulationOut is not null)
         {
-            stream.Write(PopulationOut.Value);
+            writer.Write(PopulationOut.Value);
         }
     }
 
-    public void Read(Stream stream, PacketManager packetManager)
+    public void Read(BinaryReader reader, PacketManager packetManager)
     {
-        if (stream.Read<bool>())
+        if (reader.ReadBoolean())
         {
-            BuildingOut = stream.Read<float>();
+            BuildingOut = reader.ReadSingle();
         }
-        if (stream.Read<bool>())
+        if (reader.ReadBoolean())
         {
-            BuildingIn = stream.Read<float>();
+            BuildingIn = reader.ReadSingle();
         }
-        if (stream.Read<bool>())
+        if (reader.ReadBoolean())
         {
-            PopulationIn = stream.Read<float>();
+            PopulationIn = reader.ReadSingle();
         }
-        if (stream.Read<bool>())
+        if (reader.ReadBoolean())
         {
-            PopulationOut = stream.Read<float>();
+            PopulationOut = reader.ReadSingle();
         }
     }
 }

@@ -1,5 +1,4 @@
-using Scorpia.Engine.Network;
-using Scorpia.Engine.Network.Protocol;
+using Scorpian.Network.RPC;
 
 namespace Scorpia.Game.Scenes;
 

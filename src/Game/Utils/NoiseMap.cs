@@ -1,6 +1,5 @@
 using System.Drawing;
-using Scorpia.Engine;
-using Scorpia.Engine.Maths;
+using Scorpian.Maths;
 
 namespace Scorpia.Game.Utils;
 

@@ -1,6 +1,6 @@
-using Scorpia.Engine.Network;
 using Scorpia.Game.Nodes;
 using Scorpia.Game.Player.Actions;
+using Scorpian.Network;
 
 namespace Scorpia.Game.Player;
 
@@ -9,7 +9,7 @@ public class CurrentPlayer
     private readonly NetworkManager _networkManager;
     private IPlayerAction _currentAction;
     
-    private readonly Dictionary<ushort, PlayerNode> _players = new();
+    private readonly Dictionary<uint, PlayerNode> _players = new();
 
     public CurrentPlayer(NetworkManager networkManager)
     {
@@ -34,7 +34,7 @@ public class CurrentPlayer
         return GetPlayer(_networkManager.ClientId);
     }
 
-    public PlayerNode? GetPlayer(ushort uid)
+    public PlayerNode? GetPlayer(uint uid)
     {
         return !_players.ContainsKey(uid) ? null : _players[uid];
     }
@@ -44,7 +44,7 @@ public class CurrentPlayer
         _players.Add(player.Uid.Value, player);
     }
 
-    public void RemovePlayer(ushort uid)
+    public void RemovePlayer(uint uid)
     {
         _players.Remove(uid);
     }

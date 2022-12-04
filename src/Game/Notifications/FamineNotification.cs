@@ -1,5 +1,5 @@
-using Scorpia.Engine.Network;
 using Scorpia.Game.HUD;
+using Scorpian.Network;
 
 namespace Scorpia.Game.Notifications;
 
@@ -21,13 +21,13 @@ public struct FamineNotification : INotification
     public NotificationAction? Action2 => null;
     public NotificationAction? Action3 => null;
     
-    public void Write(Stream stream, PacketManager packetManager)
+    public void Write(BinaryWriter writer, PacketManager packetManager)
     {
-        stream.Write(CityName);
+        writer.Write(CityName);
     }
 
-    public void Read(Stream stream, PacketManager packetManager)
+    public void Read(BinaryReader reader, PacketManager packetManager)
     {
-        CityName = stream.ReadString();
+        CityName = reader.ReadString();
     }
 }

@@ -1,4 +1,3 @@
-using Scorpia.Engine.SceneManagement;
 using Scorpia.Game.Nodes;
 using Scorpia.Game.World;
 
